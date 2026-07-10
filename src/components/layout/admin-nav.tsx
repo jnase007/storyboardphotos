@@ -41,13 +41,6 @@ const ADMIN_LINKS = [
         !path.startsWith("/business-plan/print")),
   },
   {
-    href: "/business-plan/print",
-    label: "Print / PDF",
-    shortLabel: "Print",
-    icon: Printer,
-    match: (path: string) => path.startsWith("/business-plan/print"),
-  },
-  {
     href: "/admin/books",
     label: "Books Library",
     shortLabel: "Books",
