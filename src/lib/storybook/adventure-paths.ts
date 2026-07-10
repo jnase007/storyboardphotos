@@ -180,6 +180,7 @@ export function materializeAdventureStory(
       imageUrl: null,
       photoSet,
       useSessionPhoto,
+      staticScene: p.staticScene,
       imagePrompt:
         fillPlaceholders(
           p.imagePromptHint ||
