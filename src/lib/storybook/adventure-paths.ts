@@ -213,7 +213,7 @@ export const ADVENTURE_PATHS: AdventurePath[] = [
         page: 1,
         title: `The Dragon Quest`,
         staticScene: "dragon-slayer/title",
-        text: `[Role] [Name]\nand the Dragon Quest`,
+        text: `[Role] [Name] and the Dragon Quest`,
         photoCaption: `A magical kingdom awaits`,
         useSessionPhoto: false,
         imagePromptHint: "title page watercolor no text",
@@ -224,15 +224,15 @@ export const ADVENTURE_PATHS: AdventurePath[] = [
         staticScene: "dragon-slayer/call",
         text: `In the Kingdom of Light, a golden morning turned to shadow when word arrived: a great dragon had settled in the hills beyond the valley, and the people trembled with fear.
 
-The King himself walked slowly to the throne room window and gazed out at the distant smoke curling above the mountains. He had heard of one person brave enough to help — one whose heart was made not just of courage, but of kindness.
+The King himself walked slowly to the throne room window and gazed out at the distant smoke curling above the mountains. He had heard of one person brave enough — one whose heart was made not just of courage, but of kindness.
 
-He turned and called out the name that made the whole kingdom hold its breath: [Role] [Name].
+He turned and called out the name that made the whole kingdom hold its breath.
 
-"There is no one in all this kingdom with a heart more true than yours," the King said softly. "The dragon does not need to be conquered — it needs to be understood. Will you go? Will you bring peace back to our land?"
+"[Name]," the King said softly, "the dragon does not need to be defeated. It needs to be understood. Will you go? Will you bring peace back to our land?"
 
-[Role] [Name] looked out at the distant mountains. [She/He/They] felt afraid — just a little. But [she/he/they] also felt something stronger: a deep and steady courage, like a flame that could not be blown out.
+[Role] [Name] looked out at the distant mountains, felt afraid — just a little — and then felt something stronger rising in [her/his/their] chest: a deep and steady courage, like a flame that cannot be blown out.
 
-[She/He/They] stood tall, lifted [her/his/their] chin, and answered with one quiet word: "Yes."`,
+[She/He/They] stood tall and answered with one quiet word: "Yes."`,
         photoCaption: `The quest begins`,
         useSessionPhoto: false,
         imagePromptHint: "call to adventure watercolor no text",
@@ -240,15 +240,17 @@ He turned and called out the name that made the whole kingdom hold its breath: [
       {
         page: 3,
         title: `The Royal Throne`,
-        text: `The Throne Room was the most beautiful place [Role] [Name] had ever seen. The walls were draped with banners of crimson and gold, and the ceiling soared so high it was almost like standing beneath the sky itself.
+        text: `The Throne Room was the most magnificent place [Role] [Name] had ever seen. Banners of crimson and gold hung from the vaulted ceiling, and every stone in the walls had been polished smooth by generations of royal hands.
 
-In the center of the room stood the royal throne — carved from the wood of an ancient oak tree, inlaid with gold, and draped in the softest velvet.
+In the center of the room, upon a platform of pure white marble, stood the throne — carved from the wood of an ancient oak, inlaid with gold, and draped in velvet the color of midnight sky.
 
-[Role] [Name] walked slowly toward it, footsteps echoing in the grand and quiet hall. [She/He/They] sat down gently, as if the throne were something holy. Because in a way, it was. This was where the leaders of the kingdom had always sat. This was where courage lived.
+[Role] [Name] walked toward it slowly, footsteps echoing in the sacred silence of the hall. [She/He/They] sat down gently, as one sits on something holy.
 
-"I am [Role] [Name]," [she/he/they] whispered. "I am brave. I am loved. I was made for such a time as this."
+Because it was.
 
-Outside the tall windows, the kingdom waited. And [Role] [Name] knew — deep in [her/his/their] heart — that today, they would be worthy of it.`,
+This was where every great leader of the kingdom had sat before [her/him/them]. This was where decisions were made that changed lives. This was where courage lived — not in swords or armies, but in the quiet, steady commitment to do what was right.
+
+[Role] [Name] straightened [her/his/their] back, lifted [her/his/their] chin, and whispered the words that every ruler must one day learn to believe: "I am ready."`,
         photoCaption: `Portrait from the Throne Room`,
         photoSet: "Throne Room",
         useSessionPhoto: true,
@@ -256,96 +258,145 @@ Outside the tall windows, the kingdom waited. And [Role] [Name] knew — deep in
       },
       {
         page: 4,
+        title: `A Royal Promise`,
+        text: `[Role] [Name] rose from the golden throne and walked to the great balcony that overlooked the kingdom. Far below, the people had gathered — farmers and bakers, children and elders — all of them looking upward with hope in their eyes.
+
+A hush fell over the crowd.
+
+[Role] [Name] placed one hand over [her/his/their] heart and spoke in a voice clear and calm enough to carry to the very edges of the kingdom: "I will face the dragon. Not with anger — but with understanding. Not with a desire to win — but with a desire to make peace. I give you my word."
+
+For a long moment, there was silence. And then — the cheering began. It rolled across the courtyard like thunder, warm and full and generous, the sound of a people who believed in their [role] with every fiber of their being.
+
+[Role] [Name] smiled. It was time.`,
+        photoCaption: `Royal portrait`,
+        photoSet: "Throne Room",
+        useSessionPhoto: true,
+        imagePromptHint: "royal promise portrait watercolor no text",
+      },
+      {
+        page: 5,
         title: `Into the Royal Forest`,
-        text: `[Role] [Name] journeyed through the Royal Forest, where lanterns glowed like stars between the ancient trees. The air smelled of pine and warm earth, and every leaf seemed to whisper a secret.
+        text: `The Royal Forest was ancient and alive, full of the kind of quiet that feels inhabited — as if the trees themselves were listening.
 
-Deep in the heart of the forest, a wise woodland creature appeared on a mossy log. Its eyes were kind, and it spoke in a voice as soft as rustling leaves.
+[Role] [Name] walked along the lantern-lit path, each step soft on the mossy ground. The light from the lanterns filtered through the leaves in golden patches, and somewhere high above, birds called to one another in the canopy.
 
-"The dragon is not what you think," it said. "It is not evil — it is frightened and alone. It has forgotten what kindness feels like. You have a gift, [Role] [Name]: the ability to see past fear, to look into a heart that is hiding, and to love it anyway."
+At the base of an enormous oak tree, a small woodland creature sat watching [her/him/them] with bright, kind eyes.
 
-[Role] [Name] listened carefully. Something was shifting inside [her/him/them] — not fear disappearing, but something stronger growing in its place.
+"You have come far," it said. "And you have a good heart. But hearts alone do not win battles. You must learn one more thing before you face the dragon."
 
-"Courage," [she/he/they] said quietly, "begins with understanding."
+[Role] [Name] sat down on a nearby stone. "What must I learn?"
 
-The forest lanterns glowed a little brighter, as if they agreed.`,
+The creature was quiet for a moment, then said: "That the bravest thing you can do is to see someone — truly see them — even when they are frightening. Especially then."
+
+[Role] [Name] sat with those words until they settled deep inside [her/him/them], like seeds finding soil.`,
         photoCaption: `Portrait in the Royal Forest`,
         photoSet: "Royal Forest",
         useSessionPhoto: true,
         imagePromptHint: "royal forest portrait watercolor no text",
       },
       {
-        page: 5,
+        page: 6,
         title: `Face to Face`,
         staticScene: "dragon-slayer/dragon",
-        text: `The dragon appeared from behind a curtain of mist — enormous, ancient, with scales the color of storm clouds and eyes like amber lanterns.
+        text: `The dragon emerged from behind a curtain of morning mist — enormous and ancient, with scales the color of storm clouds and eyes like amber lanterns burning in the dark.
 
-For a moment, neither of them moved.
+For a long moment, neither of them moved.
 
-[Role] [Name] felt [her/his/their] heart beating fast, but [she/he/they] did not run. Instead, [she/he/they] took one slow step forward — then another — until [she/he/they] stood close enough to see the dragon's breath rising like smoke in the cool air.
+[Role] [Name] felt [her/his/their] heart beating fast. But [she/he/they] did not run. Instead, [she/he/they] took one slow step forward. Then another. Until [she/he/they] stood close enough to feel the warmth radiating from the dragon's great chest.
 
-"I am not here to fight you," [she/he/they] said, voice steady and clear. "I am here because I believe you are more than what they say you are."
+"I'm not here to fight you," [she/he/they] said, voice steady and clear. "I'm here because I believe you are more than what they say you are."
 
-The dragon lowered its great head. A sound rose from its chest — not a roar, but something quieter. Something that sounded almost like hope.
+The dragon lowered its head. Its breath came out in slow plumes of smoke. And then — very softly — it spoke.
 
-"I just want to belong somewhere," the dragon said at last. "I just want a home."
+"I just want to belong somewhere. I just want a home."
 
-[Role] [Name] smiled. "Then you have already found one."`,
+[Role] [Name] felt something break open inside [her/him/them] — not pain, but tenderness. The deep and aching tenderness of recognizing another soul who is lonely.
+
+"Then you have already found one," [she/he/they] said. "I promise."`,
         photoCaption: `The dragon encounter`,
         useSessionPhoto: false,
         imagePromptHint: "dragon encounter watercolor no text",
       },
       {
-        page: 6,
+        page: 7,
         title: `The Royal Garden`,
-        text: `In the Royal Garden, flowers bloomed in every color under the golden sun — roses and lilies, morning glories and marigolds, each one more beautiful than the last.
+        text: `The Royal Garden was the most beautiful place in all the kingdom — a living tapestry of color and fragrance that seemed to exist outside of time.
 
-[Role] [Name] walked slowly through the garden, breathing in the sweet, warm air. Here, surrounded by so much beauty, everything felt possible.
+[Role] [Name] walked slowly through the garden paths, letting the peace of the place settle over [her/him/them] like a warm blanket. Roses climbed the stone walls. Butterflies drifted from flower to flower. The air smelled of honey and earth and something sweeter that had no name.
 
-[She/He/They] knew what the dragon needed — not a battle, but a blessing. Not a sword, but a seed of kindness planted in the right moment.
+In the very center of the garden grew a flower unlike any other — a single blossom that glowed softly, as if it had captured a piece of the sun inside itself.
 
-[Role] [Name] reached down and picked one perfect glowing blossom, the kind that only grows when tended with love. It pulsed gently in [her/his/their] hand like a tiny heartbeat.
+[Role] [Name] knew immediately what it was: the gift that would seal the promise. The thing that would turn a former enemy into a lifelong friend.
 
-"This," [she/he/they] whispered, "is what will change everything."`,
+[She/He/They] reached down gently, cupped the flower in both hands, and lifted it carefully. It pulsed once — warm and steady — like a heartbeat.
+
+"Thank you," [she/he/they] whispered to the garden. And [she/he/they] could have sworn the flowers nodded back.`,
         photoCaption: `Portrait in the Royal Garden`,
         photoSet: "Royal Garden",
         useSessionPhoto: true,
         imagePromptHint: "royal garden portrait watercolor no text",
       },
       {
-        page: 7,
+        page: 8,
         title: `The Courage Quest`,
-        text: `The final challenge awaited at the top of the great hill — the place where all the kingdom's stories had been decided. This was the Courage Quest, and [Role] [Name] had come prepared.
+        text: `The Courage Quest was the final challenge — a place of great and ancient power, where the kingdom's story had been written and rewritten across centuries.
 
-Not with armor alone — though the armor shone like sunlight on water. Not with a weapon alone — though [she/he/they] carried one. But with something stronger than both: a heart that had chosen kindness over fear, understanding over anger, love over pride.
+[Role] [Name] arrived at the summit as the sun was beginning its slow descent toward the horizon. The light was golden and warm, painting everything it touched in shades of amber and rose.
 
-[Role] [Name] stood tall at the summit and looked out over the whole kingdom spread below. Every cottage, every meadow, every laughing child and working farmer — all of them were counting on this moment.
+[She/He/They] stood still for a moment and breathed it all in: the smell of stone and sky, the distant sound of the kingdom below, the weight of the glowing blossom still cradled in [her/his/their] hands.
 
-"I am ready," [she/he/they] said. And for the first time in [her/his/their] life, [she/he/they] meant it completely.`,
+This was it. This was the moment.
+
+[Role] [Name] was not the same person who had answered the King's call that morning. [She/He/They] had walked through lantern-lit forests and sat upon ancient thrones. [She/He/They] had looked into the eyes of something frightening and chosen love over fear.
+
+And now [she/he/they] was ready — not because [she/he/they] had no fear left, but because [she/he/they] had learned that courage was never the absence of fear. Courage was the decision that something — and someone — else mattered more.`,
         photoCaption: `Portrait at the Courage Quest`,
         photoSet: "Chastle",
         useSessionPhoto: true,
         imagePromptHint: "courage quest portrait watercolor no text",
       },
       {
-        page: 8,
+        page: 9,
         title: `The Kingdom Rejoices`,
-        staticScene: "dragon-slayer/end",
-        text: `When [Role] [Name] returned home, the dragon flew peacefully above the castle towers — not as a threat, but as a guardian. The people cheered so loudly the sound carried all the way to the mountains and back.
+        staticScene: "dragon-slayer/victory",
+        text: `When [Role] [Name] returned home, the dragon flew peacefully above the castle towers — not as a threat, but as a guardian. Its great wings caught the evening light, turning it into something that looked almost like a sunset made of scales.
 
-The King placed a wreath of flowers on [Role] [Name]'s head and said: "You did not just save the kingdom. You showed us what it means to be truly brave."
+The people of the kingdom had gathered in the courtyard. When they saw [Role] [Name] walk through the gates — and saw the dragon land gently on the castle wall above — the cheering that rose up was unlike anything any of them had ever heard before.
 
-That night, as stars filled the sky and the dragon slept curled around the castle like a great, gentle protector, [Role] [Name] sat by the window and thought about everything that had happened.
+The King stepped forward and placed his hands on [Role] [Name]'s shoulders.
 
-[She/He/They] had been afraid. [She/He/They] had been uncertain. But [she/he/they] had chosen love over fear, and that had made all the difference.
+"You did not just save the kingdom," he said, his voice full and quiet at the same time. "You showed us what it means to be truly brave. You showed us that the greatest strength is not force — it is love."
 
-And somewhere in the kingdom below, a child looked up at the stars and whispered a name — the name of the one who had shown them that courage is not the absence of fear, but the decision that something else matters more.
+[Role] [Name] looked out at the faces of the people — all those faces alight with joy and wonder and relief — and felt something complete settle into place deep in [her/his/their] chest.
 
-The name of [Role] [Name]. Their hero. Forever.`,
+This was what [she/he/they] had been made for. Not glory. Not power. But this: the quiet, impossible, perfect miracle of bringing people home to one another.`,
         photoCaption: `The kingdom rejoices`,
         useSessionPhoto: false,
         imagePromptHint: "victory watercolor no text",
       },
-    ], },
+      {
+        page: 10,
+        title: `Always a Hero`,
+        staticScene: "dragon-slayer/end",
+        text: `That night, after the celebrations had faded and the kingdom had grown quiet, [Role] [Name] sat by the window and looked out at the stars.
+
+The dragon was there — curled around the highest tower like a great, gentle guardian — its breath rising slowly in the cool night air. Every now and then, a small flame flickered at its nostrils, and for a moment the darkness glowed gold.
+
+[Role] [Name] thought about the journey. About the fear and the courage. About the loneliness in the dragon's eyes and the warmth of the moment it had been seen — truly seen — for the first time.
+
+About how a single act of bravery had not just saved a kingdom, but had changed two hearts forever.
+
+Somewhere in the streets below, a child looked up at the stars and spoke a name in a wondering whisper. [Role] [Name] heard it carried on the wind, and smiled.
+
+Because that is what heroes do. Not because they are fearless. Not because they are perfect. But because when the moment comes — when the world needs someone to step forward and choose love — they say yes.
+
+Always, they say yes.`,
+        photoCaption: `The end`,
+        useSessionPhoto: false,
+        imagePromptHint: "peaceful ending watercolor no text",
+      },
+    ],
+  },
   {
     id: "rescue-mission",
     option: 2,
