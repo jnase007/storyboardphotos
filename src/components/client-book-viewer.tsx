@@ -80,8 +80,8 @@ export function ClientBookViewer({ book }: { book: Book }) {
 
   return (
     <div
-      className="min-h-screen flex flex-col items-center justify-center p-4"
-      style={{ background: "linear-gradient(135deg, #0A1628 0%, #2D1B4E 100%)" }}
+      className="flex flex-col items-center justify-center overflow-hidden"
+      style={{ background: "linear-gradient(135deg, #0A1628 0%, #2D1B4E 100%)", height: "100dvh", padding: "12px" }}
     >
       {/* Header */}
       <div className="text-center mb-4">
@@ -92,7 +92,7 @@ export function ClientBookViewer({ book }: { book: Book }) {
       </div>
 
       {/* Book spread */}
-      <div className="flex items-stretch w-full max-w-4xl" style={{ height: isMobile ? "80vh" : "75vh" }}>
+      <div className="flex items-stretch w-full max-w-4xl" style={{ height: isMobile ? "calc(100dvh - 120px)" : "calc(100dvh - 130px)" }}>
         {/* Left arrow */}
         <button
           onClick={() => setSpreadIndex((i) => Math.max(0, i - 1))}
