@@ -28,6 +28,7 @@ import {
   compressImageFile,
   readApiJson,
 } from "@/lib/storybook/compress-image";
+import { buildStorybookPdf } from "@/lib/storybook/build-pdf";
 import {
   ADVENTURE_PATHS,
   loadAdventurePathsClient,
@@ -90,6 +91,7 @@ export function StorybookGenerator() {
   const [editMode, setEditMode] = useState(false);
   const [saving, setSaving] = useState(false);
   const [approving, setApproving] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
   const [genStatus, setGenStatus] = useState("Preparing…");
 
   const page = book?.pages[pageIndex];
@@ -271,6 +273,31 @@ export function StorybookGenerator() {
       toast.error(err instanceof Error ? err.message : "Save failed");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function downloadMpixPdf() {
+    if (!book) return;
+    setPdfLoading(true);
+    try {
+      const blob = await buildStorybookPdf({
+        bookTitle: book.bookTitle,
+        childName: book.child_name,
+        pages: book.pages,
+        includeCover: true,
+        includeBack: true,
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${book.child_name.replace(/\s+/g, "-")}-Kingdom-Quest-Storybook.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success("Mpix PDF downloaded — ready for photo book order!");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "PDF generation failed");
+    } finally {
+      setPdfLoading(false);
     }
   }
 
@@ -598,6 +625,21 @@ export function StorybookGenerator() {
                       <Check className="h-4 w-4" />
                     )}
                     Save edits
+                  </button>
+                )}
+                {(book.status === "ready" || book.status === "approved") && (
+                  <button
+                    type="button"
+                    onClick={downloadMpixPdf}
+                    disabled={pdfLoading}
+                    className="inline-flex h-10 items-center gap-1.5 rounded-md border-2 border-royal-gold bg-royal-blue px-4 text-sm font-semibold text-royal-gold hover:bg-royal-blue/80 disabled:opacity-50 transition-colors"
+                  >
+                    {pdfLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Download className="h-4 w-4" />
+                    )}
+                    Download Mpix PDF
                   </button>
                 )}
                 <button
