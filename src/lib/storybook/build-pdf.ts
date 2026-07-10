@@ -9,8 +9,8 @@ const GOLD_DARK    = [180, 145,  88] as [number, number, number]; // darker gold
 const WHITE        = [255, 255, 255] as [number, number, number];
 
 // ─── Page geometry (letter, points) ──────────────────────────────────────────
-const PAGE_W = 612;  // 8.5"
-const PAGE_H = 792;  // 11"
+const PAGE_W = 594;  // 8.25" (8" + 0.125" bleed each side)
+const PAGE_H = 594;  // 8.25" square
 const BLEED  = 9;    // 0.125" bleed margin
 const MARGIN = 36;   // 0.5" interior text margin
 
@@ -38,7 +38,7 @@ export async function buildStorybookPdf(options: {
   const doc = new jsPDF({
     orientation: "portrait",
     unit: "pt",
-    format: "letter",
+    format: [594, 594],  // 8.25" x 8.25" square (8" + 0.125" bleed)
   });
 
   let pageCount = 0;
