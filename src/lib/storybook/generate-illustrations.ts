@@ -363,6 +363,13 @@ export async function illustrateStoryPages(options: {
   const result: StoryPage[] = [];
 
   for (const page of pages) {
+    // FIRST: Check for pre-approved static scene — always takes priority
+    if (page.staticScene && STATIC_SCENES[page.staticScene]) {
+      result.push({ ...page, imageUrl: STATIC_SCENES[page.staticScene] });
+      continue;
+    }
+
+    // SECOND: Use session photos for set pages
     if (page.photoSet && photosBySet) {
       const setId = SET_NAME_TO_ID[page.photoSet];
       const pool = photosBySet[setId] ?? [];
@@ -384,14 +391,6 @@ export async function illustrateStoryPages(options: {
 
     if (page.imageUrl) {
       result.push(page);
-      continue;
-    }
-
-    // AI illustration page — use flux-pulid if character photo provided,
-    // Check for pre-approved static scene first
-    const staticKey = (page as unknown as {staticScene?: string}).staticScene;
-    if (staticKey && STATIC_SCENES[staticKey]) {
-      result.push({ ...page, imageUrl: STATIC_SCENES[staticKey] });
       continue;
     }
 

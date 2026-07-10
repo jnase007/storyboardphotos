@@ -26,6 +26,8 @@ export type StoryPage = {
   photoSet: KingdomSet;
   /** Prompt used for illustration */
   imagePrompt?: string;
+  /** Key for pre-approved static scene from STATIC_SCENES map */
+  staticScene?: string;
   /** True when this page should prefer a session photo over AI art */
   useSessionPhoto?: boolean;
 };
