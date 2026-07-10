@@ -87,48 +87,42 @@ async function drawCoverPageAsync(doc: jsPDF, childName: string, coverImageUrl?:
     drawFallbackCover(doc);
   }
 
-  // Semi-transparent dark overlay at bottom for text
+  // Gold decorative border frame over the image
+  drawGoldBorder(doc, 10, 10, PAGE_W - 20, PAGE_H - 20, 2);
+  drawGoldBorder(doc, 18, 18, PAGE_W - 36, PAGE_H - 36, 0.75);
+
+  // Top name area — semi-transparent dark band at top
   doc.setFillColor(10, 22, 40);
-  // Draw overlay rectangle
-  const overlayY = PAGE_H * 0.62;
-  const overlayH = PAGE_H - overlayY;
-  doc.rect(0, overlayY, PAGE_W, overlayH, "F");
+  doc.setGState(doc.GState({ opacity: 0.75 }));
+  doc.rect(0, 0, PAGE_W, PAGE_H * 0.28, "F");
+  doc.setGState(doc.GState({ opacity: 1 }));
 
-  // Gold border frame
-  drawGoldBorder(doc, 12, 12, PAGE_W - 24, PAGE_H - 24);
-  drawGoldBorder(doc, 20, 20, PAGE_W - 40, PAGE_H - 40, 0.5);
-
-  // Child's name - large gold title
+  // Child's name — large, centered at top
   doc.setTextColor(...GOLD);
   doc.setFont("times", "bold");
-  doc.setFontSize(36);
-  doc.text(`${childName}'s`, PAGE_W / 2, overlayY + 42, { align: "center" });
-  doc.setFontSize(44);
-  doc.text("Kingdom Quest", PAGE_W / 2, overlayY + 88, { align: "center" });
+  doc.setFontSize(42);
+  doc.text(`${childName}`, PAGE_W / 2, PAGE_H * 0.12, { align: "center" });
 
-  // Gold rule
+  // Decorative rule under name
   doc.setDrawColor(...GOLD);
   doc.setLineWidth(1.5);
-  doc.line(PAGE_W / 2 - 130, overlayY + 100, PAGE_W / 2 + 130, overlayY + 100);
+  doc.line(PAGE_W * 0.2, PAGE_H * 0.17, PAGE_W * 0.8, PAGE_H * 0.17);
 
-  // Subtitle
+  // "Kingdom Quest" subtitle
   doc.setFont("times", "italic");
-  doc.setFontSize(16);
+  doc.setFontSize(20);
   doc.setTextColor(...GOLD_DARK);
-  doc.text("A Storybook Photos Adventure", PAGE_W / 2, overlayY + 122, { align: "center" });
+  doc.text("Kingdom Quest", PAGE_W / 2, PAGE_H * 0.23, { align: "center" });
 
-  // Stars
-  drawStar(doc, PAGE_W / 2 - 80, overlayY + 145, 4, GOLD_DARK);
-  drawStar(doc, PAGE_W / 2, overlayY + 143, 6, GOLD);
-  drawStar(doc, PAGE_W / 2 + 80, overlayY + 145, 4, GOLD_DARK);
-
-  // Bottom branding bar
-  doc.setFillColor(...GOLD);
-  doc.rect(0, PAGE_H - 38, PAGE_W, 38, "F");
+  // Bottom branding band
+  doc.setFillColor(10, 22, 40);
+  doc.setGState(doc.GState({ opacity: 0.75 }));
+  doc.rect(0, PAGE_H * 0.88, PAGE_W, PAGE_H * 0.12, "F");
+  doc.setGState(doc.GState({ opacity: 1 }));
   doc.setFont("times", "bold");
-  doc.setFontSize(12);
-  doc.setTextColor(...ROYAL_BLUE);
-  doc.text("Storybook Photos  |  Kingdom Quests", PAGE_W / 2, PAGE_H - 14, { align: "center" });
+  doc.setFontSize(11);
+  doc.setTextColor(...GOLD_DARK);
+  doc.text("Storybook Photos · Kingdom Quests", PAGE_W / 2, PAGE_H * 0.95, { align: "center" });
 }
 
 function drawFallbackCover(doc: jsPDF): void {
