@@ -201,6 +201,7 @@ export function StorybookGenerator() {
   const [saving, setSaving] = useState(false);
   const [approving, setApproving] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [regeneratingPage, setRegeneratingPage] = useState(false);
   const [genStatus, setGenStatus] = useState("Preparing…");
 
   const page = book?.pages[pageIndex];
@@ -459,6 +460,41 @@ export function StorybookGenerator() {
       toast.error(err instanceof Error ? err.message : "PDF generation failed");
     } finally {
       setPdfLoading(false);
+    }
+  }
+
+  async function regeneratePage(pageIdx: number) {
+    if (!book) return;
+    const page = book.pages[pageIdx];
+    if (!page || page.useSessionPhoto) {
+      toast.error("This page uses a real photo — upload a different photo to change it");
+      return;
+    }
+    setRegeneratingPage(true);
+    try {
+      const res = await fetch("/api/admin/storybooks/regenerate-page", {
+        method: "POST",
+        headers: { ...adminHeaders, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          imagePrompt: page.imagePrompt,
+          pageTitle: page.title,
+        }),
+      });
+      if (!res.ok) throw new Error("Regeneration failed");
+      const data = await res.json();
+      if (data.imageUrl) {
+        setBook((prev) => {
+          if (!prev) return prev;
+          const pages = [...prev.pages];
+          pages[pageIdx] = { ...pages[pageIdx], imageUrl: data.imageUrl };
+          return { ...prev, pages };
+        });
+        toast.success("Page regenerated! ✨");
+      }
+    } catch (err) {
+      toast.error("Failed to regenerate page");
+    } finally {
+      setRegeneratingPage(false);
     }
   }
 
@@ -824,6 +860,8 @@ export function StorybookGenerator() {
             saveEdits={saveEdits}
             downloadMpixPdf={downloadMpixPdf}
             approveAndDownload={approveAndDownload}
+            regeneratePage={regeneratePage}
+            regeneratingPage={regeneratingPage}
             onNewBook={() => {
               setStep("form");
               setBook(null);
@@ -854,6 +892,8 @@ function BookFlipPreview({
   saveEdits,
   downloadMpixPdf,
   approveAndDownload,
+  regeneratePage,
+  regeneratingPage,
   onNewBook,
 }: {
   book: GeneratedBook;
@@ -868,6 +908,8 @@ function BookFlipPreview({
   saveEdits: () => void;
   downloadMpixPdf: () => void;
   approveAndDownload: () => void;
+  regeneratePage: (pageIdx: number) => void;
+  regeneratingPage: boolean;
   onNewBook: () => void;
 }) {
   const page = book.pages[pageIndex];
@@ -958,6 +1000,21 @@ function BookFlipPreview({
                 <Check className="h-4 w-4" />
               )}
               Save edits
+            </button>
+          )}
+          {(book.status === "ready" || book.status === "approved") && !page.useSessionPhoto && (
+            <button
+              type="button"
+              onClick={() => regeneratePage(pageIndex)}
+              disabled={regeneratingPage}
+              className="inline-flex h-10 items-center gap-1.5 rounded-md border-2 border-amber-500 bg-amber-50 px-4 text-sm font-semibold text-amber-700 hover:bg-amber-100 disabled:opacity-50 transition-colors"
+            >
+              {regeneratingPage ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <span>✨</span>
+              )}
+              {regeneratingPage ? "Regenerating..." : "Regenerate This Scene"}
             </button>
           )}
           {(book.status === "ready" || book.status === "approved") && (
