@@ -135,7 +135,7 @@ export function BooksLibrary() {
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-bold text-gray-900 text-lg">{book.child_name}'s Kingdom Quest</h3>
+                  <h3 className="font-bold text-gray-900 text-lg">{book.child_name}&apos;s Kingdom Quest</h3>
                   <div className="flex items-center gap-3 mt-1">
                     <span className="text-sm text-gray-500">Age {book.child_age} · {book.gender}</span>
                     <span

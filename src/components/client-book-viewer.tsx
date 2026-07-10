@@ -32,7 +32,7 @@ export function ClientBookViewer({ book }: { book: Book }) {
       {/* Header */}
       <div className="text-center mb-6">
         <h1 className="text-2xl font-bold" style={{ color: "#C5A26F" }}>
-          {book.child_name}'s Kingdom Quest
+          {book.child_name}&apos;s Kingdom Quest
         </h1>
         <p className="text-white/50 text-sm mt-1">A Storybook Photos Adventure</p>
       </div>
