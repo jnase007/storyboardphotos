@@ -150,6 +150,7 @@ export function StorybookGenerator() {
 
     setStep("generating");
     setGenStatus("Compressing photos…");
+    window.scrollTo({ top: 0, behavior: "smooth" });
 
     try {
       const photos_by_set = {
