@@ -214,10 +214,17 @@ export const PRICING_PACKAGES = [
 ] as const;
 
 export const ADDITIONAL_INVESTMENTS = [
-  { label: "Additional child book (4th+)", price: "$149 each" },
-  { label: "Animated video upgrade", price: "$299" },
-  { label: "Rush processing (48hr)", price: "$75" },
-  { label: "Extra printed copies", price: "$45 each" },
+  { label: "Additional child book (4th+ child)", price: "$149 each" },
+  { label: "Extra printed copies of book", price: "$45 each" },
+  { label: "Animated Kingdom video", price: "$299" },
+  { label: "Rush processing (48hr turnaround)", price: "$75" },
+  { label: "Extra 8×10 portrait print", price: "$200 each" },
+  { label: "11×14 portrait print", price: "$600" },
+  { label: "16×20 portrait print", price: "$975" },
+  { label: "24×30 portrait print", price: "$1,650" },
+  { label: "30×40 portrait print", price: "$2,650" },
+  { label: "Single digital image", price: "$500" },
+  { label: "MP4 digital slideshow", price: "$1,400" },
 ] as const;
 
 export const OUR_PROMISE = {
