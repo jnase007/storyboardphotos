@@ -306,7 +306,7 @@ export async function illustrateStoryPages(options: {
     const art = await generateStoryIllustration({
       prompt: page.imagePrompt ?? page.title,
       referenceImageUrl: reference,
-      characterPhotoUrl: processedCharacterPhotoUrl,
+
     });
 
     result.push({ ...page, imageUrl: art.imageUrl });
