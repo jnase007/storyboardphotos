@@ -7,7 +7,7 @@ type FluxResult = {
 };
 
 const STYLE_SUFFIX =
-  "classic children's storybook watercolor illustration, soft fine ink outlines, gentle pastel washes on cream white background, delicate floral details, rosy cheeks, warm soft lighting, intricate costume details with floral embroidery, whimsical and enchanting, style of a premium children's picture book, no text, no watermark, no borders, isolated figure on cream background";
+  "double-page spread children's storybook watercolor illustration, hand-drawn fine ink outlines, soft watercolor washes with gentle pastel colors, detailed enchanted kingdom scene with castle towers stone paths wildflowers fairies, decorative vine border frame around the edges, warm cream background, rich detailed scenery like a premium illustrated children's book, whimsical and magical atmosphere, style of a classic fairy tale picture book, lush green trees and rolling hills, cozy storybook feel, no text no watermark";
 
 /**
  * Remove background from an image using fal-ai/bria background removal.
