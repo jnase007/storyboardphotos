@@ -14,10 +14,11 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { bookTitle, childName, pages } = body as {
+    const { bookTitle, childName, pages, coverImageUrl } = body as {
       bookTitle: string;
       childName: string;
       pages: StoryPage[];
+      coverImageUrl?: string;
     };
 
     if (!bookTitle || !childName || !pages?.length) {
@@ -30,6 +31,7 @@ export async function POST(request: NextRequest) {
       pages,
       includeCover: true,
       includeBack: true,
+      coverImageUrl,
     });
 
     const pdfBuffer = await pdfBlob.arrayBuffer();

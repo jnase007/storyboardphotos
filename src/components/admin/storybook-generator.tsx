@@ -450,6 +450,7 @@ export function StorybookGenerator() {
           bookTitle: book.bookTitle,
           childName: book.child_name,
           pages: book.pages,
+          coverImageUrl: book.pages[0]?.imageUrl ?? undefined,
         }),
       });
       if (!res.ok) throw new Error("PDF generation failed");

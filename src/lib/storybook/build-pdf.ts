@@ -22,8 +22,9 @@ export async function buildStorybookPdf(options: {
   bookTitle: string;
   childName: string;
   pages: StoryPage[];
-  includeCover?: boolean;  // default true
-  includeBack?: boolean;   // default true
+  includeCover?: boolean;
+  includeBack?: boolean;
+  coverImageUrl?: string; // AI-generated cover with child's face
 }): Promise<Blob> {
   const {
     bookTitle,
@@ -31,6 +32,7 @@ export async function buildStorybookPdf(options: {
     pages,
     includeCover = true,
     includeBack = true,
+    coverImageUrl,
   } = options;
 
   const doc = new jsPDF({
@@ -45,7 +47,7 @@ export async function buildStorybookPdf(options: {
   if (includeCover) {
     if (pageCount > 0) doc.addPage();
     pageCount++;
-    await drawCoverPageAsync(doc, childName);
+    await drawCoverPageAsync(doc, childName, coverImageUrl);
   }
 
   // ── Interior pages ────────────────────────────────────────────────────────
@@ -69,12 +71,12 @@ export async function buildStorybookPdf(options: {
 // ─────────────────────────────────────────────────────────────────────────────
 // Cover Page
 // ─────────────────────────────────────────────────────────────────────────────
-async function drawCoverPageAsync(doc: jsPDF, childName: string): Promise<void> {
-  const CASTLE_URL = "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/dragon-slayer/title.jpg";
+async function drawCoverPageAsync(doc: jsPDF, childName: string, coverImageUrl?: string): Promise<void> {
+  // Use AI-generated cover with child's face if available, otherwise use castle scene
+  const COVER_URL = coverImageUrl ?? "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/dragon-slayer/title.jpg";
 
-  // Try to load the castle watercolor as full-bleed background
   try {
-    const img = await fetchImageAsDataUrl(CASTLE_URL);
+    const img = await fetchImageAsDataUrl(COVER_URL);
     if (img) {
       const croppedDataUrl = await centerCropImage(img.dataUrl, PAGE_W / PAGE_H);
       doc.addImage(croppedDataUrl, "JPEG", 0, 0, PAGE_W, PAGE_H);
@@ -203,8 +205,8 @@ async function drawInteriorPage(
   childName: string,
   _bookTitle: string,
 ): Promise<void> {
-  const imageAreaH = PAGE_H * 0.65;  // top 65%
-  const textAreaY  = imageAreaH;      // bottom 35% starts here
+  const imageAreaH = PAGE_H * 0.70;  // top 70% - bigger image
+  const textAreaY  = imageAreaH;      // bottom 30% text area
   const textAreaH  = PAGE_H - imageAreaH;
 
   // ── Image area (top 65%, edge-to-edge) ──────────────────────────────────
@@ -234,22 +236,25 @@ async function drawInteriorPage(
   doc.setLineWidth(2);
   doc.line(0, imageAreaH, PAGE_W, imageAreaH);
 
-  // ── Text area (bottom 35%) ───────────────────────────────────────────────
+  // ── Text area (bottom 30%) ───────────────────────────────────────────────
+  // Cream background for text
   doc.setFillColor(...CREAM);
   doc.rect(0, textAreaY, PAGE_W, textAreaH, "F");
 
-  // Top accent line inside text area
+  // Gold top border
   doc.setFillColor(...GOLD);
-  doc.rect(MARGIN, textAreaY + 14, 4, 40, "F");
+  doc.rect(0, textAreaY, PAGE_W, 2, "F");
 
-  // Page title — skip generic "Title Page" label
-  const displayTitle = page.title === "Title Page" || page.title === "The Dragon Quest" 
-    ? _bookTitle  // show book title instead
-    : page.title;
-  doc.setTextColor(...GOLD);
-  doc.setFont("times", "bold");
-  doc.setFontSize(17);
-  doc.text(displayTitle, MARGIN + 12, textAreaY + 35, { maxWidth: PAGE_W - MARGIN * 2 - 12 });
+  // Page title — skip generic labels
+  const skipTitles = ["Title Page", "The Dragon Quest", "The Rescue Mission", "The Lost Crown", "The Forest Guardian", "The Kindness Quest", "The Light Treasure"];
+  const displayTitle = skipTitles.includes(page.title) ? "" : page.title;
+  
+  if (displayTitle) {
+    doc.setTextColor(...GOLD);
+    doc.setFont("times", "bold");
+    doc.setFontSize(15);
+    doc.text(displayTitle, PAGE_W / 2, textAreaY + 22, { align: "center", maxWidth: PAGE_W - MARGIN * 2 });
+  }
 
   // Page subtitle (set name)
   if (page.photoSet) {
@@ -259,13 +264,13 @@ async function drawInteriorPage(
     doc.text(page.photoSet, MARGIN + 12, textAreaY + 52, { maxWidth: PAGE_W - MARGIN * 2 });
   }
 
-  // Story text in royal blue
+  // Story text in royal blue - centered, elegant
   doc.setFont("times", "normal");
-  doc.setFontSize(11.5);
+  doc.setFontSize(11);
   doc.setTextColor(...ROYAL_BLUE);
-  const textLines = doc.splitTextToSize(page.text, PAGE_W - MARGIN * 2);
-  const textY = textAreaY + (page.photoSet ? 70 : 62);
-  doc.text(textLines, MARGIN, textY, { maxWidth: PAGE_W - MARGIN * 2 });
+  const textLines = doc.splitTextToSize(page.text, PAGE_W - MARGIN * 2.5);
+  const textY = textAreaY + (displayTitle ? (page.photoSet ? 58 : 50) : (page.photoSet ? 48 : 36));
+  doc.text(textLines, MARGIN * 1.25, textY, { maxWidth: PAGE_W - MARGIN * 2.5 });
 
   // ── Footer ───────────────────────────────────────────────────────────────
   const footerY = PAGE_H - 18;
