@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState, type DragEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -9,6 +9,7 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
+  Crown,
   Download,
   Loader2,
   Pencil,
@@ -72,6 +73,110 @@ const adminHeaders = {
 
 type Step = "form" | "generating" | "preview";
 
+// ─── Animated progress steps ───────────────────────────────────────────────
+const PROGRESS_STEPS = [
+  { emoji: "✨", message: "Preparing your royal quest…" },
+  { emoji: "📜", message: "Writing your adventure story…" },
+  { emoji: "🎨", message: "Painting your kingdom scenes…" },
+  { emoji: "🐉", message: "Bringing the dragon to life…" },
+  { emoji: "🌟", message: "Adding the finishing touches…" },
+  { emoji: "📖", message: "Binding your royal storybook…" },
+];
+
+function GeneratingView({ status }: { status: string }) {
+  const [stepIndex, setStepIndex] = useState(0);
+  const [progress, setProgress] = useState(0);
+
+  // Auto-advance through magical steps every ~8 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStepIndex((prev) => {
+        const next = Math.min(prev + 1, PROGRESS_STEPS.length - 1);
+        setProgress(Math.round((next / (PROGRESS_STEPS.length - 1)) * 100));
+        return next;
+      });
+    }, 8000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const currentStep = PROGRESS_STEPS[stepIndex];
+
+  return (
+    <div className="rounded-2xl border-2 border-royal-gold/35 bg-white p-12 text-center shadow-lg">
+      {/* Animated emoji */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={stepIndex}
+          initial={{ scale: 0.5, opacity: 0, y: 10 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 1.2, opacity: 0, y: -10 }}
+          transition={{ duration: 0.45, type: "spring", bounce: 0.4 }}
+          className="text-6xl mb-6 select-none"
+        >
+          {currentStep.emoji}
+        </motion.div>
+      </AnimatePresence>
+
+      <h2 className="font-serif text-2xl font-bold text-royal-blue mb-2">
+        Creating the kingdom story…
+      </h2>
+
+      {/* Step message */}
+      <AnimatePresence mode="wait">
+        <motion.p
+          key={stepIndex}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={{ duration: 0.35 }}
+          className="text-royal-blue/70 text-base font-medium mb-1"
+        >
+          {currentStep.message}
+        </motion.p>
+      </AnimatePresence>
+
+      <p className="text-royal-blue/40 text-xs mb-8">{status}</p>
+
+      {/* Progress bar */}
+      <div className="max-w-sm mx-auto">
+        <div className="flex justify-between text-[10px] font-semibold text-royal-blue/40 mb-2 px-0.5">
+          <span>Step {stepIndex + 1} of {PROGRESS_STEPS.length}</span>
+          <span>{progress}%</span>
+        </div>
+        <div className="h-2.5 w-full rounded-full bg-royal-blue/10 overflow-hidden">
+          <motion.div
+            className="h-full rounded-full bg-gradient-to-r from-royal-gold to-[#E8C97A]"
+            initial={{ width: "0%" }}
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+          />
+        </div>
+
+        {/* Step dots */}
+        <div className="flex justify-center gap-2 mt-4">
+          {PROGRESS_STEPS.map((_, i) => (
+            <div
+              key={i}
+              className={cn(
+                "h-2 w-2 rounded-full transition-all duration-300",
+                i < stepIndex
+                  ? "bg-royal-gold"
+                  : i === stepIndex
+                  ? "bg-royal-gold scale-125"
+                  : "bg-royal-blue/15"
+              )}
+            />
+          ))}
+        </div>
+      </div>
+
+      <p className="text-royal-blue/30 text-xs mt-6">
+        This can take a minute when fal.ai / Grok keys are configured.
+      </p>
+    </div>
+  );
+}
+
 /**
  * Internal staff tool: upload session photos by set → generate story + art → edit → PDF.
  */
@@ -86,6 +191,10 @@ export function StorybookGenerator() {
   const [storyMode, setStoryMode] = useState<"script" | "ai">("script");
   const [setFiles, setSetFiles] = useState<SetFiles>(emptySetFiles);
   const [setPreviews, setSetPreviews] = useState<SetPreviews>(emptySetPreviews);
+  // Character portrait state
+  const [characterPhoto, setCharacterPhoto] = useState<string | null>(null);
+  const [characterPreview, setCharacterPreview] = useState<string | null>(null);
+  const [characterDragging, setCharacterDragging] = useState(false);
   const [book, setBook] = useState<GeneratedBook | null>(null);
   const [pageIndex, setPageIndex] = useState(0);
   const [editMode, setEditMode] = useState(false);
@@ -95,6 +204,52 @@ export function StorybookGenerator() {
   const [genStatus, setGenStatus] = useState("Preparing…");
 
   const page = book?.pages[pageIndex];
+
+  // ── Character portrait handlers ─────────────────────────────────────────
+
+  function handleCharacterFile(file: File) {
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload an image file (JPG, PNG, or WebP).");
+      return;
+    }
+    const previewUrl = URL.createObjectURL(file);
+    setCharacterPreview(previewUrl);
+    // Convert to base64 for transmission
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const result = e.target?.result;
+      if (typeof result === "string") setCharacterPhoto(result);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function clearCharacterPhoto() {
+    if (characterPreview) URL.revokeObjectURL(characterPreview);
+    setCharacterPreview(null);
+    setCharacterPhoto(null);
+  }
+
+  function onCharacterDragOver(e: DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    e.stopPropagation();
+    setCharacterDragging(true);
+  }
+
+  function onCharacterDragLeave(e: DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    e.stopPropagation();
+    setCharacterDragging(false);
+  }
+
+  function onCharacterDrop(e: DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    e.stopPropagation();
+    setCharacterDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleCharacterFile(file);
+  }
+
+  // ── Set upload handlers ─────────────────────────────────────────────────
 
   const addFilesToSet = useCallback((setId: SetUploadId, list: FileList | File[]) => {
     const incoming = Array.from(list).filter((f) => f.type.startsWith("image/"));
@@ -135,6 +290,8 @@ export function StorybookGenerator() {
       };
     });
   }
+
+  // ── Generate handler ────────────────────────────────────────────────────
 
   async function handleGenerate(e: React.FormEvent) {
     e.preventDefault();
@@ -196,7 +353,7 @@ export function StorybookGenerator() {
         loadAdventurePathsClient().find((p) => p.id === adventurePath) ??
         ADVENTURE_PATHS.find((p) => p.id === adventurePath) ??
         ADVENTURE_PATHS[0];
-      setGenStatus(`Writing “${selectedPath.label}”…`);
+      setGenStatus(`Writing "${selectedPath.label}"…`);
 
       const genRes = await fetch("/api/admin/storybooks/generate", {
         method: "POST",
@@ -214,6 +371,7 @@ export function StorybookGenerator() {
           story_mode: storyMode,
           photos_by_set,
           photo_urls,
+          character_photo: characterPhoto ?? undefined,
         }),
       });
 
@@ -239,6 +397,8 @@ export function StorybookGenerator() {
       setStep("form");
     }
   }
+
+  // ── Page editing ────────────────────────────────────────────────────────
 
   function updatePageField(
     index: number,
@@ -384,6 +544,83 @@ export function StorybookGenerator() {
             onSubmit={handleGenerate}
             className="rounded-2xl border-2 border-royal-gold/35 bg-white p-6 sm:p-8 shadow-lg shadow-royal-gold/10 space-y-6"
           >
+            {/* ── Character Portrait Upload (TOP) ─────────────────────────── */}
+            <div>
+              <div className="mb-3">
+                <p className="text-sm font-medium text-royal-blue">
+                  Upload Character Portrait (white background)
+                </p>
+                <p className="text-xs text-royal-blue/50 mt-0.5">
+                  Upload a studio portrait of the child on a white background — this becomes the hero of every scene
+                </p>
+              </div>
+
+              {characterPreview ? (
+                <div className="relative inline-block">
+                  <div className="relative w-40 h-52 rounded-xl overflow-hidden border-2 border-royal-gold/50 shadow-md">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={characterPreview}
+                      alt="Character portrait"
+                      className="absolute inset-0 h-full w-full object-cover"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={clearCharacterPhoto}
+                    className="absolute -top-2 -right-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-royal-blue text-white hover:bg-royal-blue/80 shadow"
+                    aria-label="Remove character portrait"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                  <p className="mt-2 text-xs text-royal-blue/50 text-center">Character photo ✓</p>
+                </div>
+              ) : (
+                <div
+                  onDragOver={onCharacterDragOver}
+                  onDragLeave={onCharacterDragLeave}
+                  onDrop={onCharacterDrop}
+                  className={cn(
+                    "rounded-xl border-2 border-dashed transition-colors",
+                    characterDragging
+                      ? "border-royal-gold bg-royal-gold/10"
+                      : "border-royal-gold/40 bg-royal-cream/30 hover:border-royal-gold/70"
+                  )}
+                >
+                  <label className="flex flex-col items-center justify-center gap-3 px-6 py-10 cursor-pointer">
+                    <div className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-royal-gold/15 ring-2 ring-royal-gold/30">
+                      <Crown className="h-7 w-7 text-royal-gold" />
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm font-semibold text-royal-blue">
+                        {characterDragging ? "Drop portrait here" : "Drag & drop or click to upload"}
+                      </p>
+                      <p className="text-xs text-royal-blue/45 mt-1">
+                        Single portrait · JPG, PNG, WebP · white background
+                      </p>
+                      <p className="text-xs text-royal-blue/35 mt-0.5 italic">
+                        Optional — enables AI face compositing for all scenes
+                      </p>
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleCharacterFile(file);
+                        e.target.value = "";
+                      }}
+                    />
+                  </label>
+                </div>
+              )}
+            </div>
+
+            {/* ── Divider ─────────────────────────────────────────────────── */}
+            <div className="border-t border-royal-gold/20" />
+
+            {/* ── Adventure path ──────────────────────────────────────────── */}
             <div>
               <div className="mb-3">
                 <p className="text-sm font-medium text-royal-blue">
@@ -570,247 +807,344 @@ export function StorybookGenerator() {
         )}
 
         {step === "generating" && (
-          <div className="rounded-2xl border-2 border-royal-gold/35 bg-white p-12 text-center shadow-lg">
-            <Loader2 className="h-10 w-10 text-royal-gold animate-spin mx-auto mb-4" />
-            <h2 className="font-serif text-2xl font-bold text-royal-blue mb-2">
-              Creating the kingdom story…
-            </h2>
-            <p className="text-royal-blue/60 text-sm">{genStatus}</p>
-            <p className="text-royal-blue/40 text-xs mt-4">
-              This can take a minute when fal.ai / Grok keys are configured.
-            </p>
-          </div>
+          <GeneratingView status={genStatus} />
         )}
 
         {step === "preview" && book && page && (
-          <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <h2 className="font-serif text-2xl font-bold text-royal-blue">
-                  {book.bookTitle}
-                </h2>
-                <p className="text-sm text-royal-blue/55">
-                  {book.pages.length} pages · Age {book.child_age}
-                  {book.adventure_path
-                    ? ` · ${
-                        ADVENTURE_PATHS.find((p) => p.id === book.adventure_path)
-                          ?.label ?? book.adventure_path
-                      }`
-                    : ""}
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={() => setEditMode((v) => !v)}
-                  className={cn(
-                    "inline-flex h-10 items-center gap-1.5 rounded-md border px-4 text-sm font-semibold transition-colors",
-                    editMode
-                      ? "border-royal-gold bg-royal-gold/15 text-royal-blue"
-                      : "border-royal-gold/35 bg-white text-royal-blue hover:bg-royal-gold/10"
-                  )}
-                >
-                  <Pencil className="h-4 w-4" />
-                  {editMode ? "Editing…" : "Edit Story"}
-                </button>
-                {editMode && (
-                  <button
-                    type="button"
-                    onClick={saveEdits}
-                    disabled={saving}
-                    className="inline-flex h-10 items-center gap-1.5 rounded-md bg-royal-blue px-4 text-sm font-semibold text-royal-cream disabled:opacity-50"
-                  >
-                    {saving ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Check className="h-4 w-4" />
-                    )}
-                    Save edits
-                  </button>
-                )}
-                {(book.status === "ready" || book.status === "approved") && (
-                  <button
-                    type="button"
-                    onClick={downloadMpixPdf}
-                    disabled={pdfLoading}
-                    className="inline-flex h-10 items-center gap-1.5 rounded-md border-2 border-royal-gold bg-royal-blue px-4 text-sm font-semibold text-royal-gold hover:bg-royal-blue/80 disabled:opacity-50 transition-colors"
-                  >
-                    {pdfLoading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Download className="h-4 w-4" />
-                    )}
-                    Download Mpix PDF
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={approveAndDownload}
-                  disabled={approving}
-                  className="inline-flex h-10 items-center gap-1.5 rounded-md bg-royal-gold px-4 text-sm font-semibold text-royal-blue hover:bg-[#D4B480] disabled:opacity-50"
-                >
-                  {approving ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Download className="h-4 w-4" />
-                  )}
-                  Approve &amp; Send to Printer
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setStep("form");
-                    setBook(null);
-                    setPageIndex(0);
-                    setEditMode(false);
-                    setChildName("");
-                    setNotes("");
-                  }}
-                  className="inline-flex h-10 items-center rounded-md border border-royal-gold/25 px-4 text-sm text-royal-blue/70 hover:bg-white"
-                >
-                  New book
-                </button>
-              </div>
-            </div>
-
-            <div className="relative rounded-2xl border border-royal-gold/30 bg-gradient-to-br from-[#FFFBF5] via-white to-[#F5EDE0] p-4 sm:p-8 shadow-inner">
-              <div
-                className="pointer-events-none absolute inset-y-6 left-1/2 w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-royal-gold/25 to-transparent hidden sm:block"
-                aria-hidden="true"
-              />
-
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={`${book.id}-${page.page}-${editMode}`}
-                  initial={{ opacity: 0, rotateY: -8 }}
-                  animate={{ opacity: 1, rotateY: 0 }}
-                  exit={{ opacity: 0, rotateY: 8 }}
-                  transition={{ duration: 0.35 }}
-                  className="grid sm:grid-cols-2 gap-6 sm:gap-10 min-h-[340px]"
-                  style={{ transformPerspective: 1200 }}
-                >
-                  <div className="flex flex-col justify-center px-1 sm:pr-4">
-                    <p className="text-royal-gold text-xs font-semibold tracking-[0.2em] uppercase mb-2">
-                      Page {page.page} of {book.pages.length}
-                    </p>
-                    {editMode ? (
-                      <>
-                        <input
-                          value={page.title}
-                          onChange={(e) =>
-                            updatePageField(pageIndex, "title", e.target.value)
-                          }
-                          className="font-serif text-2xl font-bold text-royal-blue mb-3 w-full border-b border-royal-gold/40 bg-transparent outline-none"
-                        />
-                        <textarea
-                          value={page.text}
-                          onChange={(e) =>
-                            updatePageField(pageIndex, "text", e.target.value)
-                          }
-                          rows={10}
-                          className="w-full rounded-md border border-royal-gold/30 bg-white/80 px-3 py-2 text-sm text-royal-blue/80 leading-relaxed outline-none focus:ring-2 focus:ring-royal-gold/20"
-                        />
-                      </>
-                    ) : (
-                      <>
-                        <h3 className="font-serif text-2xl sm:text-3xl font-bold text-royal-blue mb-4 leading-tight">
-                          {page.title}
-                        </h3>
-                        <p className="text-royal-blue/75 leading-relaxed text-sm sm:text-base whitespace-pre-line">
-                          {page.text}
-                        </p>
-                      </>
-                    )}
-                    {page.photoSet && (
-                      <p className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-royal-blue/50">
-                        <Camera className="h-3.5 w-3.5 text-royal-gold" />
-                        {page.photoSet}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="relative rounded-xl overflow-hidden border-2 border-royal-gold/30 bg-royal-cream shadow-md aspect-[3/4] sm:aspect-auto sm:min-h-[320px]">
-                    {page.imageUrl ? (
-                      page.imageUrl.startsWith("data:") ||
-                      page.imageUrl.includes("placehold.co") ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={page.imageUrl}
-                          alt={page.title}
-                          className="absolute inset-0 h-full w-full object-cover"
-                        />
-                      ) : (
-                        <Image
-                          src={page.imageUrl}
-                          alt={page.title}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 640px) 100vw, 400px"
-                          unoptimized
-                        />
-                      )
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center text-royal-blue/40 text-sm">
-                        No image
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-              </AnimatePresence>
-
-              <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-royal-gold/20 pt-5">
-                <button
-                  type="button"
-                  onClick={() => setPageIndex((i) => Math.max(0, i - 1))}
-                  disabled={pageIndex === 0}
-                  className="inline-flex h-10 items-center gap-1.5 rounded-md border border-royal-gold/35 bg-white px-4 text-sm font-semibold text-royal-blue disabled:opacity-40"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                  Previous
-                </button>
-                <div className="flex flex-wrap justify-center gap-1.5">
-                  {book.pages.map((p, i) => (
-                    <button
-                      key={p.page}
-                      type="button"
-                      onClick={() => setPageIndex(i)}
-                      className={cn(
-                        "h-10 min-w-10 sm:h-8 sm:min-w-8 rounded-md px-2 text-xs font-bold",
-                        i === pageIndex
-                          ? "bg-royal-gold text-royal-blue"
-                          : "bg-royal-blue/5 text-royal-blue/60 hover:bg-royal-gold/20"
-                      )}
-                    >
-                      {p.page}
-                    </button>
-                  ))}
-                </div>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setPageIndex((i) =>
-                      Math.min(book.pages.length - 1, i + 1)
-                    )
-                  }
-                  disabled={pageIndex === book.pages.length - 1}
-                  className="inline-flex h-10 items-center gap-1.5 rounded-md border border-royal-gold/35 bg-white px-4 text-sm font-semibold text-royal-blue disabled:opacity-40"
-                >
-                  Next
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-
-            <p className="text-center text-sm text-royal-blue/50">
-              Each kingdom-set page uses the photos you dropped for that set.
-              AI watercolor fills the remaining pages when fal.ai is configured.
-            </p>
-          </div>
+          <BookFlipPreview
+            book={book}
+            pageIndex={pageIndex}
+            setPageIndex={setPageIndex}
+            editMode={editMode}
+            setEditMode={setEditMode}
+            saving={saving}
+            approving={approving}
+            pdfLoading={pdfLoading}
+            updatePageField={updatePageField}
+            saveEdits={saveEdits}
+            downloadMpixPdf={downloadMpixPdf}
+            approveAndDownload={approveAndDownload}
+            onNewBook={() => {
+              setStep("form");
+              setBook(null);
+              setPageIndex(0);
+              setEditMode(false);
+              setChildName("");
+              setNotes("");
+            }}
+          />
         )}
       </div>
     </div>
   );
 }
+
+// ─── Book Flip Preview ───────────────────────────────────────────────────────
+
+function BookFlipPreview({
+  book,
+  pageIndex,
+  setPageIndex,
+  editMode,
+  setEditMode,
+  saving,
+  approving,
+  pdfLoading,
+  updatePageField,
+  saveEdits,
+  downloadMpixPdf,
+  approveAndDownload,
+  onNewBook,
+}: {
+  book: GeneratedBook;
+  pageIndex: number;
+  setPageIndex: (i: number) => void;
+  editMode: boolean;
+  setEditMode: (v: boolean | ((prev: boolean) => boolean)) => void;
+  saving: boolean;
+  approving: boolean;
+  pdfLoading: boolean;
+  updatePageField: (index: number, field: "title" | "text", value: string) => void;
+  saveEdits: () => void;
+  downloadMpixPdf: () => void;
+  approveAndDownload: () => void;
+  onNewBook: () => void;
+}) {
+  const page = book.pages[pageIndex];
+  const [direction, setDirection] = useState<1 | -1>(1);
+
+  function goNext() {
+    if (pageIndex < book.pages.length - 1) {
+      setDirection(1);
+      setPageIndex(pageIndex + 1);
+    }
+  }
+
+  function goPrev() {
+    if (pageIndex > 0) {
+      setDirection(-1);
+      setPageIndex(pageIndex - 1);
+    }
+  }
+
+  // Handle keyboard navigation
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "ArrowRight") goNext();
+      if (e.key === "ArrowLeft") goPrev();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
+
+  const variants = {
+    enter: (dir: number) => ({
+      x: dir > 0 ? 80 : -80,
+      opacity: 0,
+      rotateY: dir > 0 ? -12 : 12,
+    }),
+    center: { x: 0, opacity: 1, rotateY: 0 },
+    exit: (dir: number) => ({
+      x: dir > 0 ? -80 : 80,
+      opacity: 0,
+      rotateY: dir > 0 ? 12 : -12,
+    }),
+  };
+
+  if (!page) return null;
+
+  return (
+    <div className="space-y-5">
+      {/* Header row */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h2 className="font-serif text-2xl font-bold text-royal-blue">
+            {book.bookTitle}
+          </h2>
+          <p className="text-sm text-royal-blue/55">
+            {book.pages.length} pages · Age {book.child_age}
+            {book.adventure_path
+              ? ` · ${
+                  ADVENTURE_PATHS.find((p) => p.id === book.adventure_path)
+                    ?.label ?? book.adventure_path
+                }`
+              : ""}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setEditMode((v) => !v)}
+            className={cn(
+              "inline-flex h-10 items-center gap-1.5 rounded-md border px-4 text-sm font-semibold transition-colors",
+              editMode
+                ? "border-royal-gold bg-royal-gold/15 text-royal-blue"
+                : "border-royal-gold/35 bg-white text-royal-blue hover:bg-royal-gold/10"
+            )}
+          >
+            <Pencil className="h-4 w-4" />
+            {editMode ? "Editing…" : "Edit Story"}
+          </button>
+          {editMode && (
+            <button
+              type="button"
+              onClick={saveEdits}
+              disabled={saving}
+              className="inline-flex h-10 items-center gap-1.5 rounded-md bg-royal-blue px-4 text-sm font-semibold text-royal-cream disabled:opacity-50"
+            >
+              {saving ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Check className="h-4 w-4" />
+              )}
+              Save edits
+            </button>
+          )}
+          {(book.status === "ready" || book.status === "approved") && (
+            <button
+              type="button"
+              onClick={downloadMpixPdf}
+              disabled={pdfLoading}
+              className="inline-flex h-10 items-center gap-1.5 rounded-md border-2 border-royal-gold bg-royal-blue px-4 text-sm font-semibold text-royal-gold hover:bg-royal-blue/80 disabled:opacity-50 transition-colors"
+            >
+              {pdfLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4" />
+              )}
+              Download Mpix PDF
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={onNewBook}
+            className="inline-flex h-10 items-center rounded-md border border-royal-gold/25 px-4 text-sm text-royal-blue/70 hover:bg-white"
+          >
+            New book
+          </button>
+        </div>
+      </div>
+
+      {/* Book viewer */}
+      <div className="rounded-2xl border border-royal-gold/30 bg-gradient-to-br from-[#FFFBF5] via-white to-[#F5EDE0] shadow-xl overflow-hidden">
+        {/* Page content with flip animation */}
+        <div className="relative" style={{ perspective: 1200 }}>
+          <AnimatePresence custom={direction} mode="wait">
+            <motion.div
+              key={`${book.id}-${page.page}-${editMode}`}
+              custom={direction}
+              variants={variants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.38, ease: [0.25, 0.46, 0.45, 0.94] }}
+              className="w-full"
+            >
+              {/* Illustration — top 70% */}
+              <div className="relative w-full" style={{ paddingBottom: "58%" }}>
+                {page.imageUrl ? (
+                  page.imageUrl.startsWith("data:") ||
+                  page.imageUrl.includes("placehold.co") ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={page.imageUrl}
+                      alt={page.title}
+                      className="absolute inset-0 h-full w-full object-cover"
+                    />
+                  ) : (
+                    <Image
+                      src={page.imageUrl}
+                      alt={page.title}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 640px) 100vw, 900px"
+                      unoptimized
+                    />
+                  )
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center bg-royal-cream/50">
+                    <span className="text-royal-blue/30 text-sm">No illustration yet</span>
+                  </div>
+                )}
+                {/* Page number overlay */}
+                <div className="absolute bottom-3 right-4 bg-royal-blue/70 text-royal-cream text-xs font-semibold px-2.5 py-1 rounded-full backdrop-blur-sm">
+                  Page {page.page} of {book.pages.length}
+                </div>
+                {page.photoSet && (
+                  <div className="absolute bottom-3 left-4 inline-flex items-center gap-1 bg-white/80 text-royal-blue/60 text-[10px] font-semibold px-2 py-1 rounded-full backdrop-blur-sm">
+                    <Camera className="h-3 w-3 text-royal-gold" />
+                    {page.photoSet}
+                  </div>
+                )}
+              </div>
+
+              {/* Text — bottom 30% */}
+              <div className="px-6 sm:px-10 py-6 bg-white border-t border-royal-gold/15">
+                {editMode ? (
+                  <div className="space-y-3">
+                    <input
+                      value={page.title}
+                      onChange={(e) =>
+                        updatePageField(pageIndex, "title", e.target.value)
+                      }
+                      className="font-serif text-2xl font-bold text-royal-blue w-full border-b border-royal-gold/40 bg-transparent outline-none pb-1"
+                    />
+                    <textarea
+                      value={page.text}
+                      onChange={(e) =>
+                        updatePageField(pageIndex, "text", e.target.value)
+                      }
+                      rows={5}
+                      className="w-full rounded-md border border-royal-gold/30 bg-white px-3 py-2 text-sm text-royal-blue/80 leading-relaxed outline-none focus:ring-2 focus:ring-royal-gold/20"
+                    />
+                  </div>
+                ) : (
+                  <div>
+                    <h3 className="font-serif text-xl sm:text-2xl font-bold text-royal-blue mb-3 leading-tight">
+                      {page.title}
+                    </h3>
+                    <p className="text-royal-blue/75 leading-relaxed text-sm sm:text-base whitespace-pre-line">
+                      {page.text}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* Navigation bar */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-royal-gold/20 bg-white/50">
+          <button
+            type="button"
+            onClick={goPrev}
+            disabled={pageIndex === 0}
+            className="inline-flex h-10 items-center gap-1.5 rounded-md border border-royal-gold/35 bg-white px-4 text-sm font-semibold text-royal-blue disabled:opacity-40 hover:bg-royal-gold/5 transition-colors"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Previous
+          </button>
+
+          {/* Page dots / numbers */}
+          <div className="flex flex-wrap justify-center gap-1.5">
+            {book.pages.map((p, i) => (
+              <button
+                key={p.page}
+                type="button"
+                onClick={() => {
+                  setDirection(i > pageIndex ? 1 : -1);
+                  setPageIndex(i);
+                }}
+                className={cn(
+                  "h-8 min-w-8 rounded-md px-2 text-xs font-bold transition-colors",
+                  i === pageIndex
+                    ? "bg-royal-gold text-royal-blue"
+                    : "bg-royal-blue/5 text-royal-blue/60 hover:bg-royal-gold/20"
+                )}
+              >
+                {p.page}
+              </button>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            onClick={goNext}
+            disabled={pageIndex === book.pages.length - 1}
+            className="inline-flex h-10 items-center gap-1.5 rounded-md border border-royal-gold/35 bg-white px-4 text-sm font-semibold text-royal-blue disabled:opacity-40 hover:bg-royal-gold/5 transition-colors"
+          >
+            Next
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* Approve & Download PDF — bottom CTA */}
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+        <button
+          type="button"
+          onClick={approveAndDownload}
+          disabled={approving}
+          className="inline-flex h-12 items-center gap-2 rounded-md bg-royal-gold px-8 text-sm font-semibold text-royal-blue hover:bg-[#D4B480] disabled:opacity-50 shadow-md shadow-royal-gold/20 transition-colors"
+        >
+          {approving ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Download className="h-4 w-4" />
+          )}
+          Approve &amp; Download PDF
+        </button>
+      </div>
+
+      <p className="text-center text-sm text-royal-blue/50">
+        Each kingdom-set page uses the photos you dropped for that set.
+        AI watercolor fills the remaining pages when fal.ai is configured.
+      </p>
+    </div>
+  );
+}
+
+// ─── SetDropZone ─────────────────────────────────────────────────────────────
 
 function SetDropZone({
   name,
@@ -829,19 +1163,19 @@ function SetDropZone({
 }) {
   const [dragging, setDragging] = useState(false);
 
-  function onDragOver(e: DragEvent) {
+  function onDragOver(e: DragEvent<HTMLDivElement>) {
     e.preventDefault();
     e.stopPropagation();
     setDragging(true);
   }
 
-  function onDragLeave(e: DragEvent) {
+  function onDragLeave(e: DragEvent<HTMLDivElement>) {
     e.preventDefault();
     e.stopPropagation();
     setDragging(false);
   }
 
-  function onDrop(e: DragEvent) {
+  function onDrop(e: DragEvent<HTMLDivElement>) {
     e.preventDefault();
     e.stopPropagation();
     setDragging(false);
