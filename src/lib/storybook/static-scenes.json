@@ -1,0 +1,44 @@
+{
+  "dragon-slayer": {
+    "call": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/call.jpg",
+    "dragon": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/dragon.jpg",
+    "end": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/end.jpg",
+    "title": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/title.jpg",
+    "victory": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/victory.jpg"
+  },
+  "rescue-mission": {
+    "call": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/call.jpg",
+    "end": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/end.jpg",
+    "found": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/found.jpg",
+    "search": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/search.jpg",
+    "title": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/title.jpg"
+  },
+  "lost-crown": {
+    "call": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/call.jpg",
+    "clues": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/clues.jpg",
+    "discovery": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/discovery.jpg",
+    "end": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/end.jpg",
+    "title": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/title.jpg"
+  },
+  "forest-guardian": {
+    "call": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/call.jpg",
+    "end": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/end.jpg",
+    "journey": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/journey.jpg",
+    "magic": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/magic.jpg",
+    "title": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/title.jpg"
+  },
+  "kindness-quest": {
+    "call": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/call.jpg",
+    "end": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/end.jpg",
+    "gift": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/gift.jpg",
+    "journey": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/journey.jpg",
+    "title": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/title.jpg"
+  },
+  "light-treasure": {
+    "call": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/call.jpg",
+    "discovery": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/discovery.jpg",
+    "end": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/end.jpg",
+    "journey": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/journey.jpg",
+    "title": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/title.jpg"
+  }
+}
