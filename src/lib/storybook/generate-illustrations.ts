@@ -1,6 +1,17 @@
 import type { KingdomSet, PhotosBySet, StoryPage } from "./types";
 import { SET_UPLOAD_SLOTS } from "./types";
 
+
+/** Pre-approved watercolor scene illustrations — used instead of generating new AI images */
+export const STATIC_SCENES: Record<string, string> = {
+  "title-page": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/title-page.jpg",
+  "dragon-encounter": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/dragon-encounter.jpg",
+  "the-gift": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/the-gift.jpg",
+  "victory": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/victory.jpg",
+  "the-end": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/the-end.jpg",
+};
+
+
 type FluxResult = {
   imageUrl: string;
   provider: "fal" | "placeholder";
@@ -352,6 +363,12 @@ export async function illustrateStoryPages(options: {
     }
 
     // AI illustration page — use flux-pulid if character photo provided,
+    // Check for pre-approved static scene first
+    if ((page as any).staticScene && STATIC_SCENES[(page as any).staticScene]) {
+      result.push({ ...page, imageUrl: STATIC_SCENES[(page as any).staticScene] });
+      continue;
+    }
+
     // otherwise Imagen 4.0 (primary) → Flux Dev (fallback)
     const art = await generateStoryIllustration({
       prompt: page.imagePrompt ?? page.title,

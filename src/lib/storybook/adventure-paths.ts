@@ -27,6 +27,7 @@ export type AdventureScriptPage = {
   photoSet?: Exclude<KingdomSet, null>;
   useSessionPhoto?: boolean;
   imagePromptHint?: string;
+  staticScene?: string;
 };
 
 export type AdventurePath = {
@@ -211,6 +212,7 @@ export const ADVENTURE_PATHS: AdventurePath[] = [
       {
         page: 1,
         title: `The Dragon Quest`,
+        staticScene: "title-page",
         text: `[Role] [Name]\nand the Dragon Quest`,
         photoCaption: `A magical kingdom awaits`,
         useSessionPhoto: false,
@@ -269,6 +271,7 @@ export const ADVENTURE_PATHS: AdventurePath[] = [
       {
         page: 7,
         title: `The Forest Path`,
+        staticScene: "dragon-encounter",
         text: `Suddenly — a great shadow swept over the treetops!\n\nThe dragon circled overhead, its wings stirring the lanterns like leaves in the wind.\n\n[Role] [Name] did not run. [She/He/They] stood still, looked up, and held out a steady hand of peace.`,
         photoCaption: `A shadow overhead`,
         useSessionPhoto: false,
