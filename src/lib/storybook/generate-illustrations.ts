@@ -139,7 +139,7 @@ async function generateWithImagen4(prompt: string): Promise<FluxResult> {
 
   try {
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-preview-06-06:predict?key=${googleKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${googleKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
