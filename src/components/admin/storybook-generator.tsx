@@ -816,7 +816,7 @@ export function StorybookGenerator() {
                 </div>
               </div>
 
-              <div className="grid sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                 {SET_UPLOAD_SLOTS.map((slot) => (
                   <SetDropZone
                     key={slot.id}
