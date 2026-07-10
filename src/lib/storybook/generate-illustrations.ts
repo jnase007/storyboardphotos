@@ -237,6 +237,11 @@ export async function generateStoryIllustration(options: {
   return generateWithImagen4(options.prompt);
 }
 
+/** Flatten photos_by_set into a single list */
+export function flattenPhotosBySet(photosBySet: PhotosBySet): string[] {
+  return SET_UPLOAD_SLOTS.flatMap((slot) => photosBySet[slot.id] ?? []);
+}
+
 export async function illustrateStoryPages(options: {
   pages: StoryPage[];
   photoUrls?: string[];
