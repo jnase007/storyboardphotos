@@ -10,6 +10,10 @@ import { EnchantEmbers } from "@/components/enchant-embers";
 
 const HERO_BACKGROUNDS = [
   {
+    src: "https://brandastic.com/wp-content/uploads/2026/07/Gemini_Generated_Image_v9vlchv9vlchv9vl.jpg",
+    alt: "Magical Kingdom Watercolor — Storybook Photos Kings & Queens",
+  },
+  {
     src: "/sets/royal-forest.webp",
     alt: "Royal Forest set — Storybook Photos Kings & Queens",
   },
