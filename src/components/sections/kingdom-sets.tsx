@@ -11,6 +11,8 @@ import {
   Shield,
   ArrowRight,
   Expand,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { KINGDOM_SETS } from "@/lib/constants";
 import { SectionOrnament } from "@/components/section-ornament";
@@ -33,6 +35,13 @@ type KingdomSet = (typeof KINGDOM_SETS)[number];
 
 export function KingdomSetsSection() {
   const [activeSet, setActiveSet] = useState<KingdomSet | null>(null);
+
+  function navigateSet(dir: 1 | -1) {
+    if (!activeSet) return;
+    const idx = KINGDOM_SETS.findIndex((s) => s.name === activeSet.name);
+    const next = KINGDOM_SETS[(idx + dir + KINGDOM_SETS.length) % KINGDOM_SETS.length];
+    setActiveSet(next);
+  }
 
   return (
     <section id="kingdom-sets" className="py-24 bg-enchanted-cream">
@@ -150,6 +159,32 @@ export function KingdomSetsSection() {
                   sizes="(max-width: 1100px) 96vw, 1100px"
                   priority
                 />
+                {/* Prev/Next arrows */}
+                <button
+                  onClick={() => navigateSet(-1)}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                  style={{ background: "rgba(10,22,40,0.7)", color: "#C5A26F", border: "1px solid rgba(197,162,111,0.4)" }}
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => navigateSet(1)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                  style={{ background: "rgba(10,22,40,0.7)", color: "#C5A26F", border: "1px solid rgba(197,162,111,0.4)" }}
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+                {/* Dot indicators */}
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+                  {KINGDOM_SETS.map((s) => (
+                    <button
+                      key={s.name}
+                      onClick={() => setActiveSet(s)}
+                      className="w-2 h-2 rounded-full transition-all"
+                      style={{ background: s.name === activeSet.name ? "#C5A26F" : "rgba(197,162,111,0.3)" }}
+                    />
+                  ))}
+                </div>
               </div>
               <div className="px-5 sm:px-7 py-5 border-t border-royal-gold/25">
                 <DialogTitle>{activeSet.name}</DialogTitle>
