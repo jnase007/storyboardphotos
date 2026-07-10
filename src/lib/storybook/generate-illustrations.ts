@@ -24,7 +24,7 @@ export async function generateStoryIllustration(options: {
       ? "https://fal.run/fal-ai/flux/dev/image-to-image"
       : "https://fal.run/fal-ai/flux/dev";
 
-    const STYLE_SUFFIX = "watercolor and colored pencil children's coloring book illustration style, soft ink outlines, gentle pastel washes, dreamy storybook feel, warm golden light, magical kingdom atmosphere, no text, no watermark, no borders";
+    const STYLE_SUFFIX = "classic children's storybook watercolor illustration, soft fine ink outlines, gentle pastel washes on cream white background, delicate floral details, rosy cheeks, warm soft lighting, intricate costume details with floral embroidery, whimsical and enchanting, style of a premium children's picture book, no text, no watermark, no borders, isolated figure on cream background";
 
     const body = withRef
       ? {
