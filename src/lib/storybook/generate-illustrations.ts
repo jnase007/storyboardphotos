@@ -233,100 +233,10 @@ export async function generateStoryIllustration(options: {
   referenceImageUrl?: string | null;
   characterPhotoUrl?: string | null;
 }): Promise<FluxResult> {
-  const falKey = process.env.FAL_KEY ?? process.env.FAL_API_KEY;
-
-  // 1. If a processed character photo URL is provided, use flux-pulid for likeness preservation
-  if (options.characterPhotoUrl) {
-    return generateWithPulid({
-      prompt: options.prompt,
-      characterPhotoUrl: options.characterPhotoUrl,
-    });
-  }
-
-  // 2. Try Google Imagen 4.0 first (primary generator — best quality)
-  const googleKey = process.env.GOOGLE_AI_API_KEY;
-  if (googleKey) {
-    const result = await generateWithImagen4(options.prompt);
-    if (result.provider !== "placeholder") {
-      return result;
-    }
-  }
-
-  // 3. Fallback to Fal.ai Flux Dev
-  if (falKey) {
-    const withRef =
-      Boolean(options.referenceImageUrl) &&
-      !options.referenceImageUrl!.startsWith("data:");
-    const endpoint = withRef
-      ? "https://fal.run/fal-ai/flux/dev/image-to-image"
-      : "https://fal.run/fal-ai/flux/dev";
-
-    const body = withRef
-      ? {
-          prompt: `${options.prompt}. ${STYLE_SUFFIX}. Preserve the child's face and likeness from the reference photo.`,
-          image_url: options.referenceImageUrl,
-          strength: 0.72,
-          num_inference_steps: 32,
-          guidance_scale: 4.0,
-          image_size: "portrait_4_3",
-          enable_safety_checker: true,
-        }
-      : {
-          prompt: `${options.prompt}. ${STYLE_SUFFIX}.`,
-          num_inference_steps: 32,
-          guidance_scale: 4.0,
-          image_size: "portrait_4_3",
-          enable_safety_checker: true,
-        };
-
-    try {
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          Authorization: `Key ${falKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        const url =
-          data?.images?.[0]?.url ??
-          data?.image?.url ??
-          (Array.isArray(data?.output) ? data.output[0] : null);
-        if (typeof url === "string") {
-          return { imageUrl: url, provider: "fal" };
-        }
-      } else {
-        console.error("fal.ai Flux error:", await res.text());
-      }
-    } catch (err) {
-      console.error("fal.ai Flux failed:", err);
-    }
-  }
-
-  // 4. Last resort — placeholder
-  return fallbackPlaceholder(options.prompt);
+  // Use Google Imagen 4.0 exclusively — highest quality watercolor illustrations
+  return generateWithImagen4(options.prompt);
 }
 
-const SET_NAME_TO_ID: Record<Exclude<KingdomSet, null>, keyof PhotosBySet> = {
-  "Throne Room": "throne-room",
-  "Royal Forest": "royal-forest",
-  "Royal Garden": "royal-garden",
-  "Chastle": "chastle",
-};
-
-/** Flatten photos_by_set into a single list (order: throne → forest → garden → quest). */
-export function flattenPhotosBySet(photosBySet: PhotosBySet): string[] {
-  return SET_UPLOAD_SLOTS.flatMap((slot) => photosBySet[slot.id] ?? []);
-}
-
-/**
- * Fill page images using per-set session photos when available.
- * When characterPhoto is provided, AI illustration pages use flux-pulid for likeness preservation.
- * When no character photo, Google Imagen 4.0 is used for primary generation.
- */
 export async function illustrateStoryPages(options: {
   pages: StoryPage[];
   photoUrls?: string[];
