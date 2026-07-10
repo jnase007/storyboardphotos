@@ -43,7 +43,7 @@ type FluxResult = {
 };
 
 const STYLE_SUFFIX =
-  "soft gentle children's watercolor illustration, pastel colors, delicate brushwork, whimsical fairy tale style like Beatrix Potter or classic Disney, enchanted magical kingdom setting with soft rolling hills and a castle in the background, warm cream and gold tones, dreamy and gentle atmosphere, NOT photorealistic NOT comic book NOT dark, appropriate for ages 2-10, no text, no watermark, no logos, no signs";
+  "Cozy watercolor children's book illustration, soft painterly style, warm gentle colors, storybook aesthetic, soft lighting, subtle texture, high detail, beautiful children's book art, no text, no watermark, no real people, no faces";
 
 /**
  * Remove background from an image using fal-ai/bria background removal.
@@ -262,22 +262,8 @@ export async function illustrateStoryPages(options: {
     (photosBySet ? flattenPhotosBySet(photosBySet) : []);
   const reference = flat.find((u) => !u.startsWith("data:")) ?? null;
 
-  // Process character photo: upload if base64, then remove background
-  let processedCharacterPhotoUrl: string | null = null;
-  if (characterPhoto) {
-    let photoUrl = characterPhoto;
-    if (characterPhoto.startsWith("data:")) {
-      const uploaded = await uploadBase64ToFal(characterPhoto);
-      if (uploaded) photoUrl = uploaded;
-      else {
-        // Can't upload — skip character photo compositing
-        photoUrl = "";
-      }
-    }
-    if (photoUrl) {
-      processedCharacterPhotoUrl = await removeBackground(photoUrl);
-    }
-  }
+  // NOTE: Character portrait upload is saved for future face-compositing feature.
+  // For now, Mode A = real session photos, Mode B = pure AI watercolor (no faces).
 
   // Round-robin cursor per set so multiple photos on one set rotate
   const setCursors: Partial<Record<keyof PhotosBySet, number>> = {};
