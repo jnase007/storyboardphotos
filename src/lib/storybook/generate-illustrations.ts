@@ -124,6 +124,55 @@ async function generateWithPulid(options: {
   return fallbackPlaceholder(options.prompt);
 }
 
+/**
+ * Generate a watercolor storybook illustration via Google Imagen 4.0.
+ * Higher quality than Flux Dev — used as the primary generator when no character photo.
+ */
+async function generateWithImagen4(prompt: string): Promise<FluxResult> {
+  const googleKey = process.env.GOOGLE_AI_API_KEY;
+  if (!googleKey) return fallbackPlaceholder(prompt);
+
+  const STYLE =
+    "double-page spread children's storybook watercolor illustration, hand-drawn fine ink outlines, soft watercolor washes with gentle pastel colors, detailed enchanted kingdom scene with castle towers stone paths wildflowers fairies, decorative vine border frame around the edges, warm cream background, rich detailed scenery like a premium illustrated children's book, whimsical and magical atmosphere, style of a classic fairy tale picture book, lush green trees and rolling hills, cozy storybook feel, no text, no watermark";
+
+  const fullPrompt = `${prompt}. ${STYLE}`;
+
+  try {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-preview-06-06:predict?key=${googleKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          instances: [{ prompt: fullPrompt }],
+          parameters: {
+            sampleCount: 1,
+            aspectRatio: "3:4",
+            safetyFilterLevel: "block_few",
+            personGeneration: "allow_adult",
+          },
+        }),
+      }
+    );
+
+    if (res.ok) {
+      const data = await res.json();
+      const b64 = data?.predictions?.[0]?.bytesBase64Encoded;
+      if (b64) {
+        // Return as data URL — jsPDF can handle it directly
+        const dataUrl = `data:image/jpeg;base64,${b64}`;
+        return { imageUrl: dataUrl, provider: "fal" };
+      }
+    } else {
+      console.error("Imagen 4.0 error:", res.status, await res.text());
+    }
+  } catch (err) {
+    console.error("Imagen 4.0 failed:", err);
+  }
+
+  return fallbackPlaceholder(prompt);
+}
+
 function fallbackPlaceholder(prompt: string): FluxResult {
   const label = encodeURIComponent(
     prompt.slice(0, 60).replace(/\s+/g, " ")
@@ -135,8 +184,13 @@ function fallbackPlaceholder(prompt: string): FluxResult {
 }
 
 /**
- * Generate a watercolor storybook illustration via fal.ai Flux
- * (with optional reference image for character consistency).
+ * Generate a watercolor storybook illustration.
+ *
+ * Priority order:
+ * 1. characterPhotoUrl provided → flux-pulid (face/likeness preservation)
+ * 2. No character photo → Google Imagen 4.0 (primary, best quality)
+ * 3. Imagen 4.0 fails or no key → Fal.ai Flux Dev
+ * 4. Last resort → placeholder
  */
 export async function generateStoryIllustration(options: {
   prompt: string;
@@ -145,7 +199,7 @@ export async function generateStoryIllustration(options: {
 }): Promise<FluxResult> {
   const falKey = process.env.FAL_KEY ?? process.env.FAL_API_KEY;
 
-  // If a processed character photo URL is provided, use flux-pulid for likeness preservation
+  // 1. If a processed character photo URL is provided, use flux-pulid for likeness preservation
   if (options.characterPhotoUrl) {
     return generateWithPulid({
       prompt: options.prompt,
@@ -153,6 +207,16 @@ export async function generateStoryIllustration(options: {
     });
   }
 
+  // 2. Try Google Imagen 4.0 first (primary generator — best quality)
+  const googleKey = process.env.GOOGLE_AI_API_KEY;
+  if (googleKey) {
+    const result = await generateWithImagen4(options.prompt);
+    if (result.provider !== "placeholder") {
+      return result;
+    }
+  }
+
+  // 3. Fallback to Fal.ai Flux Dev
   if (falKey) {
     const withRef =
       Boolean(options.referenceImageUrl) &&
@@ -206,6 +270,7 @@ export async function generateStoryIllustration(options: {
     }
   }
 
+  // 4. Last resort — placeholder
   return fallbackPlaceholder(options.prompt);
 }
 
@@ -224,6 +289,7 @@ export function flattenPhotosBySet(photosBySet: PhotosBySet): string[] {
 /**
  * Fill page images using per-set session photos when available.
  * When characterPhoto is provided, AI illustration pages use flux-pulid for likeness preservation.
+ * When no character photo, Google Imagen 4.0 is used for primary generation.
  */
 export async function illustrateStoryPages(options: {
   pages: StoryPage[];
@@ -285,7 +351,8 @@ export async function illustrateStoryPages(options: {
       continue;
     }
 
-    // AI illustration page — use flux-pulid if character photo provided
+    // AI illustration page — use flux-pulid if character photo provided,
+    // otherwise Imagen 4.0 (primary) → Flux Dev (fallback)
     const art = await generateStoryIllustration({
       prompt: page.imagePrompt ?? page.title,
       referenceImageUrl: reference,
