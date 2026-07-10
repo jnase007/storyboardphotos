@@ -7,7 +7,7 @@ type FluxResult = {
 };
 
 const STYLE_SUFFIX =
-  "traditional watercolor painting style, soft painterly brushstrokes, gentle watercolor washes, children's picture book illustration, warm golden lighting, enchanted fairy tale scene, detailed kingdom background with castle spires and rolling hills, lush vegetation, painterly textures, dreamlike atmosphere, professional children's book art, no text, no watermark";
+  "soft gentle children's watercolor illustration, pastel colors, delicate brushwork, whimsical fairy tale style like Beatrix Potter or classic Disney, enchanted magical kingdom setting with soft rolling hills and a castle in the background, warm cream and gold tones, dreamy and gentle atmosphere, NOT photorealistic NOT comic book NOT dark, appropriate for ages 2-10, no text, no watermark, no logos, no signs";
 
 /**
  * Remove background from an image using fal-ai/bria background removal.
