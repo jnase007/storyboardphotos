@@ -48,11 +48,25 @@ const ADMIN_LINKS = [
     match: (path: string) => path.startsWith("/business-plan/print"),
   },
   {
+    href: "/admin/books",
+    label: "Books Library",
+    shortLabel: "Books",
+    icon: BookOpen,
+    match: (path: string) => path.startsWith("/admin/books"),
+  },
+  {
     href: "/admin/story-scripts",
     label: "Story Scripts",
     shortLabel: "Scripts",
     icon: BookOpen,
     match: (path: string) => path.startsWith("/admin/story-scripts"),
+  },
+  {
+    href: "/admin/ip",
+    label: "IP Bible",
+    shortLabel: "IP",
+    icon: BookOpen,
+    match: (path: string) => path.startsWith("/admin/ip"),
   },
 ] as const;
 
