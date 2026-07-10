@@ -35,6 +35,7 @@ type KingdomSet = (typeof KINGDOM_SETS)[number];
 
 export function KingdomSetsSection() {
   const [activeSet, setActiveSet] = useState<KingdomSet | null>(null);
+  const [mapOpen, setMapOpen] = useState(false);
 
   function navigateSet(dir: 1 | -1) {
     if (!activeSet) return;
@@ -211,7 +212,11 @@ export function KingdomSetsSection() {
           <p className="text-royal-blue/60 mb-8 max-w-lg mx-auto">
             Your adventure takes you through these enchanted lands — each one waiting to become part of your story.
           </p>
-          <div className="relative max-w-2xl mx-auto rounded-2xl overflow-hidden shadow-2xl border-2" style={{ borderColor: "#C5A26F33" }}>
+          <div
+            className="relative max-w-2xl mx-auto rounded-2xl overflow-hidden shadow-2xl border-2 cursor-zoom-in hover:scale-[1.02] transition-transform"
+            style={{ borderColor: "#C5A26F33" }}
+            onClick={() => setMapOpen(true)}
+          >
             <Image
               src="https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/kingdom-map.jpg"
               alt="Map of the Kingdom of Light"
@@ -220,7 +225,28 @@ export function KingdomSetsSection() {
               className="w-full h-auto"
             />
             <div className="absolute inset-0 rounded-2xl" style={{ boxShadow: "inset 0 0 40px rgba(10,22,40,0.15)" }} />
+            <div className="absolute bottom-3 right-3 px-3 py-1 rounded-full text-xs font-semibold" style={{ background: "rgba(10,22,40,0.7)", color: "#C5A26F" }}>
+              Click to expand ✦
+            </div>
           </div>
+
+          {/* Map modal */}
+          <Dialog open={mapOpen} onOpenChange={setMapOpen}>
+            <DialogContent className="max-w-4xl w-full p-2 rounded-2xl border-2" style={{ borderColor: "#C5A26F40", background: "#0A1628" }}>
+              <DialogTitle className="sr-only">Map of the Kingdom of Light</DialogTitle>
+              <DialogDescription className="sr-only">Full map of the Kingdom of Light showing all adventure locations</DialogDescription>
+              <div className="relative w-full rounded-xl overflow-hidden">
+                <Image
+                  src="https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/kingdom-map.jpg"
+                  alt="Map of the Kingdom of Light"
+                  width={1200}
+                  height={1200}
+                  className="w-full h-auto"
+                />
+              </div>
+              <p className="text-center text-sm mt-2 pb-1" style={{ color: "#C5A26F99" }}>The Kingdom of Light — your adventure awaits</p>
+            </DialogContent>
+          </Dialog>
         </motion.div>
       </div>
     </section>
