@@ -289,7 +289,9 @@ export async function illustrateStoryPages(options: {
       }
     }
 
-    const preferPhoto = page.useSessionPhoto || Boolean(page.photoSet);
+    // Only use flat fallback if useSessionPhoto is explicitly true AND this page
+    // doesn't have a specific photoSet (avoid cross-contaminating set photos)
+    const preferPhoto = page.useSessionPhoto && !page.photoSet;
     if (preferPhoto && flat.length > 0) {
       const photo = flat[flatCursor % flat.length];
       flatCursor += 1;
