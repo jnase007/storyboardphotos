@@ -243,7 +243,7 @@ async function generateWithCharacterPortrait(options: {
 
   try {
     const res = await fetch(
-      \`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=\${googleKey}\`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${googleKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -265,7 +265,7 @@ async function generateWithCharacterPortrait(options: {
       for (const part of parts) {
         if (part.inlineData?.data) {
           // Convert base64 to data URL
-          const dataUrl = \`data:image/jpeg;base64,\${part.inlineData.data}\`;
+          const dataUrl = `data:image/jpeg;base64,${part.inlineData.data}`;
           return { imageUrl: dataUrl, provider: "fal" };
         }
       }
