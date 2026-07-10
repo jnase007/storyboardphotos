@@ -1071,13 +1071,13 @@ function BookFlipPreview({
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={page.imageUrl}
-                      alt={page.title}
+                      alt={["Title Page","The Dragon Quest","The Lost Crown","The Rescue Mission","The Forest Guardian","The Kindness Quest","The Light Treasure"].includes(page.title) ? "" : page.title}
                       className="absolute inset-0 h-full w-full object-cover"
                     />
                   ) : (
                     <Image
                       src={page.imageUrl}
-                      alt={page.title}
+                      alt={["Title Page","The Dragon Quest","The Lost Crown","The Rescue Mission","The Forest Guardian","The Kindness Quest","The Light Treasure"].includes(page.title) ? "" : page.title}
                       fill
                       className="object-cover"
                       sizes="(max-width: 640px) 100vw, 900px"
@@ -1106,7 +1106,7 @@ function BookFlipPreview({
                 {editMode ? (
                   <div className="space-y-3">
                     <input
-                      value={page.title}
+                      value={["Title Page","The Dragon Quest","The Lost Crown","The Rescue Mission","The Forest Guardian","The Kindness Quest","The Light Treasure"].includes(page.title) ? "" : page.title}
                       onChange={(e) =>
                         updatePageField(pageIndex, "title", e.target.value)
                       }
@@ -1124,7 +1124,7 @@ function BookFlipPreview({
                 ) : (
                   <div>
                     <h3 className="font-serif text-xl sm:text-2xl font-bold text-royal-blue mb-3 leading-tight">
-                      {page.title}
+                      {["Title Page","The Dragon Quest","The Lost Crown","The Rescue Mission","The Forest Guardian","The Kindness Quest","The Light Treasure"].includes(page.title) ? "" : page.title}
                     </h3>
                     <p className="text-royal-blue/75 leading-relaxed text-sm sm:text-base whitespace-pre-line">
                       {page.text}
