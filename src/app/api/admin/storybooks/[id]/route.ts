@@ -82,3 +82,28 @@ export async function GET(request: NextRequest, { params }: Params) {
 
   return NextResponse.json(data);
 }
+
+export async function DELETE(request: NextRequest, { params }: Params) {
+  const denied = assertAdminAccess(request);
+  if (denied) return denied;
+
+  const { id } = await params;
+
+  if (!hasRealSupabase() || id.startsWith("local-")) {
+    return NextResponse.json({ success: true });
+  }
+
+  try {
+    const supabase = createServiceClient();
+    const { error } = await supabase
+      .from("storybooks")
+      .delete()
+      .eq("id", id);
+
+    if (error) throw error;
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error("Delete storybook error:", err);
+    return NextResponse.json({ error: "Delete failed" }, { status: 500 });
+  }
+}
