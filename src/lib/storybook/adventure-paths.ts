@@ -216,12 +216,12 @@ export const ADVENTURE_PATHS: AdventurePath[] = [
         text: `[Role] [Name]\nand the Dragon Quest`,
         photoCaption: `A magical kingdom awaits`,
         useSessionPhoto: false,
-        imagePromptHint:
-          "[Role] [Name] title page with a glowing dragon silhouette on distant hills, royal crest, watercolor and colored pencil children's storybook illustration style, soft ink outlines, gentle pastel washes on cream background, magical kingdom atmosphere, warm golden light, no text",
+        imagePromptHint: "title page watercolor no text",
       },
       {
         page: 2,
         title: `The Call`,
+        staticScene: "dragon-slayer/call",
         text: `In the Kingdom of Light, a golden morning turned to shadow when word arrived: a great dragon had settled in the hills beyond the valley, and the people trembled with fear.
 
 The King himself walked slowly to the throne room window and gazed out at the distant smoke curling above the mountains. He had heard of one person brave enough to help — one whose heart was made not just of courage, but of kindness.
@@ -235,198 +235,117 @@ He turned and called out the name that made the whole kingdom hold its breath: [
 [She/He/They] stood tall, lifted [her/his/their] chin, and answered with one quiet word: "Yes."`,
         photoCaption: `The quest begins`,
         useSessionPhoto: false,
-        imagePromptHint:
-          "[Role] [Name] receiving a quest scroll in a grand castle hall, a distant dragon silhouette on misty hills through the window, watercolor and colored pencil children's storybook illustration style, soft ink outlines, gentle pastel washes on cream background, magical kingdom atmosphere, warm golden light, no text",
+        imagePromptHint: "call to adventure watercolor no text",
       },
       {
         page: 3,
         title: `The Royal Throne`,
         text: `The Throne Room was the most beautiful place [Role] [Name] had ever seen. The walls were draped with banners of crimson and gold, and the ceiling soared so high it was almost like standing beneath the sky itself.
 
-In the center of the room, on a platform of smooth white stone, sat the royal throne — carved from the wood of an ancient oak tree, inlaid with gold, and draped in the softest velvet.
+In the center of the room stood the royal throne — carved from the wood of an ancient oak tree, inlaid with gold, and draped in the softest velvet.
 
-[Role] [Name] walked slowly toward it, footsteps echoing in the grand and quiet hall. [She/He/They] sat down gently, as if the throne were something holy — and in a way, it was. This was where the leaders of the kingdom had always sat. This was where courage lived.
+[Role] [Name] walked slowly toward it, footsteps echoing in the grand and quiet hall. [She/He/They] sat down gently, as if the throne were something holy. Because in a way, it was. This was where the leaders of the kingdom had always sat. This was where courage lived.
 
-"I am [Role] [Name]," [she/he/they] whispered to [her/his/their] reflection in the polished floor. "I am brave. I am loved. I was made for such a time as this."
+"I am [Role] [Name]," [she/he/they] whispered. "I am brave. I am loved. I was made for such a time as this."
 
 Outside the tall windows, the kingdom waited. And [Role] [Name] knew — deep in [her/his/their] heart — that today, they would be worthy of it.`,
         photoCaption: `Portrait from the Throne Room`,
         photoSet: "Throne Room",
         useSessionPhoto: true,
-        imagePromptHint:
-          "[Role] [Name] on a golden throne with royal banners, watercolor and colored pencil children's storybook illustration style, soft ink outlines, gentle pastel washes on cream background, magical kingdom atmosphere, warm golden light, no text",
+        imagePromptHint: "throne room portrait watercolor no text",
       },
       {
         page: 4,
-        title: `A Royal Promise`,
-        text: `When [Role] [Name] rose from the golden throne, something had changed. There was a new light in [her/his/their] eyes — the kind of light that doesn't come from candles or torches, but from deep inside a person who has decided to be brave.
-
-The people of the kingdom gathered in the courtyard below, their faces turned upward, their hearts full of hope and worry all at once. They had heard about the dragon. They had heard about the mission. And now they looked to [Role] [Name] to lead them.
-
-[Role] [Name] stepped to the edge of the balcony, and in a clear, calm voice that carried over the whole crowd, spoke the words that everyone would remember for the rest of their lives:
-
-"I will go. I will face the dragon — not with anger, but with an open heart. I will listen before I speak, and love before I fear. And I promise you, I will come home."
-
-The cheering that followed was the loudest sound [Role] [Name] had ever heard. But even louder was the quiet voice inside [her/his/their] chest that whispered: You can do this. You were made for this. Go.`,
-        photoCaption: `Royal portrait`,
-        photoSet: "Throne Room",
-        useSessionPhoto: true,
-        imagePromptHint:
-          "[Role] [Name] standing tall before royal banners making a promise, watercolor and colored pencil children's storybook illustration style, soft ink outlines, gentle pastel washes on cream background, magical kingdom atmosphere, warm golden light, no text",
-      },
-      {
-        page: 5,
         title: `Into the Royal Forest`,
-        text: `[Role] [Name] journeyed into the Royal Forest, where lanterns glowed between ancient trees.\n\nA wise woodland creature appeared on a mossy log.\n\n"The dragon is not only fierce," it whispered. "It is lonely and misunderstood. To face it, you must first understand it."`,
+        text: `[Role] [Name] journeyed through the Royal Forest, where lanterns glowed like stars between the ancient trees. The air smelled of pine and warm earth, and every leaf seemed to whisper a secret.
+
+Deep in the heart of the forest, a wise woodland creature appeared on a mossy log. Its eyes were kind, and it spoke in a voice as soft as rustling leaves.
+
+"The dragon is not what you think," it said. "It is not evil — it is frightened and alone. It has forgotten what kindness feels like. You have a gift, [Role] [Name]: the ability to see past fear, to look into a heart that is hiding, and to love it anyway."
+
+[Role] [Name] listened carefully. Something was shifting inside [her/him/them] — not fear disappearing, but something stronger growing in its place.
+
+"Courage," [she/he/they] said quietly, "begins with understanding."
+
+The forest lanterns glowed a little brighter, as if they agreed.`,
         photoCaption: `Portrait in the Royal Forest`,
         photoSet: "Royal Forest",
         useSessionPhoto: true,
-        imagePromptHint:
-          "[Role] [Name] in a glowing lantern forest talking with a woodland creature, watercolor and colored pencil children's storybook illustration style, soft ink outlines, gentle pastel washes on cream background, magical kingdom atmosphere, warm golden light, no text",
+        imagePromptHint: "royal forest portrait watercolor no text",
+      },
+      {
+        page: 5,
+        title: `Face to Face`,
+        staticScene: "dragon-slayer/dragon",
+        text: `The dragon appeared from behind a curtain of mist — enormous, ancient, with scales the color of storm clouds and eyes like amber lanterns.
+
+For a moment, neither of them moved.
+
+[Role] [Name] felt [her/his/their] heart beating fast, but [she/he/they] did not run. Instead, [she/he/they] took one slow step forward — then another — until [she/he/they] stood close enough to see the dragon's breath rising like smoke in the cool air.
+
+"I am not here to fight you," [she/he/they] said, voice steady and clear. "I am here because I believe you are more than what they say you are."
+
+The dragon lowered its great head. A sound rose from its chest — not a roar, but something quieter. Something that sounded almost like hope.
+
+"I just want to belong somewhere," the dragon said at last. "I just want a home."
+
+[Role] [Name] smiled. "Then you have already found one."`,
+        photoCaption: `The dragon encounter`,
+        useSessionPhoto: false,
+        imagePromptHint: "dragon encounter watercolor no text",
       },
       {
         page: 6,
-        title: `Secrets of the Forest`,
-        text: `Deep in the Royal Forest, [Name] listened to the ancient trees.\n\nTheir rustling leaves told stories of the dragon — once a gentle creature, now frightened and alone.\n\n[Role] [Name] felt something change in [her/his/their] heart. Courage, [she/he/they] realized, begins with understanding.`,
-        photoCaption: `Forest portrait`,
-        photoSet: "Royal Forest",
-        useSessionPhoto: true,
-        imagePromptHint:
-          "[Role] [Name] listening to whispering ancient trees in a magical forest, watercolor and colored pencil children's storybook illustration style, soft ink outlines, gentle pastel washes on cream background, magical kingdom atmosphere, warm golden light, no text",
-      },
-      {
-        page: 7,
-        title: `The Forest Path`,
-        staticScene: "dragon-slayer/dragon",
-        text: `Suddenly — a great shadow swept over the treetops!\n\nThe dragon circled overhead, its wings stirring the lanterns like leaves in the wind.\n\n[Role] [Name] did not run. [She/He/They] stood still, looked up, and held out a steady hand of peace.`,
-        photoCaption: `A shadow overhead`,
-        useSessionPhoto: false,
-        imagePromptHint:
-          "A large friendly dragon flying overhead in a glowing forest, [Role] [Name] standing bravely below with hand outstretched, watercolor and colored pencil children's storybook illustration style, soft ink outlines, gentle pastel washes on cream background, magical kingdom atmosphere, warm golden light, no text",
-      },
-      {
-        page: 8,
         title: `The Royal Garden`,
-        text: `In the Royal Garden, flowers bloomed in every color under the golden sun.\n\nHere [Role] [Name] searched for a special gift — a glowing blossom said to calm even the wildest heart.\n\n"Kindness will be my shield," [she/he/they] said softly.`,
+        text: `In the Royal Garden, flowers bloomed in every color under the golden sun — roses and lilies, morning glories and marigolds, each one more beautiful than the last.
+
+[Role] [Name] walked slowly through the garden, breathing in the sweet, warm air. Here, surrounded by so much beauty, everything felt possible.
+
+[She/He/They] knew what the dragon needed — not a battle, but a blessing. Not a sword, but a seed of kindness planted in the right moment.
+
+[Role] [Name] reached down and picked one perfect glowing blossom, the kind that only grows when tended with love. It pulsed gently in [her/his/their] hand like a tiny heartbeat.
+
+"This," [she/he/they] whispered, "is what will change everything."`,
         photoCaption: `Portrait in the Royal Garden`,
         photoSet: "Royal Garden",
         useSessionPhoto: true,
-        imagePromptHint:
-          "[Role] [Name] searching among colorful blooms in a royal garden, watercolor and colored pencil children's storybook illustration style, soft ink outlines, gentle pastel washes on cream background, magical kingdom atmosphere, warm golden light, no text",
+        imagePromptHint: "royal garden portrait watercolor no text",
       },
       {
-        page: 9,
-        title: `The Glowing Blossom`,
-        text: `[Role] [Name] found it at the heart of the garden — a single blossom glowing soft as moonlight.\n\n[She/He/They] cupped it gently in both hands.\n\nBravery would be [her/his/their] sword. Kindness would be [her/his/their] shield. Now [she/he/they] was ready.`,
-        photoCaption: `Garden portrait`,
-        photoSet: "Royal Garden",
-        useSessionPhoto: true,
-        imagePromptHint:
-          "[Role] [Name] holding a glowing magical blossom in a royal garden, watercolor and colored pencil children's storybook illustration style, soft ink outlines, gentle pastel washes on cream background, magical kingdom atmosphere, warm golden light, no text",
-      },
-      {
-        page: 10,
-        title: `Garden Magic`,
-        text: `As [Role] [Name] held the blossom, the whole garden seemed to glow.\n\nButterflies of light danced around [her/him/them], and for a moment the world felt very still and very safe.\n\n"You are ready," whispered the wind through the flowers.`,
-        photoCaption: `A moment of magic`,
-        useSessionPhoto: false,
-        imagePromptHint:
-          "A royal garden glowing with magic, butterflies of golden light swirling around a lone figure, watercolor and colored pencil children's storybook illustration style, soft ink outlines, gentle pastel washes on cream background, magical kingdom atmosphere, warm golden light, no text",
-      },
-      {
-        page: 11,
-        title: `The Chastle`,
-        text: `At last [Role] [Name] reached the Chastle — the ancient fortress at the edge of the kingdom.\n\nIts towers rose high above the mist, and from inside came the rumbling breath of the great dragon.\n\n[She/He/They] took a deep breath and stepped through the gate.`,
-        photoCaption: `Portrait at the Chastle`,
+        page: 7,
+        title: `The Courage Quest`,
+        text: `The final challenge awaited at the top of the great hill — the place where all the kingdom's stories had been decided. This was the Courage Quest, and [Role] [Name] had come prepared.
+
+Not with armor alone — though the armor shone like sunlight on water. Not with a weapon alone — though [she/he/they] carried one. But with something stronger than both: a heart that had chosen kindness over fear, understanding over anger, love over pride.
+
+[Role] [Name] stood tall at the summit and looked out over the whole kingdom spread below. Every cottage, every meadow, every laughing child and working farmer — all of them were counting on this moment.
+
+"I am ready," [she/he/they] said. And for the first time in [her/his/their] life, [she/he/they] meant it completely.`,
+        photoCaption: `Portrait at the Courage Quest`,
         photoSet: "Chastle",
         useSessionPhoto: true,
-        imagePromptHint:
-          "[Role] [Name] entering an ancient fortress gate, watercolor and colored pencil children's storybook illustration style, soft ink outlines, gentle pastel washes on cream background, magical kingdom atmosphere, warm golden light, no text",
+        imagePromptHint: "courage quest portrait watercolor no text",
       },
       {
-        page: 12,
-        title: `Face to Face`,
-        text: `[Role] [Name] walked into the great hall of the Chastle.\n\nThere, curled among the stones, was the dragon — enormous and glowing like embers.\n\n[She/He/They] stood tall, heart steady, and waited.`,
-        photoCaption: `Chastle portrait`,
-        photoSet: "Chastle",
-        useSessionPhoto: true,
-        imagePromptHint:
-          "[Role] [Name] standing bravely in an ancient hall facing a large glowing dragon, watercolor and colored pencil children's storybook illustration style, soft ink outlines, gentle pastel washes on cream background, magical kingdom atmosphere, warm golden light, no text",
-      },
-      {
-        page: 13,
-        title: `The Dragon Roars`,
-        text: `The dragon roared. The ground trembled. Fire flickered at the edges of the room.\n\nBut [Role] [Name] did not run.\n\n[She/He/They] stepped forward and held out the glowing blossom — a small and gentle light in the dark.`,
-        photoCaption: `Courage in the dark`,
+        page: 8,
+        title: `The Kingdom Rejoices`,
+        staticScene: "dragon-slayer/end",
+        text: `When [Role] [Name] returned home, the dragon flew peacefully above the castle towers — not as a threat, but as a guardian. The people cheered so loudly the sound carried all the way to the mountains and back.
+
+The King placed a wreath of flowers on [Role] [Name]'s head and said: "You did not just save the kingdom. You showed us what it means to be truly brave."
+
+That night, as stars filled the sky and the dragon slept curled around the castle like a great, gentle protector, [Role] [Name] sat by the window and thought about everything that had happened.
+
+[She/He/They] had been afraid. [She/He/They] had been uncertain. But [she/he/they] had chosen love over fear, and that had made all the difference.
+
+And somewhere in the kingdom below, a child looked up at the stars and whispered a name — the name of the one who had shown them that courage is not the absence of fear, but the decision that something else matters more.
+
+The name of [Role] [Name]. Their hero. Forever.`,
+        photoCaption: `The kingdom rejoices`,
         useSessionPhoto: false,
-        imagePromptHint:
-          "A brave child holding a glowing blossom before a roaring dragon in an ancient hall, fire light flickering warmly, watercolor and colored pencil children's storybook illustration style, soft ink outlines, gentle pastel washes on cream background, magical kingdom atmosphere, warm golden light, no text",
+        imagePromptHint: "victory watercolor no text",
       },
-      {
-        page: 14,
-        title: `A New Friend`,
-        text: `[Role] [Name] spoke with a steady voice:\n\n"You do not have to be alone. The kingdom can be your home — if you choose peace."\n\nThe dragon blinked. Its fire softened to warm golden light.\n\nSlowly, gently, it lowered its great head. A new friendship was born.`,
-        photoCaption: `Friendship begins`,
-        useSessionPhoto: false,
-        imagePromptHint:
-          "A dragon bowing its great head gently toward a small brave child who holds a glowing flower, golden warm light filling the hall, watercolor and colored pencil children's storybook illustration style, soft ink outlines, gentle pastel washes on cream background, magical kingdom atmosphere, warm golden light, no text",
-      },
-      {
-        page: 15,
-        title: `Victory!`,
-        text: `Word raced back to the Kingdom of Light: the dragon had been calmed!\n\nNot by a sword — but by a brave and kind heart.\n\n[Role] [Name] had done what no warrior could: [she/he/they] had turned a fearsome foe into a faithful friend.`,
-        photoCaption: `Victory for the kingdom`,
-        useSessionPhoto: false,
-        imagePromptHint:
-          "A joyful kingdom celebration scene with banners and golden light, a friendly dragon visible above the castle towers, watercolor and colored pencil children's storybook illustration style, soft ink outlines, gentle pastel washes on cream background, magical kingdom atmosphere, warm golden light, no text",
-      },
-      {
-        page: 16,
-        title: `The Celebration`,
-        text: `The whole kingdom erupted in celebration!\n\nBells rang from every tower. Flowers rained from the windows. The dragon soared above the rooftops — not as an enemy, but as a guardian of the realm.\n\nAnd at the center of it all stood [Role] [Name], beaming with joy.`,
-        photoCaption: `Celebration in the kingdom`,
-        useSessionPhoto: false,
-        imagePromptHint:
-          "A grand kingdom celebration with bells, flowers falling from windows, and a friendly dragon soaring above celebrating crowds, watercolor and colored pencil children's storybook illustration style, soft ink outlines, gentle pastel washes on cream background, magical kingdom atmosphere, warm golden light, no text",
-      },
-      {
-        page: 17,
-        title: `The Return Home`,
-        text: `[Role] [Name] rode home beside the great dragon, who now wore a wreath of flowers around its neck.\n\nAlong the road, children waved and cheered.\n\n[Name] waved back, [her/his/their] heart full — knowing that home was always worth fighting for.`,
-        photoCaption: `The journey home`,
-        useSessionPhoto: false,
-        imagePromptHint:
-          "[Role] [Name] riding beside a friendly flower-wreathed dragon on a golden road while children wave from the roadside, watercolor and colored pencil children's storybook illustration style, soft ink outlines, gentle pastel washes on cream background, magical kingdom atmosphere, warm golden light, no text",
-      },
-      {
-        page: 18,
-        title: `The King's Gift`,
-        text: `The King met [Role] [Name] at the castle gate with a smile and a golden medallion.\n\n"You have given the kingdom something more precious than treasure," he said. "You have shown us that courage and kindness together can change the world."\n\n[Name] placed the medallion over [her/his/their] heart.`,
-        photoCaption: `A royal gift`,
-        useSessionPhoto: false,
-        imagePromptHint:
-          "A king presenting a golden medallion to [Role] [Name] at a castle gate, warm ceremony, watercolor and colored pencil children's storybook illustration style, soft ink outlines, gentle pastel washes on cream background, magical kingdom atmosphere, warm golden light, no text",
-      },
-      {
-        page: 19,
-        title: `Under the Stars`,
-        text: `That night, [Role] [Name] sat on the castle wall as the stars came out one by one.\n\nThe dragon curled peacefully at the base of the tower, breathing slow and warm.\n\n[She/He/They] looked up at the sky and felt something deep and quiet — the peace of a job done with love.`,
-        photoCaption: `A peaceful night`,
-        useSessionPhoto: false,
-        imagePromptHint:
-          "[Role] [Name] sitting on a castle wall under a starry sky, a sleeping dragon peacefully below, moonlight and starlight glowing softly, watercolor and colored pencil children's storybook illustration style, soft ink outlines, gentle pastel washes on cream background, magical kingdom atmosphere, warm golden light, no text",
-      },
-      {
-        page: 20,
-        title: `The End`,
-        text: `And so, [Role] [Name] lived bravely ever after,\nknowing [she/he/they] [is/are] strong, kind, and deeply loved.\n\nTrue courage protects. True kindness heals.\nAnd true heroes carry both in their hearts.\n\nThe End.`,
-        photoCaption: `The End`,
-        useSessionPhoto: false,
-        imagePromptHint:
-          "A soft closing illustration of a glowing kingdom at peace under a starry sky, a small crown and flower in the foreground, watercolor and colored pencil children's storybook illustration style, soft ink outlines, gentle pastel washes on cream background, magical kingdom atmosphere, warm golden light, no text",
-      },
-    ],
-  },
+    ], },
   {
     id: "rescue-mission",
     option: 2,
