@@ -442,13 +442,18 @@ export function StorybookGenerator() {
     if (!book) return;
     setPdfLoading(true);
     try {
-      const blob = await buildStorybookPdf({
-        bookTitle: book.bookTitle,
-        childName: book.child_name,
-        pages: book.pages,
-        includeCover: true,
-        includeBack: true,
+      // Use server-side PDF generation so images are fetched without CORS issues
+      const res = await fetch("/api/admin/storybooks/build-pdf", {
+        method: "POST",
+        headers: { ...adminHeaders, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bookTitle: book.bookTitle,
+          childName: book.child_name,
+          pages: book.pages,
+        }),
       });
+      if (!res.ok) throw new Error("PDF generation failed");
+      const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
