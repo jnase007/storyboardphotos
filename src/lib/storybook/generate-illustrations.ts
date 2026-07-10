@@ -230,6 +230,38 @@ function fallbackPlaceholder(_prompt: string): FluxResult {
  * Generate a watercolor scene featuring the child from the uploaded portrait.
  * Uses Gemini multimodal to place the character in a storybook scene.
  */
+
+async function uploadToSupabase(dataUrl: string, filename: string): Promise<string | null> {
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!supabaseUrl || !serviceKey) return null;
+
+    const b64 = dataUrl.split(",")[1];
+    if (!b64) return null;
+    
+    const buffer = Buffer.from(b64, "base64");
+    
+    const res = await fetch(`${supabaseUrl}/storage/v1/object/storybook-assets/${filename}`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${serviceKey}`,
+        "Content-Type": "image/jpeg",
+        "x-upsert": "true",
+      },
+      body: buffer,
+    });
+
+    if (res.ok) {
+      return `${supabaseUrl}/storage/v1/object/public/storybook-assets/${filename}`;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+
 async function generateWithCharacterPortrait(options: {
   prompt: string;
   characterPhotoB64: string;
@@ -266,7 +298,10 @@ async function generateWithCharacterPortrait(options: {
         if (part.inlineData?.data) {
           // Convert base64 to data URL
           const dataUrl = `data:image/jpeg;base64,${part.inlineData.data}`;
-          return { imageUrl: dataUrl, provider: "fal" };
+          // Upload to Supabase so PDF can load it server-side
+          const filename = `character-scenes/${Date.now()}-${Math.random().toString(36).slice(2)}.jpg`;
+          const publicUrl = await uploadToSupabase(dataUrl, filename);
+          return { imageUrl: publicUrl ?? dataUrl, provider: "fal" };
         }
       }
     }
