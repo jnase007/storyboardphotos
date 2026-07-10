@@ -1,0 +1,348 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 40 33% 96%;
+    --foreground: 220 60% 10%;
+    --card: 40 33% 98%;
+    --card-foreground: 220 60% 10%;
+    --popover: 40 33% 98%;
+    --popover-foreground: 220 60% 10%;
+    --primary: 38 42% 60%;
+    --primary-foreground: 220 60% 10%;
+    --secondary: 260 47% 21%;
+    --secondary-foreground: 40 33% 96%;
+    --muted: 40 20% 90%;
+    --muted-foreground: 220 20% 40%;
+    --accent: 152 40% 30%;
+    --accent-foreground: 40 33% 96%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 38 30% 85%;
+    --input: 38 30% 85%;
+    --ring: 38 42% 60%;
+    --radius: 0.625rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    --promo-bar-height: 2rem;
+  }
+
+  body {
+    @apply bg-royal-cream text-royal-blue font-sans antialiased;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(212, 176, 122, 0.18), transparent 55%),
+      radial-gradient(ellipse 60% 40% at 100% 0%, rgba(74, 53, 104, 0.05), transparent 50%),
+      radial-gradient(ellipse 50% 30% at 0% 100%, rgba(212, 176, 122, 0.12), transparent 45%);
+    background-attachment: fixed;
+    overflow-x: clip;
+  }
+
+  @media (max-width: 1023px) {
+    body {
+      /* iOS Safari often janks with fixed body backgrounds */
+      background-attachment: scroll;
+    }
+  }
+
+  ::selection {
+    background: rgba(212, 176, 122, 0.4);
+    color: #1e3352;
+  }
+}
+
+@layer utilities {
+  .text-gradient-gold {
+    @apply bg-gradient-to-r from-royal-gold via-[#E8D5A8] to-royal-gold bg-clip-text text-transparent;
+    background-size: 200% auto;
+  }
+
+  .text-gradient-gold-shine {
+    @apply text-gradient-gold;
+    animation: gold-shine 6s ease-in-out infinite;
+  }
+
+  .bg-royal-gradient {
+    background: linear-gradient(
+      135deg,
+      #1e3352 0%,
+      #4a3568 50%,
+      #1e3352 100%
+    );
+  }
+
+  .bg-gold-shimmer {
+    background: linear-gradient(
+      90deg,
+      #d4b07a 0%,
+      #f0e0b8 50%,
+      #d4b07a 100%
+    );
+    background-size: 200% 100%;
+  }
+
+  .glass-card {
+    @apply bg-white/10 backdrop-blur-md border border-white/20;
+  }
+
+  /* Soft parchment wash for cream sections */
+  .bg-enchanted-cream {
+    background-color: #fffbf5;
+    background-image:
+      radial-gradient(ellipse 70% 60% at 20% 10%, rgba(212, 176, 122, 0.2), transparent 55%),
+      radial-gradient(ellipse 50% 40% at 90% 80%, rgba(74, 53, 104, 0.04), transparent 50%);
+  }
+
+  /* Soft dusk wash for accent sections (brighter than before) */
+  .bg-enchanted-night {
+    background-color: #2a4468;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% 0%, rgba(212, 176, 122, 0.22), transparent 55%),
+      radial-gradient(ellipse 40% 30% at 80% 60%, rgba(74, 53, 104, 0.35), transparent 60%),
+      radial-gradient(1.5px 1.5px at 12% 24%, rgba(255, 251, 245, 0.5), transparent),
+      radial-gradient(1px 1px at 28% 68%, rgba(212, 176, 122, 0.55), transparent),
+      radial-gradient(1.5px 1.5px at 55% 18%, rgba(255, 251, 245, 0.4), transparent),
+      radial-gradient(1px 1px at 72% 42%, rgba(240, 224, 184, 0.5), transparent),
+      radial-gradient(1px 1px at 88% 78%, rgba(255, 251, 245, 0.35), transparent),
+      radial-gradient(1.5px 1.5px at 40% 88%, rgba(212, 176, 122, 0.4), transparent);
+  }
+
+  .ornament-line {
+    @apply mx-auto flex items-center justify-center gap-3;
+  }
+
+  .ornament-line::before,
+  .ornament-line::after {
+    content: "";
+    height: 1px;
+    width: 2.5rem;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(197, 162, 111, 0.7),
+      transparent
+    );
+  }
+
+  .glow-gold {
+    box-shadow:
+      0 0 0 1px rgba(197, 162, 111, 0.25),
+      0 12px 40px -12px rgba(197, 162, 111, 0.35),
+      0 0 60px -20px rgba(197, 162, 111, 0.25);
+  }
+
+  .glow-lantern {
+    box-shadow:
+      0 0 0 1px rgba(197, 162, 111, 0.35),
+      0 20px 50px -15px rgba(0, 0, 0, 0.45),
+      0 0 80px -10px rgba(197, 162, 111, 0.28);
+  }
+}
+
+@layer components {
+  .enchant-embers {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    z-index: 2;
+  }
+
+  .enchant-embers span {
+    position: absolute;
+    bottom: -8%;
+    width: 3px;
+    height: 3px;
+    border-radius: 9999px;
+    background: rgba(232, 213, 168, 0.75);
+    box-shadow: 0 0 8px 2px rgba(197, 162, 111, 0.45);
+    animation: ember-rise linear infinite;
+    opacity: 0;
+  }
+
+  .enchant-embers span:nth-child(1) {
+    left: 8%;
+    animation-duration: 11s;
+    animation-delay: 0s;
+  }
+  .enchant-embers span:nth-child(2) {
+    left: 22%;
+    width: 2px;
+    height: 2px;
+    animation-duration: 14s;
+    animation-delay: 2s;
+  }
+  .enchant-embers span:nth-child(3) {
+    left: 38%;
+    animation-duration: 12s;
+    animation-delay: 4s;
+  }
+  .enchant-embers span:nth-child(4) {
+    left: 55%;
+    width: 2px;
+    height: 2px;
+    animation-duration: 15s;
+    animation-delay: 1s;
+  }
+  .enchant-embers span:nth-child(5) {
+    left: 70%;
+    animation-duration: 13s;
+    animation-delay: 3.5s;
+  }
+  .enchant-embers span:nth-child(6) {
+    left: 85%;
+    width: 2px;
+    height: 2px;
+    animation-duration: 16s;
+    animation-delay: 5s;
+  }
+}
+
+@keyframes gold-shine {
+  0%,
+  100% {
+    background-position: 0% center;
+  }
+  50% {
+    background-position: 100% center;
+  }
+}
+
+@keyframes ember-rise {
+  0% {
+    transform: translateY(0) translateX(0) scale(0.6);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.85;
+  }
+  70% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(-110vh) translateX(18px) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes soft-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .text-gradient-gold-shine,
+  .enchant-embers span,
+  .animate-character-float {
+    animation: none !important;
+  }
+
+  .enchant-embers span {
+    opacity: 0.35;
+    transform: none;
+  }
+}
+
+/* Cursor sparkle trail */
+.cursor-sparkle {
+  position: fixed;
+  border-radius: 9999px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  animation: sparkle-fade 0.9s ease-out forwards;
+  box-shadow: 0 0 8px 2px rgba(197, 162, 111, 0.45);
+}
+
+.cursor-sparkle--gold {
+  background: radial-gradient(circle, #e8d5a8 0%, #c5a26f 70%, transparent 100%);
+}
+
+.cursor-sparkle--cream {
+  background: radial-gradient(circle, #f8f4ec 0%, #e8d5a8 65%, transparent 100%);
+  box-shadow: 0 0 6px 1px rgba(248, 244, 236, 0.5);
+}
+
+.cursor-sparkle--soft {
+  background: radial-gradient(circle, rgba(197, 162, 111, 0.9) 0%, transparent 75%);
+  box-shadow: 0 0 10px 3px rgba(197, 162, 111, 0.35);
+}
+
+@keyframes sparkle-fade {
+  0% {
+    opacity: 0.95;
+    transform: translate(-50%, -50%) scale(0.4);
+  }
+  35% {
+    opacity: 1;
+    transform: translate(calc(-50% + var(--sparkle-drift, 0px) * 0.35), calc(-50% - 6px))
+      scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--sparkle-drift, 0px)), calc(-50% - 22px))
+      scale(0.2);
+  }
+}
+
+@media print {
+  @page {
+    margin: 0.6in;
+  }
+
+  html,
+  body {
+    height: auto !important;
+    overflow: visible !important;
+    background: white !important;
+    background-image: none !important;
+    color: #0a1628 !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  header,
+  footer,
+  [role="dialog"],
+  .print\:hidden {
+    display: none !important;
+  }
+
+  main,
+  main * {
+    overflow: visible !important;
+  }
+
+  /* Framer Motion leaves off-screen sections at opacity:0 — force visible for print */
+  [style*="opacity"],
+  [style*="transform"] {
+    opacity: 1 !important;
+    transform: none !important;
+    visibility: visible !important;
+  }
+
+  .bp-document h2,
+  .bp-document table tr,
+  .bp-document .break-inside-avoid {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .bg-royal-blue {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}

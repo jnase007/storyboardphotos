@@ -1,0 +1,29 @@
+import type { Metadata } from "next";
+import { PageShell } from "@/components/layout/page-shell";
+import { PasswordGate } from "@/components/password-gate";
+import { AdminDashboard } from "@/components/admin/admin-dashboard";
+
+export const metadata: Metadata = {
+  title: "Admin Dashboard (Internal)",
+  description: "Internal staff dashboard for Storybook Photos.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
+
+export default function AdminPage() {
+  return (
+    <PageShell>
+      <PasswordGate
+        code="3121"
+        storageKey="sbp-unlock-admin"
+        title="Admin Dashboard"
+        description="Staff tools — enter the access code to continue."
+        buttonLabel="Enter Admin"
+      >
+        <AdminDashboard />
+      </PasswordGate>
+    </PageShell>
+  );
+}
