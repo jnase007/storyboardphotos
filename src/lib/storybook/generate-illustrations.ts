@@ -209,12 +209,10 @@ async function generateWithImagen4(prompt: string): Promise<FluxResult> {
   return fallbackPlaceholder(prompt);
 }
 
-function fallbackPlaceholder(prompt: string): FluxResult {
-  const label = encodeURIComponent(
-    prompt.slice(0, 60).replace(/\s+/g, " ")
-  );
+function fallbackPlaceholder(_prompt: string): FluxResult {
+  // Use a generic kingdom placeholder instead of showing the prompt text
   return {
-    imageUrl: `https://placehold.co/768x1024/1E3352/D4B07A/png?text=${label}&font=playfair-display`,
+    imageUrl: `https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/dragon-slayer/title.jpg`,
     provider: "placeholder",
   };
 }
