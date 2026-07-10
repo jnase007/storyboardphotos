@@ -221,6 +221,19 @@ export const ADVENTURE_PATHS: AdventurePath[] = [
       },
       {
         page: 2,
+        title: `The Kingdom of Light`,
+        staticScene: "kingdom-map",
+        text: `Welcome to the Kingdom of Light — a magical realm of enchanted forests, royal gardens, and ancient castles.
+
+Every path leads to adventure. Every adventure begins with a brave heart.
+
+Your kingdom awaits, [Role] [Name].`,
+        photoCaption: `Map of the Kingdom`,
+        useSessionPhoto: false,
+        imagePromptHint: "kingdom map watercolor no text",
+      },
+      {
+        page: 3,
         title: `The Call`,
         staticScene: "dragon-slayer/call",
         text: `In the Kingdom of Light, a golden morning turned to shadow when word arrived: a great dragon had settled in the hills beyond the valley, and the people trembled with fear.
@@ -239,7 +252,7 @@ He turned and called out the name that made the whole kingdom hold its breath.
         imagePromptHint: "call to adventure watercolor no text",
       },
       {
-        page: 3,
+        page: 4,
         title: `The Royal Throne`,
         text: `The Throne Room was the most magnificent place [Role] [Name] had ever seen. Banners of crimson and gold hung from the vaulted ceiling, and every stone in the walls had been polished smooth by generations of royal hands.
 
@@ -258,7 +271,7 @@ This was where every great leader of the kingdom had sat before [her/him/them]. 
         imagePromptHint: "throne room portrait watercolor no text",
       },
       {
-        page: 4,
+        page: 5,
         title: `A Royal Promise`,
         staticScene: "dragon-slayer/call",
         text: `[Role] [Name] rose from the golden throne and walked to the great balcony that overlooked the kingdom. Far below, the people had gathered — farmers and bakers, children and elders — all of them looking upward with hope in their eyes.
@@ -275,7 +288,7 @@ For a long moment, there was silence. And then — the cheering began. It rolled
         imagePromptHint: "royal promise watercolor coloring book no text",
       },
       {
-        page: 5,
+        page: 6,
         title: `Into the Royal Forest`,
         text: `The Royal Forest was ancient and alive, full of the kind of quiet that feels inhabited — as if the trees themselves were listening.
 
@@ -296,7 +309,7 @@ The creature was quiet for a moment, then said: "That the bravest thing you can 
         imagePromptHint: "royal forest portrait watercolor no text",
       },
       {
-        page: 6,
+        page: 7,
         title: `Face to Face`,
         staticScene: "dragon-slayer/dragon",
         text: `The dragon emerged from behind a curtain of morning mist — enormous and ancient, with scales the color of storm clouds and eyes like amber lanterns burning in the dark.
@@ -319,7 +332,7 @@ The dragon lowered its head. Its breath came out in slow plumes of smoke. And th
         imagePromptHint: "dragon encounter watercolor no text",
       },
       {
-        page: 7,
+        page: 8,
         title: `The Royal Garden`,
         text: `The Royal Garden was the most beautiful place in all the kingdom — a living tapestry of color and fragrance that seemed to exist outside of time.
 
@@ -338,7 +351,7 @@ In the very center of the garden grew a flower unlike any other — a single blo
         imagePromptHint: "royal garden portrait watercolor no text",
       },
       {
-        page: 8,
+        page: 9,
         title: `The Courage Quest`,
         text: `The Courage Quest was the final challenge — a place of great and ancient power, where the kingdom's story had been written and rewritten across centuries.
 
@@ -357,7 +370,7 @@ And now [she/he/they] was ready — not because [she/he/they] had no fear left, 
         imagePromptHint: "courage quest portrait watercolor no text",
       },
       {
-        page: 9,
+        page: 10,
         title: `The Kingdom Rejoices`,
         staticScene: "dragon-slayer/victory",
         text: `When [Role] [Name] returned home, the dragon flew peacefully above the castle towers — not as a threat, but as a guardian. Its great wings caught the evening light, turning it into something that looked almost like a sunset made of scales.
@@ -376,7 +389,7 @@ This was what [she/he/they] had been made for. Not glory. Not power. But this: t
         imagePromptHint: "victory watercolor no text",
       },
       {
-        page: 10,
+        page: 11,
         title: `Always a Hero`,
         staticScene: "dragon-slayer/end",
         text: `That night, after the celebrations had faded and the kingdom had grown quiet, [Role] [Name] sat by the window and looked out at the stars.

@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
       childAge: child_age,
       gender,
       notes: notes ?? undefined,
-      pageCount: 10,
+      pageCount: 11,
       adventurePath: adventure_path,
       adventureScript: adventure_script,
       storyMode: story_mode,

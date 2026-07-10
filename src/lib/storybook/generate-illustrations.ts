@@ -4,6 +4,7 @@ import { SET_UPLOAD_SLOTS } from "./types";
 
 /** Pre-approved watercolor scene illustrations — used instead of generating new AI images */
 export const STATIC_SCENES: Record<string, string> = {
+  "kingdom-map": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/kingdom-map.jpg",
   "dragon-slayer/title": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/dragon-slayer/title.jpg",
   "dragon-slayer/call": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/dragon-slayer/call.jpg",
   "dragon-slayer/dragon": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/dragon-slayer/dragon.jpg",
