@@ -1,5 +1,15 @@
 "use client";
 
+const ADVENTURE_CARD_IMAGES: Record<string, string> = {
+  "dragon-slayer": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/dragon-slayer.jpg",
+  "rescue-mission": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/rescue-mission.jpg",
+  "lost-crown": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/lost-crown.jpg",
+  "forest-guardian": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/forest-guardian.jpg",
+  "kindness-quest": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/kindness-quest.jpg",
+  "light-treasure": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/light-treasure.jpg",
+};
+
+
 import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
@@ -681,35 +691,37 @@ export function StorybookGenerator() {
                       type="button"
                       onClick={() => setAdventurePath(path.id)}
                       className={cn(
-                        "rounded-xl border-2 px-4 py-4 text-left transition-all min-h-[5.5rem]",
+                        "rounded-xl border-2 text-left transition-all overflow-hidden",
                         selected
-                          ? "border-royal-gold bg-royal-blue text-royal-cream shadow-md shadow-royal-gold/20"
-                          : "border-royal-gold/25 bg-royal-cream/40 text-royal-blue hover:border-royal-gold/55"
+                          ? "border-royal-gold shadow-md shadow-royal-gold/20"
+                          : "border-royal-gold/25 hover:border-royal-gold/55"
                       )}
                     >
-                      <span
-                        className={cn(
-                          "inline-flex h-7 min-w-7 items-center justify-center rounded-md px-2 text-xs font-bold mb-2",
-                          selected
-                            ? "bg-royal-gold text-royal-blue"
-                            : "bg-royal-gold/20 text-royal-blue"
-                        )}
-                      >
-                        {path.option}
-                      </span>
-                      <span className="font-serif text-lg font-bold block leading-snug">
-                        {path.label}
-                      </span>
-                      <span
-                        className={cn(
-                          "mt-1.5 block text-sm leading-snug",
-                          selected
-                            ? "text-royal-cream/70"
-                            : "text-royal-blue/55"
-                        )}
-                      >
-                        {path.description}
-                      </span>
+                      {/* Watercolor image */}
+                      {ADVENTURE_CARD_IMAGES[path.id] && (
+                        <div className="relative h-24 overflow-hidden">
+                          <img
+                            src={ADVENTURE_CARD_IMAGES[path.id]}
+                            alt={path.label}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0" style={{ background: selected ? "rgba(10,22,40,0.3)" : "rgba(10,22,40,0.1)" }} />
+                          <span className={cn(
+                            "absolute top-2 left-2 inline-flex h-7 min-w-7 items-center justify-center rounded-md px-2 text-xs font-bold",
+                            selected ? "bg-royal-gold text-royal-blue" : "bg-white/90 text-royal-blue"
+                          )}>
+                            {path.option}
+                          </span>
+                        </div>
+                      )}
+                      <div className={cn("px-4 py-3", selected ? "bg-royal-blue text-royal-cream" : "bg-royal-cream/40 text-royal-blue")}>
+                        <span className="font-serif text-base font-bold block leading-snug">
+                          {path.label}
+                        </span>
+                        <span className={cn("mt-1 block text-xs leading-snug", selected ? "text-royal-cream/70" : "text-royal-blue/55")}>
+                          {path.description}
+                        </span>
+                      </div>
                     </button>
                   );
                 })}
