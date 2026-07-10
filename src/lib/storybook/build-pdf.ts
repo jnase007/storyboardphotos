@@ -218,9 +218,36 @@ async function drawInteriorPage(
     try {
       const img = await fetchImageAsDataUrl(page.imageUrl);
       if (img) {
-        // Center-crop landscape images to portrait ratio using canvas
-        // Fit image within the area maintaining aspect ratio (no skewing)
-        doc.addImage(img.dataUrl, img.format, 0, 0, PAGE_W, imageAreaH, undefined, "FAST");
+        // Get image dimensions to calculate proper fit (no skewing)
+        try {
+          const props = doc.getImageProperties(img.dataUrl);
+          const imgW = props.width;
+          const imgH = props.height;
+          const imgRatio = imgW / imgH;
+          const areaRatio = PAGE_W / imageAreaH;
+
+          let drawW, drawH, drawX, drawY;
+          if (imgRatio > areaRatio) {
+            // Image wider than area — fit by width, letterbox top/bottom
+            drawW = PAGE_W;
+            drawH = PAGE_W / imgRatio;
+            drawX = 0;
+            drawY = (imageAreaH - drawH) / 2;
+          } else {
+            // Image taller than area — fit by height, letterbox left/right
+            drawH = imageAreaH;
+            drawW = imageAreaH * imgRatio;
+            drawX = (PAGE_W - drawW) / 2;
+            drawY = 0;
+          }
+          // Fill background white first
+          doc.setFillColor(...WHITE);
+          doc.rect(0, 0, PAGE_W, imageAreaH, "F");
+          doc.addImage(img.dataUrl, img.format, drawX, drawY, drawW, drawH, undefined, "FAST");
+        } catch {
+          // Fallback: stretch to fill
+          doc.addImage(img.dataUrl, img.format, 0, 0, PAGE_W, imageAreaH, undefined, "FAST");
+        }
       } else {
         drawImagePlaceholder(doc, 0, 0, PAGE_W, imageAreaH);
       }
