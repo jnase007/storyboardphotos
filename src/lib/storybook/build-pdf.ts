@@ -403,20 +403,32 @@ async function fetchImageAsDataUrl(
   }
 
   try {
-    const res = await fetch(url);
+    // Use server-side proxy to avoid CORS issues with CDN images
+    const proxyUrl = `/api/image-proxy?url=${encodeURIComponent(url)}`;
+    const res = await fetch(proxyUrl);
     if (!res.ok) return null;
 
-    const contentType = res.headers.get("content-type") ?? "image/jpeg";
-    // jsPDF reliably handles JPEG and PNG; skip WebP and exotic formats
-    if (contentType.includes("webp") || contentType.includes("avif")) return null;
+    const data = await res.json();
+    if (!data.dataUrl) return null;
 
-    const arrayBuffer = await res.arrayBuffer();
-    const b64 = arrayBufferToBase64(arrayBuffer);
-    const dataUrl = `data:${contentType};base64,${b64}`;
+    const contentType: string = data.contentType ?? "image/jpeg";
     const format: "JPEG" | "PNG" = contentType.includes("png") ? "PNG" : "JPEG";
-    return { dataUrl, format };
+    return { dataUrl: data.dataUrl, format };
   } catch {
-    return null;
+    // Fallback: direct fetch
+    try {
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      const contentType = res.headers.get("content-type") ?? "image/jpeg";
+      if (contentType.includes("webp") || contentType.includes("avif")) return null;
+      const arrayBuffer = await res.arrayBuffer();
+      const b64 = arrayBufferToBase64(arrayBuffer);
+      const dataUrl = `data:${contentType};base64,${b64}`;
+      const format: "JPEG" | "PNG" = contentType.includes("png") ? "PNG" : "JPEG";
+      return { dataUrl, format };
+    } catch {
+      return null;
+    }
   }
 }
 
