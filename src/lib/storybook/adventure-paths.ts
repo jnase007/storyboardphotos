@@ -104,7 +104,7 @@ export function fillPlaceholders(
     .replace(/\[is\/are\]/g, p.is);
 }
 
-export const ADVENTURE_PATHS_STORAGE_KEY = "sbp-adventure-paths-v1";
+export const ADVENTURE_PATHS_STORAGE_KEY = "sbp-adventure-paths-v3";
 
 export function getAdventurePath(id: AdventurePathId): AdventurePath {
   const path = ADVENTURE_PATHS.find((p) => p.id === id);
