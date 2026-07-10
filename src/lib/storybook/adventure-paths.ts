@@ -212,7 +212,7 @@ export const ADVENTURE_PATHS: AdventurePath[] = [
       {
         page: 1,
         title: `The Dragon Quest`,
-        staticScene: "title-page",
+        staticScene: "dragon-slayer/title",
         text: `[Role] [Name]\nand the Dragon Quest`,
         photoCaption: `A magical kingdom awaits`,
         useSessionPhoto: false,
@@ -222,7 +222,17 @@ export const ADVENTURE_PATHS: AdventurePath[] = [
       {
         page: 2,
         title: `The Call`,
-        text: `In the Kingdom of Light, word spread like wildfire — a great dragon had settled near the hills, and the people were afraid.\n\nThe King called upon [Role] [Name]:\n\n"[Name], the kingdom needs your courage. Will you face the dragon and bring peace back to our lands?"\n\n[She/He/They] stood tall. The adventure had begun.`,
+        text: `In the Kingdom of Light, a golden morning turned to shadow when word arrived: a great dragon had settled in the hills beyond the valley, and the people trembled with fear.
+
+The King himself walked slowly to the throne room window and gazed out at the distant smoke curling above the mountains. He had heard of one person brave enough to help — one whose heart was made not just of courage, but of kindness.
+
+He turned and called out the name that made the whole kingdom hold its breath: [Role] [Name].
+
+"There is no one in all this kingdom with a heart more true than yours," the King said softly. "The dragon does not need to be conquered — it needs to be understood. Will you go? Will you bring peace back to our land?"
+
+[Role] [Name] looked out at the distant mountains. [She/He/They] felt afraid — just a little. But [she/he/they] also felt something stronger: a deep and steady courage, like a flame that could not be blown out.
+
+[She/He/They] stood tall, lifted [her/his/their] chin, and answered with one quiet word: "Yes."`,
         photoCaption: `The quest begins`,
         useSessionPhoto: false,
         imagePromptHint:
@@ -231,7 +241,15 @@ export const ADVENTURE_PATHS: AdventurePath[] = [
       {
         page: 3,
         title: `The Royal Throne`,
-        text: `First, [Role] [Name] entered the majestic Throne Room.\n\n[She/He/They] sat upon the golden throne and felt the honor of royalty — and the duty to protect [her/his/their] people.\n\n"I am brave," [she/he/they] whispered. "I am loved."`,
+        text: `The Throne Room was the most beautiful place [Role] [Name] had ever seen. The walls were draped with banners of crimson and gold, and the ceiling soared so high it was almost like standing beneath the sky itself.
+
+In the center of the room, on a platform of smooth white stone, sat the royal throne — carved from the wood of an ancient oak tree, inlaid with gold, and draped in the softest velvet.
+
+[Role] [Name] walked slowly toward it, footsteps echoing in the grand and quiet hall. [She/He/They] sat down gently, as if the throne were something holy — and in a way, it was. This was where the leaders of the kingdom had always sat. This was where courage lived.
+
+"I am [Role] [Name]," [she/he/they] whispered to [her/his/their] reflection in the polished floor. "I am brave. I am loved. I was made for such a time as this."
+
+Outside the tall windows, the kingdom waited. And [Role] [Name] knew — deep in [her/his/their] heart — that today, they would be worthy of it.`,
         photoCaption: `Portrait from the Throne Room`,
         photoSet: "Throne Room",
         useSessionPhoto: true,
@@ -241,7 +259,15 @@ export const ADVENTURE_PATHS: AdventurePath[] = [
       {
         page: 4,
         title: `A Royal Promise`,
-        text: `[Role] [Name] rose from the throne and made a royal promise to the people of the kingdom.\n\n"I will face the dragon with a true heart. I will bring peace to our land."\n\nThe people cheered, and [she/he/they] set out on [her/his/their] great quest.`,
+        text: `When [Role] [Name] rose from the golden throne, something had changed. There was a new light in [her/his/their] eyes — the kind of light that doesn't come from candles or torches, but from deep inside a person who has decided to be brave.
+
+The people of the kingdom gathered in the courtyard below, their faces turned upward, their hearts full of hope and worry all at once. They had heard about the dragon. They had heard about the mission. And now they looked to [Role] [Name] to lead them.
+
+[Role] [Name] stepped to the edge of the balcony, and in a clear, calm voice that carried over the whole crowd, spoke the words that everyone would remember for the rest of their lives:
+
+"I will go. I will face the dragon — not with anger, but with an open heart. I will listen before I speak, and love before I fear. And I promise you, I will come home."
+
+The cheering that followed was the loudest sound [Role] [Name] had ever heard. But even louder was the quiet voice inside [her/his/their] chest that whispered: You can do this. You were made for this. Go.`,
         photoCaption: `Royal portrait`,
         photoSet: "Throne Room",
         useSessionPhoto: true,
@@ -271,7 +297,7 @@ export const ADVENTURE_PATHS: AdventurePath[] = [
       {
         page: 7,
         title: `The Forest Path`,
-        staticScene: "dragon-encounter",
+        staticScene: "dragon-slayer/dragon",
         text: `Suddenly — a great shadow swept over the treetops!\n\nThe dragon circled overhead, its wings stirring the lanterns like leaves in the wind.\n\n[Role] [Name] did not run. [She/He/They] stood still, looked up, and held out a steady hand of peace.`,
         photoCaption: `A shadow overhead`,
         useSessionPhoto: false,

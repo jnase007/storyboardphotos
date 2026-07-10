@@ -364,8 +364,9 @@ export async function illustrateStoryPages(options: {
 
     // AI illustration page — use flux-pulid if character photo provided,
     // Check for pre-approved static scene first
-    if ((page as any).staticScene && STATIC_SCENES[(page as any).staticScene]) {
-      result.push({ ...page, imageUrl: STATIC_SCENES[(page as any).staticScene] });
+    const staticKey = (page as unknown as {staticScene?: string}).staticScene;
+    if (staticKey && STATIC_SCENES[staticKey]) {
+      result.push({ ...page, imageUrl: STATIC_SCENES[staticKey] });
       continue;
     }
 
