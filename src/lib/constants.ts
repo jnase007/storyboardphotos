@@ -292,7 +292,9 @@ export const FAQ_ITEMS = [
   },
 ] as const;
 
-export const PACKAGE_OPTIONS = PRICING_PACKAGES.map((p) => ({
-  value: p.id,
-  label: `${p.name} — $${p.price}`,
-}));
+export const PACKAGE_OPTIONS = [
+  { value: "solo-quest", label: "Solo Quest — $299 (1 child · 1 book)" },
+  { value: "sibling-quest", label: "Sibling Quest — $499 (2 children · 2 separate books)" },
+  { value: "family-quest", label: "Family Quest — $647 (3 children · 3 separate books)" },
+  { value: "additional-book", label: "Add extra book — $149 (for 4th child+)" },
+];
