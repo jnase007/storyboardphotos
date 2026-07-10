@@ -24,20 +24,22 @@ export async function generateStoryIllustration(options: {
       ? "https://fal.run/fal-ai/flux/dev/image-to-image"
       : "https://fal.run/fal-ai/flux/dev";
 
+    const STYLE_SUFFIX = "watercolor and colored pencil children's coloring book illustration style, soft ink outlines, gentle pastel washes, dreamy storybook feel, warm golden light, magical kingdom atmosphere, no text, no watermark, no borders";
+
     const body = withRef
       ? {
-          prompt: `${options.prompt}. Soft watercolor children's storybook illustration, consistent character likeness to the reference photo, magical kingdom atmosphere, warm golden light, no text, no watermark.`,
+          prompt: `${options.prompt}. ${STYLE_SUFFIX}. Preserve the child's face and likeness from the reference photo.`,
           image_url: options.referenceImageUrl,
-          strength: 0.65,
-          num_inference_steps: 28,
-          guidance_scale: 3.5,
+          strength: 0.72,
+          num_inference_steps: 32,
+          guidance_scale: 4.0,
           image_size: "portrait_4_3",
           enable_safety_checker: true,
         }
       : {
-          prompt: `${options.prompt}. Soft watercolor children's storybook illustration, magical kingdom atmosphere, warm golden light, no text, no watermark.`,
-          num_inference_steps: 28,
-          guidance_scale: 3.5,
+          prompt: `${options.prompt}. ${STYLE_SUFFIX}.`,
+          num_inference_steps: 32,
+          guidance_scale: 4.0,
           image_size: "portrait_4_3",
           enable_safety_checker: true,
         };
