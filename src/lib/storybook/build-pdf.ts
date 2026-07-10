@@ -355,8 +355,8 @@ function drawBackCover(doc: jsPDF): void {
   doc.setFont("times", "normal");
   doc.setFontSize(13);
   doc.setTextColor(...GOLD_DARK);
-  doc.text("www.storybookphotos.com", PAGE_W / 2, 458, { align: "center" });
-  doc.text("Costa Mesa, CA", PAGE_W / 2, 478, { align: "center" });
+  doc.text("storybookphotos.com", PAGE_W / 2, 458, { align: "center" });
+  // removed Costa Mesa
 
   // Footer accent bar
   doc.setFillColor(...GOLD);
