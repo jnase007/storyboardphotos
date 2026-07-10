@@ -237,6 +237,13 @@ export async function generateStoryIllustration(options: {
   return generateWithImagen4(options.prompt);
 }
 
+const SET_NAME_TO_ID: Record<Exclude<KingdomSet, null>, keyof PhotosBySet> = {
+  "Throne Room": "throne-room",
+  "Royal Forest": "royal-forest",
+  "Royal Garden": "royal-garden",
+  "Chastle": "chastle",
+};
+
 /** Flatten photos_by_set into a single list */
 export function flattenPhotosBySet(photosBySet: PhotosBySet): string[] {
   return SET_UPLOAD_SLOTS.flatMap((slot) => photosBySet[slot.id] ?? []);
