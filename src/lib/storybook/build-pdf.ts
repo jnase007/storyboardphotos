@@ -205,7 +205,7 @@ async function drawInteriorPage(
   childName: string,
   _bookTitle: string,
 ): Promise<void> {
-  const imageAreaH = PAGE_H * 0.70;  // top 70% - bigger image
+  const imageAreaH = PAGE_H * 0.60;  // top 60% - more text space
   const textAreaY  = imageAreaH;      // bottom 30% text area
   const textAreaH  = PAGE_H - imageAreaH;
 
@@ -289,21 +289,24 @@ async function drawInteriorPage(
     doc.text(page.photoSet, MARGIN + 12, textAreaY + 52, { maxWidth: PAGE_W - MARGIN * 2 });
   }
 
-  // Story text in royal blue - centered, elegant
+  // Story text in royal blue - fit within available space
   doc.setFont("times", "normal");
-  doc.setFontSize(11);
+  doc.setFontSize(10.5);
   doc.setTextColor(...ROYAL_BLUE);
-  const textLines = doc.splitTextToSize(page.text, PAGE_W - MARGIN * 2.5);
-  const textY = textAreaY + (displayTitle ? (page.photoSet ? 58 : 50) : (page.photoSet ? 48 : 36));
-  doc.text(textLines, MARGIN * 1.25, textY, { maxWidth: PAGE_W - MARGIN * 2.5 });
+  const allLines = doc.splitTextToSize(page.text, PAGE_W - MARGIN * 2.5);
+  const textStartY = textAreaY + (displayTitle ? (page.photoSet ? 55 : 46) : (page.photoSet ? 44 : 32));
+  const maxTextH = PAGE_H - textStartY - 28; // leave room for footer
+  const lineH = 14;
+  const maxLines = Math.floor(maxTextH / lineH);
+  const textLines = allLines.slice(0, maxLines);
+  doc.text(textLines, MARGIN * 1.25, textStartY, { maxWidth: PAGE_W - MARGIN * 2.5 });
 
-  // ── Footer ───────────────────────────────────────────────────────────────
-  const footerY = PAGE_H - 18;
-  doc.setFont("times", "normal");
-  doc.setFontSize(8);
-  doc.setTextColor(ROYAL_BLUE[0], ROYAL_BLUE[1] + 20, ROYAL_BLUE[2] + 40);
-  const footerText = `Page ${pageNum} of ${totalPages}  ·  ${childName}'s Kingdom Quest  ·  Storybook Photos`;
-  doc.text(footerText, PAGE_W / 2, footerY, { align: "center" });
+  // ── Footer — just page number, elegant ──────────────────────────────────
+  const footerY = PAGE_H - 14;
+  doc.setFont("times", "italic");
+  doc.setFontSize(13);
+  doc.setTextColor(...GOLD_DARK);
+  doc.text(`${pageNum}`, PAGE_W / 2, footerY, { align: "center" });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
