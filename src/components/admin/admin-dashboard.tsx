@@ -29,6 +29,13 @@ const TOOLS = [
     badge: "Print",
   },
   {
+    href: "/admin/books",
+    title: "Books Library",
+    description: "View all generated storybooks — preview, share links, download PDFs, delete.",
+    icon: BookOpen,
+    badge: "New",
+  },
+  {
     href: "/admin/storybook-generator",
     title: "Storybook Generator",
     description:
