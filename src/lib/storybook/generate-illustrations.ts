@@ -226,12 +226,75 @@ function fallbackPlaceholder(_prompt: string): FluxResult {
  * 3. Imagen 4.0 fails or no key → Fal.ai Flux Dev
  * 4. Last resort → placeholder
  */
+/**
+ * Generate a watercolor scene featuring the child from the uploaded portrait.
+ * Uses Gemini multimodal to place the character in a storybook scene.
+ */
+async function generateWithCharacterPortrait(options: {
+  prompt: string;
+  characterPhotoB64: string;
+}): Promise<FluxResult> {
+  const googleKey = process.env.GOOGLE_AI_API_KEY;
+  if (!googleKey) return fallbackPlaceholder(options.prompt);
+
+  const STYLE = "Classic watercolor children's storybook illustration style, fine black ink outlines, soft pastel watercolor fills, warm cream paper background, decorative vine border frame, whimsical and magical, no text, no watermark";
+
+  const fullPrompt = `Take the child in this photo and place them as the hero in this scene: ${options.prompt}. Draw them in ${STYLE}. The character should look like the child in the photo but rendered as a storybook illustration. Keep their face and features recognizable but in watercolor art style.`;
+
+  try {
+    const res = await fetch(
+      \`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=\${googleKey}\`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{
+            parts: [
+              { text: fullPrompt },
+              { inlineData: { mimeType: "image/jpeg", data: options.characterPhotoB64 } }
+            ]
+          }],
+          generationConfig: { responseModalities: ["image", "text"] }
+        })
+      }
+    );
+
+    if (res.ok) {
+      const data = await res.json();
+      const parts = data?.candidates?.[0]?.content?.parts ?? [];
+      for (const part of parts) {
+        if (part.inlineData?.data) {
+          // Convert base64 to data URL
+          const dataUrl = \`data:image/jpeg;base64,\${part.inlineData.data}\`;
+          return { imageUrl: dataUrl, provider: "fal" };
+        }
+      }
+    }
+    console.error("Gemini character scene failed:", res.status);
+  } catch (err) {
+    console.error("Gemini character scene error:", err);
+  }
+
+  return fallbackPlaceholder(options.prompt);
+}
+
+
 export async function generateStoryIllustration(options: {
   prompt: string;
   referenceImageUrl?: string | null;
   characterPhotoUrl?: string | null;
 }): Promise<FluxResult> {
-  // Use Google Imagen 4.0 exclusively — highest quality watercolor illustrations
+  // If character portrait provided as base64, use Gemini to place them in the scene
+  if (options.characterPhotoUrl?.startsWith("data:image")) {
+    const b64 = options.characterPhotoUrl.split(",")[1];
+    if (b64) {
+      return generateWithCharacterPortrait({
+        prompt: options.prompt,
+        characterPhotoB64: b64,
+      });
+    }
+  }
+  // Otherwise generate a background scene with Imagen 4.0
   return generateWithImagen4(options.prompt);
 }
 
@@ -269,8 +332,11 @@ export async function illustrateStoryPages(options: {
   const result: StoryPage[] = [];
 
   for (const page of pages) {
-    // FIRST: Check for pre-approved static scene — always takes priority
-    if (page.staticScene && STATIC_SCENES[page.staticScene]) {
+    // FIRST: Static scenes for title/call/victory/end pages
+    // BUT if a character photo is uploaded, action pages (dragon etc) get personalized
+    const isActionScene = page.staticScene && !["dragon-slayer/title","dragon-slayer/call","rescue-mission/title","rescue-mission/call","lost-crown/title","lost-crown/call","forest-guardian/title","forest-guardian/call","kindness-quest/title","kindness-quest/call","light-treasure/title","light-treasure/call"].includes(page.staticScene ?? "");
+    
+    if (page.staticScene && STATIC_SCENES[page.staticScene] && (!characterPhoto || !isActionScene)) {
       result.push({ ...page, imageUrl: STATIC_SCENES[page.staticScene] });
       continue;
     }
@@ -302,11 +368,11 @@ export async function illustrateStoryPages(options: {
       continue;
     }
 
-    // otherwise Imagen 4.0 (primary) → Flux Dev (fallback)
+    // Generate AI scene — with character portrait if uploaded, otherwise scene only
     const art = await generateStoryIllustration({
       prompt: page.imagePrompt ?? page.title,
       referenceImageUrl: reference,
-
+      characterPhotoUrl: characterPhoto ?? null,
     });
 
     result.push({ ...page, imageUrl: art.imageUrl });
