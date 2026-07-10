@@ -45,7 +45,7 @@ export async function buildStorybookPdf(options: {
   if (includeCover) {
     if (pageCount > 0) doc.addPage();
     pageCount++;
-    drawCoverPage(doc, childName);
+    await drawCoverPageAsync(doc, childName);
   }
 
   // ── Interior pages ────────────────────────────────────────────────────────
@@ -69,6 +69,72 @@ export async function buildStorybookPdf(options: {
 // ─────────────────────────────────────────────────────────────────────────────
 // Cover Page
 // ─────────────────────────────────────────────────────────────────────────────
+async function drawCoverPageAsync(doc: jsPDF, childName: string): Promise<void> {
+  const CASTLE_URL = "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/dragon-slayer/title.jpg";
+
+  // Try to load the castle watercolor as full-bleed background
+  try {
+    const img = await fetchImageAsDataUrl(CASTLE_URL);
+    if (img) {
+      const croppedDataUrl = await centerCropImage(img.dataUrl, PAGE_W / PAGE_H);
+      doc.addImage(croppedDataUrl, "JPEG", 0, 0, PAGE_W, PAGE_H);
+    } else {
+      drawFallbackCover(doc);
+    }
+  } catch {
+    drawFallbackCover(doc);
+  }
+
+  // Semi-transparent dark overlay at bottom for text
+  doc.setFillColor(10, 22, 40);
+  // Draw overlay rectangle
+  const overlayY = PAGE_H * 0.62;
+  const overlayH = PAGE_H - overlayY;
+  doc.rect(0, overlayY, PAGE_W, overlayH, "F");
+
+  // Gold border frame
+  drawGoldBorder(doc, 12, 12, PAGE_W - 24, PAGE_H - 24);
+  drawGoldBorder(doc, 20, 20, PAGE_W - 40, PAGE_H - 40, 0.5);
+
+  // Child's name - large gold title
+  doc.setTextColor(...GOLD);
+  doc.setFont("times", "bold");
+  doc.setFontSize(36);
+  doc.text(`${childName}'s`, PAGE_W / 2, overlayY + 42, { align: "center" });
+  doc.setFontSize(44);
+  doc.text("Kingdom Quest", PAGE_W / 2, overlayY + 88, { align: "center" });
+
+  // Gold rule
+  doc.setDrawColor(...GOLD);
+  doc.setLineWidth(1.5);
+  doc.line(PAGE_W / 2 - 130, overlayY + 100, PAGE_W / 2 + 130, overlayY + 100);
+
+  // Subtitle
+  doc.setFont("times", "italic");
+  doc.setFontSize(16);
+  doc.setTextColor(...GOLD_DARK);
+  doc.text("A Storybook Photos Adventure", PAGE_W / 2, overlayY + 122, { align: "center" });
+
+  // Stars
+  drawStar(doc, PAGE_W / 2 - 80, overlayY + 145, 4, GOLD_DARK);
+  drawStar(doc, PAGE_W / 2, overlayY + 143, 6, GOLD);
+  drawStar(doc, PAGE_W / 2 + 80, overlayY + 145, 4, GOLD_DARK);
+
+  // Bottom branding bar
+  doc.setFillColor(...GOLD);
+  doc.rect(0, PAGE_H - 38, PAGE_W, 38, "F");
+  doc.setFont("times", "bold");
+  doc.setFontSize(12);
+  doc.setTextColor(...ROYAL_BLUE);
+  doc.text("Storybook Photos  |  Kingdom Quests", PAGE_W / 2, PAGE_H - 14, { align: "center" });
+}
+
+function drawFallbackCover(doc: jsPDF): void {
+  doc.setFillColor(...ROYAL_BLUE);
+  doc.rect(0, 0, PAGE_W, PAGE_H, "F");
+  drawCrown(doc, PAGE_W / 2, 220, 70, GOLD);
+}
+
 function drawCoverPage(doc: jsPDF, childName: string): void {
   // Full-page royal blue background
   doc.setFillColor(...ROYAL_BLUE);
