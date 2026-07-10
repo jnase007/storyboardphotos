@@ -217,8 +217,8 @@ async function drawInteriorPage(
       const img = await fetchImageAsDataUrl(page.imageUrl);
       if (img) {
         // Center-crop landscape images to portrait ratio using canvas
-        const croppedDataUrl = await centerCropImage(img.dataUrl, PAGE_W / imageAreaH);
-        doc.addImage(croppedDataUrl, "JPEG", 0, 0, PAGE_W, imageAreaH);
+        // Fit image within the area maintaining aspect ratio (no skewing)
+        doc.addImage(img.dataUrl, img.format, 0, 0, PAGE_W, imageAreaH, undefined, "FAST");
       } else {
         drawImagePlaceholder(doc, 0, 0, PAGE_W, imageAreaH);
       }
@@ -242,11 +242,14 @@ async function drawInteriorPage(
   doc.setFillColor(...GOLD);
   doc.rect(MARGIN, textAreaY + 14, 4, 40, "F");
 
-  // Page title
+  // Page title — skip generic "Title Page" label
+  const displayTitle = page.title === "Title Page" || page.title === "The Dragon Quest" 
+    ? _bookTitle  // show book title instead
+    : page.title;
   doc.setTextColor(...GOLD);
   doc.setFont("times", "bold");
   doc.setFontSize(17);
-  doc.text(page.title, MARGIN + 12, textAreaY + 35, { maxWidth: PAGE_W - MARGIN * 2 - 12 });
+  doc.text(displayTitle, MARGIN + 12, textAreaY + 35, { maxWidth: PAGE_W - MARGIN * 2 - 12 });
 
   // Page subtitle (set name)
   if (page.photoSet) {
