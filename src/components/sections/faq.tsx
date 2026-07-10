@@ -60,7 +60,7 @@ export function FAQSection() {
             className="lg:col-span-6 flex justify-center lg:justify-end order-first lg:order-last"
           >
             {/* Larger portrait treatment — matches homepage prince scale */}
-            <div className="relative w-full max-w-[300px] sm:max-w-[380px] lg:max-w-[460px]">
+            <div className="relative w-full max-w-[220px] sm:max-w-[280px] lg:max-w-[320px]">
               <Image
                 src="/characters/princess-girl.webp"
                 alt="Young princess in floral dress and crown — Storybook Photos"
