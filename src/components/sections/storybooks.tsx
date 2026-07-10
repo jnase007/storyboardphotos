@@ -156,7 +156,6 @@ export function StorybooksSection() {
           </motion.div>
         </div>
       </div>
-    </section>
         {/* ── Adventure Paths ── */}
         <div className="mt-24">
           <motion.div
@@ -182,17 +181,11 @@ export function StorybooksSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: i * 0.08 }}
                 viewport={{ once: true }}
-                className="rounded-2xl overflow-hidden group cursor-pointer"
-                style={{ border: `1px solid ${adv.color}30`, background: "rgba(10,22,40,0.6)", backdropFilter: "blur(8px)" }}
+                className="rounded-2xl overflow-hidden group"
+                style={{ border: `1px solid ${adv.color}30`, background: "rgba(10,22,40,0.6)" }}
               >
-                {/* Image */}
                 <div className="aspect-square overflow-hidden relative">
-                  <Image
-                    src={adv.image}
-                    alt={adv.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
+                  <Image src={adv.image} alt={adv.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
                   <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 60%, rgba(10,22,40,0.8))" }} />
                   <div className="absolute bottom-3 left-3">
                     <span className="text-xs font-bold px-2 py-1 rounded-full" style={{ background: `${adv.color}25`, color: adv.color, border: `1px solid ${adv.color}40` }}>
@@ -200,8 +193,6 @@ export function StorybooksSection() {
                     </span>
                   </div>
                 </div>
-
-                {/* Info */}
                 <div className="p-4">
                   <h3 className="font-serif font-bold text-lg text-white mb-1">{adv.title}</h3>
                   <p className="text-white/50 text-sm leading-relaxed">{adv.description}</p>
@@ -211,16 +202,11 @@ export function StorybooksSection() {
           </div>
 
           <div className="text-center mt-10">
-            <a
-              href="/book"
-              className="inline-flex items-center gap-2 px-8 py-3 rounded-xl font-semibold text-royal-blue transition-all hover:scale-105"
-              style={{ background: "linear-gradient(135deg, #C5A26F, #d4a843)" }}
-            >
-              Book Your Session →
+            <a href="/book" className="inline-flex items-center gap-2 px-8 py-3 rounded-xl font-semibold text-royal-blue transition-all hover:scale-105" style={{ background: "linear-gradient(135deg, #C5A26F, #d4a843)" }}>
+              Book Your Session &rarr;
             </a>
           </div>
         </div>
-      </div>
     </section>
   );
 }
