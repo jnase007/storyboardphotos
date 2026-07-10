@@ -60,7 +60,7 @@ export const createStorybookSchema = z.object({
           })
         )
         .min(6)
-        .max(12),
+        .max(24),
     })
     .optional(),
   /** Photos grouped by kingdom set (preferred) */
