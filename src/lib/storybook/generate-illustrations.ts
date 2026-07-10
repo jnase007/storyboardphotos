@@ -6,6 +6,134 @@ type FluxResult = {
   provider: "fal" | "placeholder";
 };
 
+const STYLE_SUFFIX =
+  "classic children's storybook watercolor illustration, soft fine ink outlines, gentle pastel washes on cream white background, delicate floral details, rosy cheeks, warm soft lighting, intricate costume details with floral embroidery, whimsical and enchanting, style of a premium children's picture book, no text, no watermark, no borders, isolated figure on cream background";
+
+/**
+ * Remove background from an image using fal-ai/bria background removal.
+ * Returns the transparent PNG URL, or falls back to the original URL on failure.
+ */
+async function removeBackground(imageUrl: string): Promise<string> {
+  const falKey = process.env.FAL_KEY ?? process.env.FAL_API_KEY;
+  if (!falKey) return imageUrl;
+  try {
+    const res = await fetch("https://fal.run/fal-ai/bria/background/remove", {
+      method: "POST",
+      headers: {
+        Authorization: `Key ${falKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ image_url: imageUrl }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const url = data?.image?.url ?? data?.images?.[0]?.url;
+      if (typeof url === "string") return url;
+    } else {
+      console.warn("bria background removal failed:", await res.text());
+    }
+  } catch (err) {
+    console.warn("bria background removal error:", err);
+  }
+  return imageUrl;
+}
+
+/**
+ * Upload a base64 data URL to fal.ai storage and return a public URL.
+ * Required before passing character photo to background removal.
+ */
+async function uploadBase64ToFal(dataUrl: string): Promise<string | null> {
+  const falKey = process.env.FAL_KEY ?? process.env.FAL_API_KEY;
+  if (!falKey) return null;
+  try {
+    // Extract mime type and base64 data
+    const match = dataUrl.match(/^data:([^;]+);base64,(.+)$/);
+    if (!match) return null;
+    const [, mimeType, base64Data] = match;
+    const buffer = Buffer.from(base64Data, "base64");
+    const blob = new Blob([buffer], { type: mimeType });
+
+    const res = await fetch("https://fal.run/fal-ai/storage/upload", {
+      method: "POST",
+      headers: {
+        Authorization: `Key ${falKey}`,
+        "Content-Type": mimeType,
+      },
+      body: blob,
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return data?.url ?? null;
+    }
+  } catch (err) {
+    console.warn("fal storage upload failed:", err);
+  }
+  return null;
+}
+
+/**
+ * Generate a watercolor storybook illustration via fal.ai flux-pulid
+ * when a character photo is provided (preserves face/likeness).
+ */
+async function generateWithPulid(options: {
+  prompt: string;
+  characterPhotoUrl: string;
+}): Promise<FluxResult> {
+  const falKey = process.env.FAL_KEY ?? process.env.FAL_API_KEY;
+  if (!falKey) {
+    return fallbackPlaceholder(options.prompt);
+  }
+
+  try {
+    const res = await fetch("https://fal.run/fal-ai/flux-pulid", {
+      method: "POST",
+      headers: {
+        Authorization: `Key ${falKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        prompt: `${options.prompt}. ${STYLE_SUFFIX}. The child in the scene should look exactly like the reference photo — same face, features, and likeness.`,
+        reference_images: [
+          {
+            image_url: options.characterPhotoUrl,
+          },
+        ],
+        num_inference_steps: 30,
+        guidance_scale: 4.5,
+        image_size: "portrait_4_3",
+        enable_safety_checker: true,
+      }),
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      const url =
+        data?.images?.[0]?.url ??
+        data?.image?.url ??
+        (Array.isArray(data?.output) ? data.output[0] : null);
+      if (typeof url === "string") {
+        return { imageUrl: url, provider: "fal" };
+      }
+    } else {
+      console.error("flux-pulid error:", await res.text());
+    }
+  } catch (err) {
+    console.error("flux-pulid failed:", err);
+  }
+
+  return fallbackPlaceholder(options.prompt);
+}
+
+function fallbackPlaceholder(prompt: string): FluxResult {
+  const label = encodeURIComponent(
+    prompt.slice(0, 60).replace(/\s+/g, " ")
+  );
+  return {
+    imageUrl: `https://placehold.co/768x1024/1E3352/D4B07A/png?text=${label}&font=playfair-display`,
+    provider: "placeholder",
+  };
+}
+
 /**
  * Generate a watercolor storybook illustration via fal.ai Flux
  * (with optional reference image for character consistency).
@@ -13,8 +141,17 @@ type FluxResult = {
 export async function generateStoryIllustration(options: {
   prompt: string;
   referenceImageUrl?: string | null;
+  characterPhotoUrl?: string | null;
 }): Promise<FluxResult> {
   const falKey = process.env.FAL_KEY ?? process.env.FAL_API_KEY;
+
+  // If a processed character photo URL is provided, use flux-pulid for likeness preservation
+  if (options.characterPhotoUrl) {
+    return generateWithPulid({
+      prompt: options.prompt,
+      characterPhotoUrl: options.characterPhotoUrl,
+    });
+  }
 
   if (falKey) {
     const withRef =
@@ -23,8 +160,6 @@ export async function generateStoryIllustration(options: {
     const endpoint = withRef
       ? "https://fal.run/fal-ai/flux/dev/image-to-image"
       : "https://fal.run/fal-ai/flux/dev";
-
-    const STYLE_SUFFIX = "classic children's storybook watercolor illustration, soft fine ink outlines, gentle pastel washes on cream white background, delicate floral details, rosy cheeks, warm soft lighting, intricate costume details with floral embroidery, whimsical and enchanting, style of a premium children's picture book, no text, no watermark, no borders, isolated figure on cream background";
 
     const body = withRef
       ? {
@@ -71,13 +206,7 @@ export async function generateStoryIllustration(options: {
     }
   }
 
-  const label = encodeURIComponent(
-    options.prompt.slice(0, 60).replace(/\s+/g, " ")
-  );
-  return {
-    imageUrl: `https://placehold.co/768x1024/1E3352/D4B07A/png?text=${label}&font=playfair-display`,
-    provider: "placeholder",
-  };
+  return fallbackPlaceholder(options.prompt);
 }
 
 const SET_NAME_TO_ID: Record<Exclude<KingdomSet, null>, keyof PhotosBySet> = {
@@ -94,17 +223,37 @@ export function flattenPhotosBySet(photosBySet: PhotosBySet): string[] {
 
 /**
  * Fill page images using per-set session photos when available.
+ * When characterPhoto is provided, AI illustration pages use flux-pulid for likeness preservation.
  */
 export async function illustrateStoryPages(options: {
   pages: StoryPage[];
   photoUrls?: string[];
   photosBySet?: PhotosBySet;
+  /** Optional character portrait (base64 data URL or public URL) */
+  characterPhoto?: string | null;
 }): Promise<StoryPage[]> {
-  const { pages, photosBySet } = options;
+  const { pages, photosBySet, characterPhoto } = options;
   const flat =
     options.photoUrls ??
     (photosBySet ? flattenPhotosBySet(photosBySet) : []);
   const reference = flat.find((u) => !u.startsWith("data:")) ?? null;
+
+  // Process character photo: upload if base64, then remove background
+  let processedCharacterPhotoUrl: string | null = null;
+  if (characterPhoto) {
+    let photoUrl = characterPhoto;
+    if (characterPhoto.startsWith("data:")) {
+      const uploaded = await uploadBase64ToFal(characterPhoto);
+      if (uploaded) photoUrl = uploaded;
+      else {
+        // Can't upload — skip character photo compositing
+        photoUrl = "";
+      }
+    }
+    if (photoUrl) {
+      processedCharacterPhotoUrl = await removeBackground(photoUrl);
+    }
+  }
 
   // Round-robin cursor per set so multiple photos on one set rotate
   const setCursors: Partial<Record<keyof PhotosBySet, number>> = {};
@@ -136,9 +285,11 @@ export async function illustrateStoryPages(options: {
       continue;
     }
 
+    // AI illustration page — use flux-pulid if character photo provided
     const art = await generateStoryIllustration({
       prompt: page.imagePrompt ?? page.title,
       referenceImageUrl: reference,
+      characterPhotoUrl: processedCharacterPhotoUrl,
     });
 
     result.push({ ...page, imageUrl: art.imageUrl });

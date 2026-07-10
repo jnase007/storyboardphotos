@@ -36,6 +36,7 @@ export async function POST(request: NextRequest) {
       adventure_path,
       story_mode,
       adventure_script,
+      character_photo,
     } = parsed.data;
 
     const flatUrls =
@@ -77,7 +78,7 @@ export async function POST(request: NextRequest) {
       childAge: child_age,
       gender,
       notes: notes ?? undefined,
-      pageCount: 8,
+      pageCount: 20,
       adventurePath: adventure_path,
       adventureScript: adventure_script,
       storyMode: story_mode,
@@ -87,6 +88,7 @@ export async function POST(request: NextRequest) {
       pages: story.pages,
       photoUrls: flatUrls,
       photosBySet: photos_by_set,
+      characterPhoto: character_photo ?? undefined,
     });
 
     if (storybookId && hasRealSupabase()) {

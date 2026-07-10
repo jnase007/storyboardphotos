@@ -74,6 +74,8 @@ export const createStorybookSchema = z.object({
     .optional(),
   /** Flat list kept for backwards compatibility */
   photo_urls: z.array(photoUrlSchema).min(4).max(12).optional(),
+  /** Optional character portrait (white background) — base64 data URL or uploaded URL */
+  character_photo: z.string().optional().nullable(),
 }).refine(
   (data) => Boolean(data.photos_by_set) || Boolean(data.photo_urls?.length),
   { message: "photos_by_set or photo_urls is required" }
