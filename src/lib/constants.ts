@@ -197,7 +197,7 @@ export const PRICING_PACKAGES = [
   {
     id: "family-quest",
     name: "Family Quest",
-    price: 647,
+    price: 799,
     description: "Three children — three personalized storybooks, one magical session.",
     features: [
       "60-minute studio session",
@@ -207,7 +207,7 @@ export const PRICING_PACKAGES = [
       "All three 8x8 premium hardcover books",
       "Digital download PDFs",
       "Online share links",
-      "Save $250 vs buying separately",
+      "Save $98 vs buying separately",
     ],
     popular: false,
   },
@@ -302,6 +302,6 @@ export const FAQ_ITEMS = [
 export const PACKAGE_OPTIONS = [
   { value: "solo-quest", label: "Solo Quest — $299 (1 child · 1 book)" },
   { value: "sibling-quest", label: "Sibling Quest — $499 (2 children · 2 separate books)" },
-  { value: "family-quest", label: "Family Quest — $647 (3 children · 3 separate books)" },
+  { value: "family-quest", label: "Family Quest — $799 (3 children · 3 separate books)" },
   { value: "additional-book", label: "Add extra book — $149 (for 4th child+)" },
 ];
