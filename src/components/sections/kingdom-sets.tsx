@@ -196,6 +196,33 @@ export function KingdomSetsSection() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Kingdom Map */}
+      <div className="mt-20 text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7 }}
+          viewport={{ once: true }}
+        >
+          <h3 className="font-serif text-2xl sm:text-3xl font-bold text-royal-blue mb-3">
+            The Kingdom of Light
+          </h3>
+          <p className="text-royal-blue/60 mb-8 max-w-lg mx-auto">
+            Your adventure takes you through these enchanted lands — each one waiting to become part of your story.
+          </p>
+          <div className="relative max-w-2xl mx-auto rounded-2xl overflow-hidden shadow-2xl border-2" style={{ borderColor: "#C5A26F33" }}>
+            <Image
+              src="https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/kingdom-map.jpg"
+              alt="Map of the Kingdom of Light"
+              width={800}
+              height={800}
+              className="w-full h-auto"
+            />
+            <div className="absolute inset-0 rounded-2xl" style={{ boxShadow: "inset 0 0 40px rgba(10,22,40,0.15)" }} />
+          </div>
+        </motion.div>
+      </div>
     </section>
   );
 }
