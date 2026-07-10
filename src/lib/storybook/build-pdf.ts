@@ -150,7 +150,9 @@ async function drawInteriorPage(
     try {
       const img = await fetchImageAsDataUrl(page.imageUrl);
       if (img) {
-        doc.addImage(img.dataUrl, img.format, 0, 0, PAGE_W, imageAreaH);
+        // Center-crop landscape images to portrait ratio using canvas
+        const croppedDataUrl = await centerCropImage(img.dataUrl, PAGE_W / imageAreaH);
+        doc.addImage(croppedDataUrl, "JPEG", 0, 0, PAGE_W, imageAreaH);
       } else {
         drawImagePlaceholder(doc, 0, 0, PAGE_W, imageAreaH);
       }
@@ -392,6 +394,50 @@ function drawImagePlaceholder(
 // ─────────────────────────────────────────────────────────────────────────────
 // Image fetch — browser + Node compatible
 // ─────────────────────────────────────────────────────────────────────────────
+/**
+ * Center-crop an image to a target aspect ratio using canvas (browser only).
+ * Falls back to the original data URL in Node/SSR environments.
+ */
+async function centerCropImage(dataUrl: string, targetRatio: number): Promise<string> {
+  if (typeof window === "undefined" || typeof document === "undefined") {
+    return dataUrl; // Node.js environment — skip crop
+  }
+  try {
+    const img = new Image();
+    await new Promise<void>((resolve, reject) => {
+      img.onload = () => resolve();
+      img.onerror = reject;
+      img.src = dataUrl;
+    });
+
+    const srcW = img.naturalWidth;
+    const srcH = img.naturalHeight;
+    const srcRatio = srcW / srcH;
+
+    let cropX = 0, cropY = 0, cropW = srcW, cropH = srcH;
+
+    if (srcRatio > targetRatio) {
+      // Wider than target — crop width
+      cropW = Math.round(srcH * targetRatio);
+      cropX = Math.round((srcW - cropW) / 2);
+    } else if (srcRatio < targetRatio) {
+      // Taller than target — crop height
+      cropH = Math.round(srcW / targetRatio);
+      cropY = 0; // Crop from top
+    }
+
+    const canvas = document.createElement("canvas");
+    canvas.width = cropW;
+    canvas.height = cropH;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return dataUrl;
+    ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+    return canvas.toDataURL("image/jpeg", 0.92);
+  } catch {
+    return dataUrl;
+  }
+}
+
 async function fetchImageAsDataUrl(
   url: string
 ): Promise<{ dataUrl: string; format: "JPEG" | "PNG" } | null> {
