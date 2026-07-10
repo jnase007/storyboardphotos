@@ -7,7 +7,7 @@ type FluxResult = {
 };
 
 const STYLE_SUFFIX =
-  "double-page spread children's storybook watercolor illustration, hand-drawn fine ink outlines, soft watercolor washes with gentle pastel colors, detailed enchanted kingdom scene with castle towers stone paths wildflowers fairies, decorative vine border frame around the edges, warm cream background, rich detailed scenery like a premium illustrated children's book, whimsical and magical atmosphere, style of a classic fairy tale picture book, lush green trees and rolling hills, cozy storybook feel, no text no watermark";
+  "traditional watercolor painting style, soft painterly brushstrokes, gentle watercolor washes, children's picture book illustration, warm golden lighting, enchanted fairy tale scene, detailed kingdom background with castle spires and rolling hills, lush vegetation, painterly textures, dreamlike atmosphere, professional children's book art, no text, no watermark";
 
 /**
  * Remove background from an image using fal-ai/bria background removal.
