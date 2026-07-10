@@ -259,6 +259,7 @@ This was where every great leader of the kingdom had sat before [her/him/them]. 
       {
         page: 4,
         title: `A Royal Promise`,
+        staticScene: "dragon-slayer/call",
         text: `[Role] [Name] rose from the golden throne and walked to the great balcony that overlooked the kingdom. Far below, the people had gathered — farmers and bakers, children and elders — all of them looking upward with hope in their eyes.
 
 A hush fell over the crowd.
@@ -268,10 +269,9 @@ A hush fell over the crowd.
 For a long moment, there was silence. And then — the cheering began. It rolled across the courtyard like thunder, warm and full and generous, the sound of a people who believed in their [role] with every fiber of their being.
 
 [Role] [Name] smiled. It was time.`,
-        photoCaption: `Royal portrait`,
-        photoSet: "Throne Room",
-        useSessionPhoto: true,
-        imagePromptHint: "royal promise portrait watercolor no text",
+        photoCaption: `A royal promise`,
+        useSessionPhoto: false,
+        imagePromptHint: "royal promise watercolor coloring book no text",
       },
       {
         page: 5,
