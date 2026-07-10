@@ -227,10 +227,10 @@ export const ADVENTURE_PATHS: AdventurePath[] = [
       },
       {
         page: 3,
-        title: "Castle Throne Room",
-        text: "First, [Role] [Name] entered the majestic Castle Throne Room.\n\n[She/He/They] sat upon the golden throne and felt the honor of royalty — and the duty to protect [her/his/their] people.\n\n“I am brave,” [she/he/they] whispered. “I am loved. I will face the dragon with a true heart.”",
-        photoCaption: "Photo from Castle Throne Room",
-        photoSet: "Castle Throne Room",
+        title: "Throne Room",
+        text: "First, [Role] [Name] entered the majestic Throne Room.\n\n[She/He/They] sat upon the golden throne and felt the honor of royalty — and the duty to protect [her/his/their] people.\n\n“I am brave,” [she/he/they] whispered. “I am loved. I will face the dragon with a true heart.”",
+        photoCaption: "Photo from Throne Room",
+        photoSet: "Throne Room",
         useSessionPhoto: true,
         imagePromptHint:
           "Watercolor of [Role] [Name] on a golden throne preparing for a dragon quest, warm banners, children's book style, no text",
@@ -257,10 +257,10 @@ export const ADVENTURE_PATHS: AdventurePath[] = [
       },
       {
         page: 6,
-        title: "Courage Quest",
-        text: "At last, [Role] [Name] faced the Courage Quest — and the great dragon itself.\n\nThe dragon roared. The ground trembled. But [Name] did not run.\n\n[She/He/They] offered the glowing blossom and spoke with a steady voice:\n\n“You do not have to be alone. The kingdom can be your home — if you choose peace.”\n\nThe dragon’s fire softened to warm golden light. A new friendship was born.",
-        photoCaption: "Photo from Courage Quest",
-        photoSet: "Courage Quest",
+        title: "Chastle",
+        text: "At last, [Role] [Name] faced the Chastle — and the great dragon itself.\n\nThe dragon roared. The ground trembled. But [Name] did not run.\n\n[She/He/They] offered the glowing blossom and spoke with a steady voice:\n\n“You do not have to be alone. The kingdom can be your home — if you choose peace.”\n\nThe dragon’s fire softened to warm golden light. A new friendship was born.",
+        photoCaption: "Photo from Chastle",
+        photoSet: "Chastle",
         useSessionPhoto: true,
         imagePromptHint:
           "Watercolor of [Role] [Name] bravely facing a friendly dragon with a glowing flower, heroic but gentle, children's book illustration, no text",
@@ -314,10 +314,10 @@ export const ADVENTURE_PATHS: AdventurePath[] = [
       },
       {
         page: 3,
-        title: "Castle Throne Room",
-        text: "In the Castle Throne Room, [Role] [Name] received a royal map and a lantern of hope.\n\n[She/He/They] promised the people: “No one in our kingdom is left behind.”\n\nThen [she/he/they] set out, heart steady and eyes bright.",
-        photoCaption: "Photo from Castle Throne Room",
-        photoSet: "Castle Throne Room",
+        title: "Throne Room",
+        text: "In the Throne Room, [Role] [Name] received a royal map and a lantern of hope.\n\n[She/He/They] promised the people: “No one in our kingdom is left behind.”\n\nThen [she/he/they] set out, heart steady and eyes bright.",
+        photoCaption: "Photo from Throne Room",
+        photoSet: "Throne Room",
         useSessionPhoto: true,
         imagePromptHint:
           "Watercolor of [Role] [Name] with a map and lantern in a throne room, children's book illustration, no text",
@@ -344,10 +344,10 @@ export const ADVENTURE_PATHS: AdventurePath[] = [
       },
       {
         page: 6,
-        title: "Courage Quest",
-        text: "The final rescue waited at the Courage Quest — a bridge too high for little feet, and a friend too frightened to cross.\n\n[Role] [Name] stood beside them and whispered, “We go together.”\n\nStep by step, hand in hand, they crossed. Everyone was safe.",
-        photoCaption: "Photo from Courage Quest",
-        photoSet: "Courage Quest",
+        title: "Chastle",
+        text: "The final rescue waited at the Chastle — a bridge too high for little feet, and a friend too frightened to cross.\n\n[Role] [Name] stood beside them and whispered, “We go together.”\n\nStep by step, hand in hand, they crossed. Everyone was safe.",
+        photoCaption: "Photo from Chastle",
+        photoSet: "Chastle",
         useSessionPhoto: true,
         imagePromptHint:
           "Watercolor of [Role] [Name] helping a friend cross a gentle bridge, brave and kind, children's book style, no text",
@@ -401,10 +401,10 @@ export const ADVENTURE_PATHS: AdventurePath[] = [
       },
       {
         page: 3,
-        title: "Castle Throne Room",
-        text: "In the Castle Throne Room, [Role] [Name] searched carefully.\n\nBeneath a banner, [she/he/they] found the first clue: a golden thread leading toward the forest.\n\n“Every clue brings us closer,” [she/he/they] said with a spark of hope.",
-        photoCaption: "Photo from Castle Throne Room",
-        photoSet: "Castle Throne Room",
+        title: "Throne Room",
+        text: "In the Throne Room, [Role] [Name] searched carefully.\n\nBeneath a banner, [she/he/they] found the first clue: a golden thread leading toward the forest.\n\n“Every clue brings us closer,” [she/he/they] said with a spark of hope.",
+        photoCaption: "Photo from Throne Room",
+        photoSet: "Throne Room",
         useSessionPhoto: true,
         imagePromptHint:
           "Watercolor of [Role] [Name] finding a golden thread clue in a throne room, children's book illustration, no text",
@@ -422,7 +422,7 @@ export const ADVENTURE_PATHS: AdventurePath[] = [
       {
         page: 5,
         title: "Royal Garden",
-        text: "In the Royal Garden, petals hid a tiny map drawn in gold ink.\n\nIt pointed to the Courage Quest — where the crown waited for someone brave enough to claim it with honesty, not greed.",
+        text: "In the Royal Garden, petals hid a tiny map drawn in gold ink.\n\nIt pointed to the Chastle — where the crown waited for someone brave enough to claim it with honesty, not greed.",
         photoCaption: "Photo from Royal Garden",
         photoSet: "Royal Garden",
         useSessionPhoto: true,
@@ -431,10 +431,10 @@ export const ADVENTURE_PATHS: AdventurePath[] = [
       },
       {
         page: 6,
-        title: "Courage Quest",
-        text: "At the Courage Quest, [Role] [Name] found the crown resting on a stone of light.\n\nA soft voice asked, “Who seeks the crown — for glory, or for the people?”\n\n“For the people,” [Name] answered.\n\nThe crown shone, and [she/he/they] lifted it with care.",
-        photoCaption: "Photo from Courage Quest",
-        photoSet: "Courage Quest",
+        title: "Chastle",
+        text: "At the Chastle, [Role] [Name] found the crown resting on a stone of light.\n\nA soft voice asked, “Who seeks the crown — for glory, or for the people?”\n\n“For the people,” [Name] answered.\n\nThe crown shone, and [she/he/they] lifted it with care.",
+        photoCaption: "Photo from Chastle",
+        photoSet: "Chastle",
         useSessionPhoto: true,
         imagePromptHint:
           "Watercolor of [Role] [Name] reclaiming a glowing crown on a stone of light, children's book style, no text",
@@ -488,10 +488,10 @@ export const ADVENTURE_PATHS: AdventurePath[] = [
       },
       {
         page: 3,
-        title: "Castle Throne Room",
-        text: "In the Castle Throne Room, [Role] [Name] received a guardian’s cloak woven with leaf-gold thread.\n\n“Protect the small and the quiet,” the King said. “That is true power.”\n\n[Name] bowed and set out for the woods.",
-        photoCaption: "Photo from Castle Throne Room",
-        photoSet: "Castle Throne Room",
+        title: "Throne Room",
+        text: "In the Throne Room, [Role] [Name] received a guardian’s cloak woven with leaf-gold thread.\n\n“Protect the small and the quiet,” the King said. “That is true power.”\n\n[Name] bowed and set out for the woods.",
+        photoCaption: "Photo from Throne Room",
+        photoSet: "Throne Room",
         useSessionPhoto: true,
         imagePromptHint:
           "Watercolor of [Role] [Name] receiving a leaf-gold cloak in a throne room, children's book illustration, no text",
@@ -518,10 +518,10 @@ export const ADVENTURE_PATHS: AdventurePath[] = [
       },
       {
         page: 6,
-        title: "Courage Quest",
-        text: "At the Courage Quest, a shadow tried to snuff out the last forest light.\n\n[Role] [Name] planted the starlight seeds and stood firm.\n\nLight bloomed. The shadow fled. The forest breathed again — and named [Name] its guardian.",
-        photoCaption: "Photo from Courage Quest",
-        photoSet: "Courage Quest",
+        title: "Chastle",
+        text: "At the Chastle, a shadow tried to snuff out the last forest light.\n\n[Role] [Name] planted the starlight seeds and stood firm.\n\nLight bloomed. The shadow fled. The forest breathed again — and named [Name] its guardian.",
+        photoCaption: "Photo from Chastle",
+        photoSet: "Chastle",
         useSessionPhoto: true,
         imagePromptHint:
           "Watercolor of [Role] [Name] restoring forest light against a soft shadow, children's book style, no text",
@@ -575,10 +575,10 @@ export const ADVENTURE_PATHS: AdventurePath[] = [
       },
       {
         page: 3,
-        title: "Castle Throne Room",
-        text: "From the Castle Throne Room, [Role] [Name] gathered notes of encouragement written in gold ink.\n\n“Words can be as brave as armor,” [she/he/they] said, and set out to share them.",
-        photoCaption: "Photo from Castle Throne Room",
-        photoSet: "Castle Throne Room",
+        title: "Throne Room",
+        text: "From the Throne Room, [Role] [Name] gathered notes of encouragement written in gold ink.\n\n“Words can be as brave as armor,” [she/he/they] said, and set out to share them.",
+        photoCaption: "Photo from Throne Room",
+        photoSet: "Throne Room",
         useSessionPhoto: true,
         imagePromptHint:
           "Watercolor of [Role] [Name] with golden notes of encouragement in a throne room, children's book illustration, no text",
@@ -605,10 +605,10 @@ export const ADVENTURE_PATHS: AdventurePath[] = [
       },
       {
         page: 6,
-        title: "Courage Quest",
-        text: "The Courage Quest asked [Name] to speak kindness even when it felt hard — to include someone who had been left out.\n\n[She/He/They] reached out a hand.\n\nThat single brave moment lit the whole kingdom.",
-        photoCaption: "Photo from Courage Quest",
-        photoSet: "Courage Quest",
+        title: "Chastle",
+        text: "The Chastle asked [Name] to speak kindness even when it felt hard — to include someone who had been left out.\n\n[She/He/They] reached out a hand.\n\nThat single brave moment lit the whole kingdom.",
+        photoCaption: "Photo from Chastle",
+        photoSet: "Chastle",
         useSessionPhoto: true,
         imagePromptHint:
           "Watercolor of [Role] [Name] including someone left out, warm heroic kindness, children's book style, no text",
@@ -662,10 +662,10 @@ export const ADVENTURE_PATHS: AdventurePath[] = [
       },
       {
         page: 3,
-        title: "Castle Throne Room",
-        text: "In the Castle Throne Room, [Role] [Name] learned the treasure was not gold — it was a crystal of shared hope.\n\nWhoever held it must give light away, not keep it.\n\n“Then I will share it,” [she/he/they] promised.",
-        photoCaption: "Photo from Castle Throne Room",
-        photoSet: "Castle Throne Room",
+        title: "Throne Room",
+        text: "In the Throne Room, [Role] [Name] learned the treasure was not gold — it was a crystal of shared hope.\n\nWhoever held it must give light away, not keep it.\n\n“Then I will share it,” [she/he/they] promised.",
+        photoCaption: "Photo from Throne Room",
+        photoSet: "Throne Room",
         useSessionPhoto: true,
         imagePromptHint:
           "Watercolor of [Role] [Name] learning about a crystal of hope in a throne room, children's book illustration, no text",
@@ -683,7 +683,7 @@ export const ADVENTURE_PATHS: AdventurePath[] = [
       {
         page: 5,
         title: "Royal Garden",
-        text: "In the Royal Garden, moonflowers opened only for a true heart.\n\nThey pointed [Role] [Name] toward the Courage Quest, where the crystal waited for someone who would share its glow.",
+        text: "In the Royal Garden, moonflowers opened only for a true heart.\n\nThey pointed [Role] [Name] toward the Chastle, where the crystal waited for someone who would share its glow.",
         photoCaption: "Photo from Royal Garden",
         photoSet: "Royal Garden",
         useSessionPhoto: true,
@@ -692,10 +692,10 @@ export const ADVENTURE_PATHS: AdventurePath[] = [
       },
       {
         page: 6,
-        title: "Courage Quest",
-        text: "At the Courage Quest, a shadow tried to keep the Treasure of Light for itself.\n\n[Role] [Name] did not fight with anger. [She/He/They] opened the lantern and offered light freely.\n\nThe shadow melted. The crystal shone. The kingdom’s treasure was restored.",
-        photoCaption: "Photo from Courage Quest",
-        photoSet: "Courage Quest",
+        title: "Chastle",
+        text: "At the Chastle, a shadow tried to keep the Treasure of Light for itself.\n\n[Role] [Name] did not fight with anger. [She/He/They] opened the lantern and offered light freely.\n\nThe shadow melted. The crystal shone. The kingdom’s treasure was restored.",
+        photoCaption: "Photo from Chastle",
+        photoSet: "Chastle",
         useSessionPhoto: true,
         imagePromptHint:
           "Watercolor of [Role] [Name] restoring a glowing crystal of light, heroic and gentle, children's book style, no text",

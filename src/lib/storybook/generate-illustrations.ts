@@ -79,10 +79,10 @@ export async function generateStoryIllustration(options: {
 }
 
 const SET_NAME_TO_ID: Record<Exclude<KingdomSet, null>, keyof PhotosBySet> = {
-  "Castle Throne Room": "castle-throne",
+  "Throne Room": "throne-room",
   "Royal Forest": "royal-forest",
   "Royal Garden": "royal-garden",
-  "Courage Quest": "courage-quest",
+  "Chastle": "chastle",
 };
 
 /** Flatten photos_by_set into a single list (order: throne → forest → garden → quest). */

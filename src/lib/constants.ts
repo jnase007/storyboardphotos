@@ -104,11 +104,11 @@ export const HOW_IT_WORKS = [
 
 export const KINGDOM_SETS = [
   {
-    id: "castle-throne",
-    name: "Castle Throne Room",
+    id: "throne-room",
+    name: "Throne Room",
     description:
-      "Majestic halls and a golden throne — a place to feel like royalty.",
-    image: "/sets/castle-throne.jpg",
+      "A royal throne room fit for kings and queens — where your story begins.",
+    image: "/sets/throne-room.jpg",
   },
   {
     id: "royal-forest",
@@ -125,18 +125,18 @@ export const KINGDOM_SETS = [
     image: "/sets/royal-garden.webp",
   },
   {
-    id: "courage-quest",
-    name: "Courage Quest",
+    id: "chastle",
+    name: "Chastle",
     description:
-      "A brave adventure set with knightly props — celebrating courage and standing tall.",
-    image: "/sets/courage-quest.webp",
+      "An enchanted castle realm of bravery and wonder — where heroes rise.",
+    image: "/sets/chastle.webp",
   },
 ] as const;
 
 export const AI_STYLE_PRESETS = [
   {
-    id: "castle-throne",
-    label: "Castle Throne",
+    id: "throne-room",
+    label: "Throne Room",
     promptSuffix:
       "in a majestic castle throne room with golden crown, royal robes, warm torchlight, dignified and joyful, cinematic portrait photography",
   },
@@ -153,8 +153,8 @@ export const AI_STYLE_PRESETS = [
       "in a lush royal garden with roses, marble fountain, golden hour light, serene and beloved, elegant portrait photography",
   },
   {
-    id: "courage-quest",
-    label: "Courage Quest",
+    id: "chastle",
+    label: "Chastle",
     promptSuffix:
       "on a courageous knightly quest with noble armor accents, brave and confident pose, warm heroic lighting, premium portrait photography",
   },

@@ -39,7 +39,7 @@ export function AIKingdomGenerator({
     resolver: zodResolver(aiGenerateSchema),
     defaultValues: {
       prompt: "",
-      style_preset: "castle-throne",
+      style_preset: "throne-room",
     },
   });
 

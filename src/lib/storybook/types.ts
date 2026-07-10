@@ -10,10 +10,10 @@ export type StorybookStatus =
   | "error";
 
 export type KingdomSet =
-  | "Castle Throne Room"
+  | "Throne Room"
   | "Royal Forest"
   | "Royal Garden"
-  | "Courage Quest"
+  | "Chastle"
   | null;
 
 export type StoryPage = {
@@ -46,17 +46,17 @@ export type StorybookRecord = {
 };
 
 export const KINGDOM_SETS: Exclude<KingdomSet, null>[] = [
-  "Castle Throne Room",
+  "Throne Room",
   "Royal Forest",
   "Royal Garden",
-  "Courage Quest",
+  "Chastle",
 ];
 
 /** Upload slots in the storybook generator (one drop zone per set). */
 export const SET_UPLOAD_SLOTS = [
   {
-    id: "castle-throne",
-    name: "Castle Throne Room" as const,
+    id: "throne-room",
+    name: "Throne Room" as const,
     hint: "Throne / crown portraits from this set",
   },
   {
@@ -70,8 +70,8 @@ export const SET_UPLOAD_SLOTS = [
     hint: "Garden / bloom shots from this set",
   },
   {
-    id: "courage-quest",
-    name: "Courage Quest" as const,
+    id: "chastle",
+    name: "Chastle" as const,
     hint: "Quest / armor shots from this set",
   },
 ] as const;

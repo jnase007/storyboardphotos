@@ -18,8 +18,8 @@ const HERO_BACKGROUNDS = [
     alt: "Royal Garden set — Storybook Photos Kings & Queens",
   },
   {
-    src: "/sets/courage-quest.webp",
-    alt: "Courage Quest set — Storybook Photos Kings & Queens",
+    src: "/sets/chastle.webp",
+    alt: "Chastle set — Storybook Photos Kings & Queens",
   },
 ] as const;
 

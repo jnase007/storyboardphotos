@@ -53,17 +53,17 @@ type SetFiles = Record<SetUploadId, File[]>;
 type SetPreviews = Record<SetUploadId, string[]>;
 
 const emptySetFiles = (): SetFiles => ({
-  "castle-throne": [],
+  "throne-room": [],
   "royal-forest": [],
   "royal-garden": [],
-  "courage-quest": [],
+  "chastle": [],
 });
 
 const emptySetPreviews = (): SetPreviews => ({
-  "castle-throne": [],
+  "throne-room": [],
   "royal-forest": [],
   "royal-garden": [],
-  "courage-quest": [],
+  "chastle": [],
 });
 
 const adminHeaders = {
@@ -153,10 +153,10 @@ export function StorybookGenerator() {
 
     try {
       const photos_by_set = {
-        "castle-throne": [] as string[],
+        "throne-room": [] as string[],
         "royal-forest": [] as string[],
         "royal-garden": [] as string[],
-        "courage-quest": [] as string[],
+        "chastle": [] as string[],
       };
       const photo_urls: string[] = [];
 

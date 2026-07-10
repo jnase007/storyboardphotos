@@ -49,10 +49,10 @@ export const createStorybookSchema = z.object({
             photoCaption: z.string().optional().default(""),
             photoSet: z
               .enum([
-                "Castle Throne Room",
+                "Throne Room",
                 "Royal Forest",
                 "Royal Garden",
-                "Courage Quest",
+                "Chastle",
               ])
               .optional(),
             useSessionPhoto: z.boolean().optional(),
@@ -66,10 +66,10 @@ export const createStorybookSchema = z.object({
   /** Photos grouped by kingdom set (preferred) */
   photos_by_set: z
     .object({
-      "castle-throne": setPhotosSchema,
+      "throne-room": setPhotosSchema,
       "royal-forest": setPhotosSchema,
       "royal-garden": setPhotosSchema,
-      "courage-quest": setPhotosSchema,
+      "chastle": setPhotosSchema,
     })
     .optional(),
   /** Flat list kept for backwards compatibility */
@@ -88,10 +88,10 @@ export const updatePagesSchema = z.object({
       imageUrl: z.string().nullable(),
       photoSet: z
         .enum([
-          "Castle Throne Room",
+          "Throne Room",
           "Royal Forest",
           "Royal Garden",
-          "Courage Quest",
+          "Chastle",
         ])
         .nullable(),
       imagePrompt: z.string().optional(),

@@ -4,10 +4,10 @@
  */
 
 export type StoryPhotoSet =
-  | "Castle Throne Room"
+  | "Throne Room"
   | "Royal Forest"
   | "Royal Garden"
-  | "Courage Quest";
+  | "Chastle";
 
 export type StoryPage = {
   page: number;
@@ -51,10 +51,10 @@ export const SAMPLE_STORYBOOKS: StorybookVersion[] = [
       },
       {
         page: 3,
-        title: "Castle Throne Room",
-        text: "First, Princess [Child’s Name] entered the majestic Castle Throne Room.\n\nShe sat upon the golden throne and felt the weight and honor of royalty.\n\n“I am brave,” she whispered. “I am loved. I am a daughter of the King.”",
-        photoCaption: "Photo from Castle Throne Room",
-        photoSet: "Castle Throne Room",
+        title: "Throne Room",
+        text: "First, Princess [Child’s Name] entered the majestic Throne Room.\n\nShe sat upon the golden throne and felt the weight and honor of royalty.\n\n“I am brave,” she whispered. “I am loved. I am a daughter of the King.”",
+        photoCaption: "Photo from Throne Room",
+        photoSet: "Throne Room",
       },
       {
         page: 4,
@@ -72,10 +72,10 @@ export const SAMPLE_STORYBOOKS: StorybookVersion[] = [
       },
       {
         page: 6,
-        title: "Courage Quest",
-        text: "Finally, Princess [Child’s Name] faced the Courage Quest.\n\nWith knightly armor and a brave heart, she stood tall and faced her fears.\n\nShe discovered that true courage comes from knowing who you are.",
-        photoCaption: "Photo from Courage Quest",
-        photoSet: "Courage Quest",
+        title: "Chastle",
+        text: "Finally, Princess [Child’s Name] faced the Chastle.\n\nWith knightly armor and a brave heart, she stood tall and faced her fears.\n\nShe discovered that true courage comes from knowing who you are.",
+        photoCaption: "Photo from Chastle",
+        photoSet: "Chastle",
       },
       {
         page: 7,
@@ -112,10 +112,10 @@ export const SAMPLE_STORYBOOKS: StorybookVersion[] = [
       },
       {
         page: 3,
-        title: "Castle Throne Room",
-        text: "First, Prince [Child’s Name] entered the majestic Castle Throne Room.\n\nHe sat on the golden throne and felt the responsibility and honor of royalty.\n\n“I am brave,” he said. “I am strong. I am a son of the King.”",
-        photoCaption: "Photo from Castle Throne Room",
-        photoSet: "Castle Throne Room",
+        title: "Throne Room",
+        text: "First, Prince [Child’s Name] entered the majestic Throne Room.\n\nHe sat on the golden throne and felt the responsibility and honor of royalty.\n\n“I am brave,” he said. “I am strong. I am a son of the King.”",
+        photoCaption: "Photo from Throne Room",
+        photoSet: "Throne Room",
       },
       {
         page: 4,
@@ -133,10 +133,10 @@ export const SAMPLE_STORYBOOKS: StorybookVersion[] = [
       },
       {
         page: 6,
-        title: "Courage Quest",
-        text: "Finally, Prince [Child’s Name] entered the Courage Quest.\n\nWith knightly spirit and a brave heart, he stood tall and faced challenges with courage.",
-        photoCaption: "Photo from Courage Quest",
-        photoSet: "Courage Quest",
+        title: "Chastle",
+        text: "Finally, Prince [Child’s Name] entered the Chastle.\n\nWith knightly spirit and a brave heart, he stood tall and faced challenges with courage.",
+        photoCaption: "Photo from Chastle",
+        photoSet: "Chastle",
       },
       {
         page: 7,

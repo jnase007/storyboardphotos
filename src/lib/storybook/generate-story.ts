@@ -61,12 +61,12 @@ The child chose this adventure path: "${path.title}" (${path.label}).
 Theme guidance: ${path.aiTheme}
 Follow the plot beats of the outline below — personalize wording, keep the same page count and photoSet assignments.
 Structure the quest through these four sets in order somewhere in the middle pages:
-1) Castle Throne Room 2) Royal Forest 3) Royal Garden 4) Courage Quest.
+1) Throne Room 2) Royal Forest 3) Royal Garden 4) Chastle.
 Return ONLY valid JSON (no markdown) matching:
 {
   "bookTitle": string,
   "pages": [
-    { "page": number, "title": string, "text": string, "photoSet": "Castle Throne Room"|"Royal Forest"|"Royal Garden"|"Courage Quest"|null, "useSessionPhoto": boolean, "imagePrompt": string }
+    { "page": number, "title": string, "text": string, "photoSet": "Throne Room"|"Royal Forest"|"Royal Garden"|"Chastle"|null, "useSessionPhoto": boolean, "imagePrompt": string }
   ]
 }
 Rules:

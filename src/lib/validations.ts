@@ -60,10 +60,10 @@ export const aiGenerateSchema = z.object({
     .min(5, "Describe your royal adventure (at least 5 characters)")
     .max(500, "Prompt must be under 500 characters"),
   style_preset: z.enum([
-    "castle-throne",
+    "throne-room",
     "royal-forest",
     "royal-garden",
-    "courage-quest",
+    "chastle",
   ]),
 });
 
