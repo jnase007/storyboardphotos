@@ -81,7 +81,7 @@ export function ClientBookViewer({ book }: { book: Book }) {
   return (
     <div
       className="flex flex-col items-center justify-center overflow-hidden"
-      style={{ background: "linear-gradient(135deg, #0A1628 0%, #2D1B4E 100%)", height: "100dvh", paddingTop: "76px", padding: "12px" }}
+      style={{ background: "linear-gradient(135deg, #0A1628 0%, #2D1B4E 100%)", height: "100dvh", paddingTop: "0px", padding: "12px" }}
     >
       {/* Header */}
       <div className="text-center mb-4">
