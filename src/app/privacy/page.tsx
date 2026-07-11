@@ -18,7 +18,7 @@ export default function PrivacyPolicyPage() {
           <p>
             {SITE.name} (&ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;)
             operates the website {SITE.domain} and provides faith-centered
-            photography sessions and personalized storybooks from our studio at{" "}
+            photography sessions and Kingdom Chronicless from our studio at{" "}
             {SITE.address}.
           </p>
           <p>

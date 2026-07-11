@@ -1,5 +1,5 @@
 /**
- * Sample 8-page heirloom storybook content for the business-plan preview.
+ * Sample 8-page Kingdom Chronicles content for the business-plan preview.
  * Exact Princess / Prince “Kingdom Quest” stories with session photo spots.
  */
 

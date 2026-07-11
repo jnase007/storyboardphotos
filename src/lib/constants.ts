@@ -5,7 +5,7 @@ export const SITE = {
   url: "https://storybookphotos.com",
   tagline: "Remind Your Child They Are Royalty",
   description:
-    "Kingdom-themed photo studio in Costa Mesa, CA. Magical royal photo shoots and personalized storybooks that help kids feel brave, beloved, and full of wonder.",
+    "Kingdom-themed photo studio in Costa Mesa, CA. Magical royal photo shoots and Kingdom Chronicless that help kids feel brave, beloved, and full of wonder.",
   location: "Costa Mesa, CA",
   email: "hello@storybookphotos.com",
   phone: "(949) 637-2226",
@@ -69,7 +69,7 @@ export const HOW_IT_WORKS = [
     step: 1,
     title: "Choose Your Quest",
     description:
-      "Select a package that fits your family — from a single royal portrait to a full kingdom experience with a personalized storybook.",
+      "Select a package that fits your family — from a single royal portrait to a full kingdom experience with a Kingdom Chronicles.",
     icon: "Crown" as const,
   },
   {
@@ -90,7 +90,7 @@ export const HOW_IT_WORKS = [
     step: 4,
     title: "Craft Your Storybook",
     description:
-      "We create a personalized storybook where your child is the hero — loved, brave, and made for adventure.",
+      "We create a Kingdom Chronicles where your child is the hero — loved, brave, and made for adventure.",
     icon: "BookOpen" as const,
   },
   {
@@ -269,7 +269,7 @@ export const FAQ_ITEMS = [
   {
     question: "What is Storybook Photos?",
     answer:
-      "We're a kingdom-themed photo studio in Costa Mesa. Kids dress as royalty, explore immersive sets, and can receive a personalized storybook where they are the hero of the adventure.",
+      "We're a kingdom-themed photo studio in Costa Mesa. Kids dress as royalty, explore immersive sets, and can receive a Kingdom Chronicles where they are the hero of the adventure.",
   },
   {
     question: "What ages are best for a session?",
@@ -284,7 +284,7 @@ export const FAQ_ITEMS = [
   {
     question: "What's included in the storybook?",
     answer:
-      "Your personalized storybook features your child as the hero of their own royal adventure, with professional photos woven throughout. Text is customized to their story and printed on premium archival paper.",
+      "Your Kingdom Chronicles features your child as the hero of their own royal adventure, with professional photos woven throughout. Text is customized to their story and printed on premium archival paper.",
   },
   {
     question: "Can siblings participate together?",

@@ -59,22 +59,22 @@ const ADVENTURES = [
 
 const storybookFeatures = [
   {
-    icon: Feather,
-    title: "Stories Written for Them",
+    icon: BookOpen,
+    title: "Kingdom Chronicles",
     description:
-      "Each storybook celebrates your child as the hero — loved, brave, and made for adventure.",
+      "The AI-illustrated adventure storybook where your child is the hero — named throughout, watercolor scenes, 6 unique adventure paths. Dad\'s favorite.",
   },
   {
     icon: Star,
-    title: "Museum-Quality Print",
+    title: "Royal Portrait Album",
     description:
-      "Premium archival paper, lay-flat binding, and optional leather covers. Built to last generations.",
+      "A stunning hardcover photo book of your child\'s professional portraits from all 4 enchanted kingdom sets. Their name on the cover. Mom\'s favorite.",
   },
   {
-    icon: BookOpen,
-    title: "Your Child as Royalty",
+    icon: Feather,
+    title: "The Royal Collection",
     description:
-      "Professional portraits woven throughout the pages, with your child named and celebrated as the star of their own kingdom.",
+      "Both books together — the story AND the portraits. The complete keepsake every family will treasure for generations.",
   },
 ];
 
@@ -93,7 +93,7 @@ export function StorybooksSection() {
             viewport={{ once: true }}
           >
             <p className="text-royal-gold font-medium tracking-widest uppercase text-sm mb-3">
-              Heirloom Storybooks
+              Kingdom Chronicless
             </p>
             <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-royal-cream mb-6">
               A Story They&apos;ll
@@ -101,7 +101,7 @@ export function StorybooksSection() {
               <span className="text-gradient-gold-shine">Never Forget</span>
             </h2>
             <p className="text-royal-cream/70 text-lg leading-relaxed mb-8">
-              Beyond beautiful portraits, we craft personalized storybooks that
+              Beyond beautiful portraits, we craft Kingdom Chronicless that
               help your child see themselves as royal, beloved, and made for
               adventure. Every page is illustrated with their professional
               photos — a keepsake that builds lasting confidence.

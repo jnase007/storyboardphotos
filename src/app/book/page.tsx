@@ -7,7 +7,7 @@ import { SITE } from "@/lib/constants";
 export const metadata: Metadata = {
   title: "Book Your Session",
   description:
-    "Book a faith-centered Kings & Queens session at Storybook Photos in Costa Mesa. Celebrate your child's God-given identity with portraits and a personalized storybook.",
+    "Book a faith-centered Kings & Queens session at Storybook Photos in Costa Mesa. Celebrate your child's God-given identity with portraits and a Kingdom Chronicles.",
   alternates: {
     canonical: `${SITE.url}/book`,
   },

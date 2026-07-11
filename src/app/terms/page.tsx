@@ -36,7 +36,7 @@ export default function TermsOfServicePage() {
         <LegalSection title="2. Services">
           <p>
             We provide immersive studio photography sessions, digital and print
-            products, and personalized storybooks as described on our website.
+            products, and Kingdom Chronicless as described on our website.
             Package details, pricing, and inclusions may change; the description
             at the time of booking controls unless we agree otherwise in writing.
           </p>

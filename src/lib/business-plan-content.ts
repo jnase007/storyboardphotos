@@ -10,7 +10,7 @@ export const BP_ADVANTAGES = [
 export const BP_REVENUE_POINTS = [
   "Session packages starting at $450 (2 kingdom sets included)",
   "Mid and premium tiers at $750 and $1,200 for deeper set coverage + storybooks",
-  "High-margin upsells: fine art prints, digital files, and Heirloom Storybooks (starting at $3,000)",
+  "High-margin upsells: fine art prints, digital files, and Kingdom Chronicless (starting at $3,000)",
   "Digital-only storybooks for instant high-margin revenue",
 ] as const;
 
@@ -65,7 +65,7 @@ export const BP_PRINT_PARTNERS = [
   },
   {
     name: "Artifact Uprising",
-    role: "Optional luxury lay-flat heirloom storybooks for premium upgrades",
+    role: "Optional luxury lay-flat Kingdom Chronicless for premium upgrades",
     url: null as string | null,
   },
   {
@@ -219,7 +219,7 @@ export const BP_COMPETITOR_PRICING = {
       { product: "24x30 Portrait", price: "$1,650", us: "$1,650" },
       { product: "30x40 Portrait", price: "$2,650", us: "$2,650" },
       { product: "Digital Image", price: "$500", us: "$500" },
-      { product: "Heirloom Storybook", price: "Starts at $3,000", us: "INCLUDED in packages" },
+      { product: "Kingdom Chronicles", price: "Starts at $3,000", us: "INCLUDED in packages" },
       { product: "MP4 Digital Slideshow", price: "$1,400", us: "$299 (animated video)" },
       { product: "Session / Package", price: "Unknown — add-on model", us: "$299–$799 all-in" },
     ],
@@ -300,4 +300,4 @@ export const BP_COST_BREAKDOWN = {
 
 
 export const BP_EXECUTIVE_SUMMARY =
-  "Storybook Photos (Kingdom Quests) is a premium fantasy photo studio in Costa Mesa offering kingdom-themed photo sessions for children and families. Clients dress as kings, queens, and royalty and are photographed in custom-built sets. Every session includes the option of a personalized AI-assisted heirloom storybook where the child is the hero of their own adventure.";
+  "Storybook Photos (Kingdom Quests) is a premium fantasy photo studio in Costa Mesa offering kingdom-themed photo sessions for children and families. Clients dress as kings, queens, and royalty and are photographed in custom-built sets. Every session includes the option of a personalized AI-assisted Kingdom Chronicles where the child is the hero of their own adventure.";

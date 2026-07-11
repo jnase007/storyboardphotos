@@ -92,7 +92,7 @@ export function HeroSection() {
             </h1>
 
             <p className="text-lg text-royal-cream/90 max-w-lg mb-8 leading-relaxed drop-shadow">
-              Kingdom-themed photo shoots and personalized storybooks that help
+              Kingdom-themed photo shoots and Kingdom Chronicless that help
               kids feel brave, beloved, and full of wonder — an enchanted
               adventure they&apos;ll never forget.
             </p>

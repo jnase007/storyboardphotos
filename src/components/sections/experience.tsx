@@ -20,7 +20,7 @@ const features = [
   },
   {
     icon: BookOpen,
-    title: "Heirloom Storybooks",
+    title: "Kingdom Chronicless",
     description:
       "Personalized books where your child is the hero — loved, brave, and made for adventure.",
   },

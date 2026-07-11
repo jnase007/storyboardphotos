@@ -317,7 +317,7 @@ function drawBackCover(doc: jsPDF): void {
   doc.setFontSize(18);
   doc.setTextColor(...GOLD);
   const tagline = "Turn Your Child Into Royalty —";
-  const tagline2 = "With a Personalized Storybook";
+  const tagline2 = "With a Kingdom Chronicles";
   doc.text(tagline,  PAGE_W / 2, 390, { align: "center" });
   doc.text(tagline2, PAGE_W / 2, 413, { align: "center" });
 
