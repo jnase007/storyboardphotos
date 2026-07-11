@@ -73,7 +73,7 @@ export async function buildStorybookPdf(options: {
 // ─────────────────────────────────────────────────────────────────────────────
 async function drawCoverPageAsync(doc: jsPDF, childName: string, coverImageUrl?: string): Promise<void> {
   // Use AI-generated cover with child's face if available, otherwise use castle scene
-  const COVER_URL = coverImageUrl ?? "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/dragon-slayer/title.jpg";
+  const COVER_URL = coverImageUrl ?? "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/cover-template.jpg";
 
   try {
     const img = await fetchImageAsDataUrl(COVER_URL);
@@ -87,42 +87,17 @@ async function drawCoverPageAsync(doc: jsPDF, childName: string, coverImageUrl?:
     drawFallbackCover(doc);
   }
 
-  // Gold decorative border frame over the image
-  drawGoldBorder(doc, 10, 10, PAGE_W - 20, PAGE_H - 20, 2);
-  drawGoldBorder(doc, 18, 18, PAGE_W - 36, PAGE_H - 36, 0.75);
-
-  // Top name area — semi-transparent dark band at top
-  doc.setFillColor(10, 22, 40);
-  doc.setGState(doc.GState({ opacity: 0.75 }));
-  doc.rect(0, 0, PAGE_W, PAGE_H * 0.28, "F");
-  doc.setGState(doc.GState({ opacity: 1 }));
-
-  // Child's name — large, centered at top
-  doc.setTextColor(...GOLD);
+  // Child name overlay — centered over the [Your Child] area in the template
+  // The template already has "Child of the King" and "STORYBOOK PHOTOS" baked in
+  // We just overlay the child's name in the center
   doc.setFont("times", "bold");
-  doc.setFontSize(42);
-  doc.text(`${childName}`, PAGE_W / 2, PAGE_H * 0.12, { align: "center" });
-
-  // Decorative rule under name
-  doc.setDrawColor(...GOLD);
-  doc.setLineWidth(1.5);
-  doc.line(PAGE_W * 0.2, PAGE_H * 0.17, PAGE_W * 0.8, PAGE_H * 0.17);
-
-  // "Kingdom Quest" subtitle
-  doc.setFont("times", "italic");
-  doc.setFontSize(20);
-  doc.setTextColor(...GOLD_DARK);
-  doc.text("Kingdom Quest", PAGE_W / 2, PAGE_H * 0.23, { align: "center" });
-
-  // Bottom branding band
-  doc.setFillColor(10, 22, 40);
-  doc.setGState(doc.GState({ opacity: 0.75 }));
-  doc.rect(0, PAGE_H * 0.88, PAGE_W, PAGE_H * 0.12, "F");
-  doc.setGState(doc.GState({ opacity: 1 }));
-  doc.setFont("times", "bold");
-  doc.setFontSize(11);
-  doc.setTextColor(...GOLD_DARK);
-  doc.text("Storybook Photos · Kingdom Quests", PAGE_W / 2, PAGE_H * 0.95, { align: "center" });
+  doc.setFontSize(36);
+  doc.setTextColor(212, 176, 122); // Gold matching the template
+  // Add a subtle dark shadow behind the name for readability
+  doc.setTextColor(10, 22, 40);
+  doc.text(`${childName}`, PAGE_W / 2 + 1, PAGE_H * 0.57 + 1, { align: "center" });
+  doc.setTextColor(212, 176, 122);
+  doc.text(`${childName}`, PAGE_W / 2, PAGE_H * 0.57, { align: "center" });
 }
 
 function drawFallbackCover(doc: jsPDF): void {
