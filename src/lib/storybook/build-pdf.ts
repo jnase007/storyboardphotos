@@ -91,21 +91,44 @@ async function drawCoverPageAsync(doc: jsPDF, childName: string, coverImageUrl?:
     drawFallbackCover(doc);
   }
 
-  // Book title based on type
+  // Book title — light cream bands top and bottom
   const line1 = `${childName}'s`;
   const line2 = bookType === "portraits" ? "Royal Portraits" : "Kingdom Chronicles";
 
-  // Shadow
+  // Light cream overlay at top for name
+  doc.setFillColor(248, 244, 236);
+  doc.setGState(doc.GState({ opacity: 0.88 }));
+  doc.rect(0, 0, PAGE_W, PAGE_H * 0.20, "F");
+  doc.setGState(doc.GState({ opacity: 1 }));
+
+  // Light cream overlay at bottom for branding
+  doc.setFillColor(248, 244, 236);
+  doc.setGState(doc.GState({ opacity: 0.88 }));
+  doc.rect(0, PAGE_H * 0.87, PAGE_W, PAGE_H * 0.13, "F");
+  doc.setGState(doc.GState({ opacity: 1 }));
+
+  // Gold border frame
+  doc.setDrawColor(...GOLD);
+  doc.setLineWidth(2);
+  doc.rect(10, 10, PAGE_W - 20, PAGE_H - 20, "S");
+
+  // Royal blue name text
   doc.setFont("times", "bolditalic");
-  doc.setFontSize(46);
-  doc.setTextColor(20, 10, 40);
-  doc.text(line1, PAGE_W / 2 + 2, PAGE_H * 0.40 + 2, { align: "center" });
-  doc.text(line2, PAGE_W / 2 + 1, PAGE_H * 0.50 + 1, { align: "center" });
-  // Gold text
-  doc.setTextColor(220, 185, 100);
-  doc.text(line1, PAGE_W / 2, PAGE_H * 0.40, { align: "center" });
-  doc.setFontSize(38);
-  doc.text(line2, PAGE_W / 2, PAGE_H * 0.50, { align: "center" });
+  doc.setFontSize(48);
+  doc.setTextColor(10, 22, 40);
+  doc.text(line1, PAGE_W / 2, PAGE_H * 0.10, { align: "center" });
+
+  // Gold subtitle
+  doc.setFont("times", "italic");
+  doc.setFontSize(34);
+  doc.setTextColor(150, 100, 20);
+  doc.text(line2, PAGE_W / 2, PAGE_H * 0.17, { align: "center" });
+
+  // Bottom branding
+  doc.setFont("times", "normal");
+  doc.setFontSize(11);
+  doc.setTextColor(150, 100, 20);
+  doc.text("Storybook Photos · Kingdom Quests", PAGE_W / 2, PAGE_H * 0.93, { align: "center" });
 }
 
 function drawFallbackCover(doc: jsPDF): void {
