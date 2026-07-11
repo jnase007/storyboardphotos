@@ -153,33 +153,29 @@ export function HeroSection() {
                 <Heart className="h-6 w-6 text-royal-gold" />
               </div>
               <h2 className="font-serif text-2xl sm:text-3xl font-bold text-royal-cream mb-3">
-                We Curate the Experience With You
+                We Curate Every Moment for Your Child
               </h2>
               <p className="text-royal-cream/75 leading-relaxed mb-6">
-                Before your session, tell us how to shape the day — the story
-                to build around, what matters most, and anything we should know
-                about your child. We create the heirloom storybook when you
-                arrive.
               </p>
               <ul className="space-y-3 mb-8 text-sm text-royal-cream/80">
                 <li className="flex gap-2">
                   <span className="text-royal-gold">✦</span>
-                  How can we curate this experience for you?
+                  Which quest speaks to your child&apos;s heart?
                 </li>
                 <li className="flex gap-2">
                   <span className="text-royal-gold">✦</span>
-                  What story or theme should we build around?
+                  What do you want them to believe about themselves?
                 </li>
                 <li className="flex gap-2">
                   <span className="text-royal-gold">✦</span>
-                  Are there things you want included?
+                  What should we know to make this day unforgettable?
                 </li>
               </ul>
               <Link
                 href="/book"
                 className="inline-flex h-12 w-full sm:w-auto items-center justify-center gap-2 rounded-md bg-royal-gold px-8 text-base font-semibold text-royal-blue hover:bg-[#D4B480] transition-all hover:scale-[1.02]"
               >
-                Share Your Vision
+                Begin Their Quest
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
