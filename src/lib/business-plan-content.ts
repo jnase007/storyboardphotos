@@ -166,6 +166,13 @@ export const BP_COMPETITOR_PRICING = {
     note: "High-end fantasy portrait studio",
     pricingModel: "No transparent pricing. Clients spend $1,000–$3,000+ at a surprise 'Ordering appointment' after the shoot. Some $10,000+. High-pressure sales. Storybook starts at $3,000.",
     theirQuote: "Most clients invest $1,000–$3,000. Ask how to save 50% at your Ordering appointment.",
+    realReviews: [
+      { source: "Lemon8 review", quote: "I won a session, but ended up paying $1,000 for just 4 digital images." },
+      { source: "Yelp review", quote: "$9K for the best package, $4K for the lower package. $400 for two 8x10s." },
+      { source: "Reddit review", quote: "Paid $25 to schedule the 'free' session. Felt like a scam." },
+      { source: "TikTok", quote: "Photo packages started at $2,500." },
+    ],
+    verdict: "Bait-and-switch model. 'Free' session = high-pressure sales appointment. Real spend: $1,000–$9,000+ after showing up.",
     items: [
       { product: "1st 8x10 Portrait", price: "FREE with special", us: null },
       { product: "8x10 Portrait", price: "$200", us: null },

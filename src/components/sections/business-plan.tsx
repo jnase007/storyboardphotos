@@ -204,6 +204,21 @@ export function BusinessPlanSection() {
               <span className="text-red-600 italic">&ldquo;Most clients invest $1,000–$3,000. Ask how to save 50% at your Ordering appointment.&rdquo;</span>
               <div className="mt-1 text-red-500 text-xs">→ No upfront pricing. High-pressure ordering session after the shoot. Storybook starts at $3,000 extra.</div>
             </div>
+            <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-4">
+              <h4 className="font-bold text-orange-800 mb-2 text-sm">⚠️ What Customers Actually Paid (Public Reviews)</h4>
+              <div className="space-y-2">
+                {COMPETITOR_PRICING.competitor.realReviews.map((r: {source: string; quote: string}) => (
+                  <div key={r.source} className="text-sm">
+                    <span className="text-orange-600 font-semibold">{r.source}: </span>
+                    <span className="text-orange-700 italic">&ldquo;{r.quote}&rdquo;</span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-3 pt-3 border-t border-orange-200">
+                <span className="text-red-700 font-bold text-sm">Verdict: </span>
+                <span className="text-red-600 text-sm">{COMPETITOR_PRICING.competitor.verdict}</span>
+              </div>
+            </div>
             <div className="overflow-x-auto rounded-xl border border-royal-gold/20 mb-6">
               <table className="w-full text-sm">
                 <thead>
