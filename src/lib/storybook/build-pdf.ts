@@ -87,17 +87,20 @@ async function drawCoverPageAsync(doc: jsPDF, childName: string, coverImageUrl?:
     drawFallbackCover(doc);
   }
 
-  // Child name overlay — centered over the [Your Child] area in the template
-  // The template already has "Child of the King" and "STORYBOOK PHOTOS" baked in
-  // We just overlay the child's name in the center
-  doc.setFont("times", "bold");
-  doc.setFontSize(36);
-  doc.setTextColor(212, 176, 122); // Gold matching the template
-  // Add a subtle dark shadow behind the name for readability
-  doc.setTextColor(10, 22, 40);
-  doc.text(`${childName}`, PAGE_W / 2 + 1, PAGE_H * 0.57 + 1, { align: "center" });
-  doc.setTextColor(212, 176, 122);
-  doc.text(`${childName}`, PAGE_W / 2, PAGE_H * 0.57, { align: "center" });
+  // Child name overlay — large and prominent in center of the arch
+  // Shadow for depth
+  doc.setFont("times", "bolditalic");
+  doc.setFontSize(52);
+  doc.setTextColor(20, 10, 40); // Dark shadow
+  doc.text(`${childName}`, PAGE_W / 2 + 2, PAGE_H * 0.42 + 2, { align: "center" });
+  // Main name in bright gold
+  doc.setTextColor(220, 185, 100);
+  doc.text(`${childName}`, PAGE_W / 2, PAGE_H * 0.42, { align: "center" });
+  // Subtitle under name
+  doc.setFont("times", "italic");
+  doc.setFontSize(18);
+  doc.setTextColor(200, 170, 90);
+  doc.text("Kingdom Quest", PAGE_W / 2, PAGE_H * 0.50, { align: "center" });
 }
 
 function drawFallbackCover(doc: jsPDF): void {
