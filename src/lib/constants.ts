@@ -224,7 +224,7 @@ export const ADDITIONAL_INVESTMENTS = [
   { label: "24×30 portrait print", price: "$1,650" },
   { label: "30×40 portrait print", price: "$2,650" },
   { label: "Single digital image", price: "$500" },
-  { label: "MP4 digital slideshow", price: "$1,400" },
+  { label: "MP4 digital slideshow (coming soon)", price: "$1,400" },
 ] as const;
 
 export const OUR_PROMISE = {
