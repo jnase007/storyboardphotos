@@ -61,6 +61,13 @@ const ADMIN_LINKS = [
     icon: BookOpen,
     match: (path: string) => path.startsWith("/admin/ip"),
   },
+  {
+    href: "https://docs.google.com/spreadsheets/d/1EtvANzzcqwofpUO6zriYN76OVjx8dgo7pk406eS9Vdk/edit#gid=0",
+    label: "Set Pricing",
+    shortLabel: "Pricing",
+    icon: BookOpen,
+    match: () => false,
+  },
 ] as const;
 
 function isAdminUnlocked(): boolean {
@@ -119,6 +126,8 @@ export function AdminNav() {
               <Link
                 key={link.href}
                 href={link.href}
+                target={link.href.startsWith("http") ? "_blank" : undefined}
+                rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
                 className={cn(
                   "shrink-0 inline-flex h-11 items-center gap-1 sm:gap-1.5 rounded-md px-2 sm:px-2.5 text-[11px] sm:text-xs font-semibold transition-colors",
                   active
