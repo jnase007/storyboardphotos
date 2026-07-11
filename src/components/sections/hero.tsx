@@ -156,6 +156,7 @@ export function HeroSection() {
                 We Curate Every Moment for Your Child
               </h2>
               <p className="text-royal-cream/75 leading-relaxed mb-6">
+                Before you arrive, we learn everything about your child — their personality, their favorite story, what makes them light up. When you walk through the door, we&apos;ve already built the day around them. You experience the magic. We handle everything else.
               </p>
               <ul className="space-y-3 mb-8 text-sm text-royal-cream/80">
                 <li className="flex gap-2">
