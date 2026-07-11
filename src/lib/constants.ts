@@ -164,7 +164,7 @@ export const PRICING_PACKAGES = [
   {
     id: "solo-quest",
     name: "Solo Quest",
-    price: 299,
+    price: 349,
     description: "One child. One hero. One personalized Kingdom Quest storybook.",
     features: [
       "60-minute studio session",
@@ -180,7 +180,7 @@ export const PRICING_PACKAGES = [
   {
     id: "sibling-quest",
     name: "Sibling Quest",
-    price: 499,
+    price: 549,
     description: "Two children — each gets their own book where THEY are the hero.",
     features: [
       "60-minute studio session",
@@ -197,7 +197,7 @@ export const PRICING_PACKAGES = [
   {
     id: "family-quest",
     name: "Family Quest",
-    price: 799,
+    price: 849,
     description: "Three children — three personalized storybooks, one magical session.",
     features: [
       "60-minute studio session",
@@ -300,8 +300,8 @@ export const FAQ_ITEMS = [
 ] as const;
 
 export const PACKAGE_OPTIONS = [
-  { value: "solo-quest", label: "Solo Quest — $299 (1 child · 1 book)" },
-  { value: "sibling-quest", label: "Sibling Quest — $499 (2 children · 2 separate books)" },
-  { value: "family-quest", label: "Family Quest — $799 (3 children · 3 separate books)" },
+  { value: "solo-quest", label: "Solo Quest — $349 (1 child · 1 book)" },
+  { value: "sibling-quest", label: "Sibling Quest — $549 (2 children · 2 separate books)" },
+  { value: "family-quest", label: "Family Quest — $849 (3 children · 3 separate books)" },
   { value: "additional-book", label: "Add extra book — $149 (for 4th child+)" },
 ];
