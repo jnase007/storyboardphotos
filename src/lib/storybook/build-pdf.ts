@@ -88,19 +88,17 @@ async function drawCoverPageAsync(doc: jsPDF, childName: string, coverImageUrl?:
   }
 
   // Child name overlay — large and prominent in center of the arch
-  // Shadow for depth
+  // Shadow
   doc.setFont("times", "bolditalic");
-  doc.setFontSize(52);
-  doc.setTextColor(20, 10, 40); // Dark shadow
-  doc.text(`${childName}`, PAGE_W / 2 + 2, PAGE_H * 0.42 + 2, { align: "center" });
-  // Main name in bright gold
+  doc.setFontSize(46);
+  doc.setTextColor(20, 10, 40);
+  doc.text(`${childName}\'s`, PAGE_W / 2 + 2, PAGE_H * 0.40 + 2, { align: "center" });
+  doc.text("Kingdom Chronicles", PAGE_W / 2 + 1, PAGE_H * 0.50 + 1, { align: "center" });
+  // Gold text
   doc.setTextColor(220, 185, 100);
-  doc.text(`${childName}`, PAGE_W / 2, PAGE_H * 0.42, { align: "center" });
-  // Subtitle under name
-  doc.setFont("times", "italic");
-  doc.setFontSize(18);
-  doc.setTextColor(200, 170, 90);
-  doc.text("Kingdom Quest", PAGE_W / 2, PAGE_H * 0.50, { align: "center" });
+  doc.text(`${childName}\'s`, PAGE_W / 2, PAGE_H * 0.40, { align: "center" });
+  doc.setFontSize(38);
+  doc.text("Kingdom Chronicles", PAGE_W / 2, PAGE_H * 0.50, { align: "center" });
 }
 
 function drawFallbackCover(doc: jsPDF): void {
