@@ -281,12 +281,21 @@ export const BP_COST_BREAKDOWN = {
     strong: { sessions: 40, avgTicket: 480, revenue: 19200, margin: 7680 },
   },
   addOnMargins: [
-    { product: "Animated video", price: 299, cost: 5, margin: 294 },
-    { product: "Extra book copy", price: 45, cost: 32, margin: 13 },
-    { product: "Rush processing", price: 75, cost: 5, margin: 70 },
-    { product: "8x10 portrait print", price: 200, cost: 35, margin: 165 },
-    { product: "16x20 portrait print", price: 975, cost: 80, margin: 895 },
+    { product: "Digital download (no watermark)", price: 49, cost: 0, margin: 49, note: "Pure software — zero cost" },
+    { product: "Digital + extra printed copy", price: 79, cost: 32, margin: 47, note: "Combo upsell" },
+    { product: "Extra printed hardcover", price: 45, cost: 32, margin: 13, note: "Mpix cost" },
+    { product: "Animated video (coming soon)", price: 299, cost: 5, margin: 294, note: "Pure margin" },
+    { product: "Rush processing", price: 75, cost: 5, margin: 70, note: "Time premium" },
+    { product: "8x10 portrait print", price: 200, cost: 35, margin: 165, note: "High margin wall art" },
+    { product: "16x20 portrait print", price: 975, cost: 80, margin: 895, note: "Best margin add-on" },
   ],
+  digitalPolicy: {
+    shareLink: "FREE — included with every session. Watermarked preview. Parents share with family/friends → organic marketing.",
+    downloadFee: "$49 — full PDF, no watermark. Pure software revenue. ~$0 cost.",
+    combo: "$79 — download + one extra printed copy.",
+    philosophy: "Physical book = the heirloom product. Digital share link = the marketing engine. Paid download = bonus revenue.",
+    projectedUptake: "Estimate 30-40% of families purchase digital download. At 50 sessions/month = $735-980 additional monthly revenue.",
+  },
 };
 
 

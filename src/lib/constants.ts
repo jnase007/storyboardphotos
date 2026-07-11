@@ -214,24 +214,29 @@ export const PRICING_PACKAGES = [
 ] as const;
 
 export const ADDITIONAL_INVESTMENTS = [
+  // Digital access
+  { label: "Digital share link (preview)", price: "FREE — included with every session" },
+  { label: "Digital download — full PDF, no watermark", price: "$49" },
+  { label: "Digital download + 1 extra printed copy", price: "$79" },
+  // Physical add-ons
   { label: "Additional child book (4th+ child)", price: "$149 each" },
-  { label: "Extra printed copies of book", price: "$45 each" },
-  { label: "Animated Kingdom video", price: "$299" },
+  { label: "Extra printed hardcover copy", price: "$45 each" },
+  { label: "Animated Kingdom video (coming soon)", price: "$299" },
   { label: "Rush processing (48hr turnaround)", price: "$75" },
-  { label: "Extra 8×10 portrait print", price: "$200 each" },
+  // Portrait prints
+  { label: "8×10 portrait print", price: "$200 each" },
   { label: "11×14 portrait print", price: "$600" },
   { label: "16×20 portrait print", price: "$975" },
   { label: "24×30 portrait print", price: "$1,650" },
   { label: "30×40 portrait print", price: "$2,650" },
-  { label: "Single digital image", price: "$500" },
   { label: "MP4 digital slideshow (coming soon)", price: "$1,400" },
 ] as const;
 
 export const OUR_PROMISE = {
   headline: "Our Promise",
-  body: "Your child will have a magical time, beautifully captured in our one-of-a-kind heirloom art pieces.",
+  body: "Your child will have a magical time, beautifully captured in their very own Kingdom Chronicles storybook.",
   detail:
-    "Most of our families invest between $1,000 – $3,000 and are thrilled with their keepsakes. Some families invest $10,000+. Payment plans are available. There is never any obligation to purchase anything beyond the free portrait.",
+    "Every session includes a printed hardcover Kingdom Chronicles book and a digital share link so family and friends can preview online. Want to download the full PDF without a watermark? Add it for $49. Additional printed copies are $45 each. Transparent pricing — no surprises.",
 } as const;
 
 export const TESTIMONIALS = [
@@ -300,8 +305,8 @@ export const FAQ_ITEMS = [
 ] as const;
 
 export const PACKAGE_OPTIONS = [
-  { value: "solo-quest", label: "Solo Quest — $349 (1 child · 1 book)" },
-  { value: "sibling-quest", label: "Sibling Quest — $549 (2 children · 2 separate books)" },
-  { value: "family-quest", label: "Family Quest — $849 (3 children · 3 separate books)" },
+  { value: "solo-quest", label: "Solo Quest — $349 (1 child · 1 printed hardcover book)" },
+  { value: "sibling-quest", label: "Sibling Quest — $549 (2 children · 2 printed hardcover books)" },
+  { value: "family-quest", label: "Family Quest — $849 (3 children · 3 printed hardcover books)" },
   { value: "additional-book", label: "Add extra book — $149 (for 4th child+)" },
 ];
