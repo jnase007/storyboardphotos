@@ -126,40 +126,39 @@ export const BP_PHASE_TWO = [
 ] as const;
 
 /**
- * 3-Year projections based on transparent pricing model ($349–$849/session).
- * Open 6 days/week (Mon–Sat), 4 sessions/day max capacity.
- * Full capacity = 24 sessions/week = 1,248 sessions/year.
- * Avg ticket includes base package + print/digital upsells.
+ * 3-Year projections — fully operational studio with leased location in OC.
+ * Open 6 days/week (Mon–Sat), 4 sessions/day. Includes rent, staff, buildout.
+ * Assumes dedicated studio space (1,500–2,000 sqft Orange County).
  */
 export const BP_PROJECTIONS = [
   {
     year: "Year 1",
-    sessions: "2–3 sessions/day · 4 days/week (≈ 400–500 sessions)",
+    sessions: "2–3 sessions/day · 5 days/week (≈ 480–600 sessions)",
     avg: "$420 avg ticket",
-    revenue: "~$168,000 – $210,000",
-    margin: "Gross Margin: 40–45%",
-    profit: "$67,000 – $95,000",
-    note: "Building brand awareness, refining operations, local OC market",
+    revenue: "~$202,000 – $252,000",
+    margin: "After overhead: 25–30%",
+    profit: "$50,000 – $76,000",
+    note: "Soft launch in leased OC space. Building brand, refining ops. Overhead: ~$150K/yr (rent $5K/mo + staff + utilities).",
     highlight: false,
   },
   {
     year: "Year 2",
-    sessions: "3–4 sessions/day · 6 days/week (≈ 750–900 sessions)",
-    avg: "$480 avg ticket (more upsells)",
-    revenue: "~$360,000 – $430,000",
-    margin: "Gross Margin: 45–50%",
-    profit: "$162,000 – $215,000",
-    note: "Full 6-day operation, second photographer added, add-on revenue growing",
+    sessions: "4 sessions/day · 6 days/week · 75% capacity (≈ 900 sessions)",
+    avg: "$480 avg ticket (upsells growing)",
+    revenue: "~$432,000",
+    margin: "After overhead: 38–42%",
+    profit: "$164,000 – $181,000",
+    note: "Full 6-day schedule. 2nd photographer hired. Add-ons (prints, video) contributing meaningfully.",
     highlight: true,
   },
   {
     year: "Year 3",
     sessions: "4 sessions/day · 6 days/week · 90% capacity (≈ 1,100 sessions)",
     avg: "$550 avg ticket",
-    revenue: "~$550,000 – $605,000",
-    margin: "Gross Margin: 50–55%",
-    profit: "$275,000 – $333,000",
-    note: "Fully booked most weeks, possible 2nd location or franchise model",
+    revenue: "~$605,000",
+    margin: "After overhead: 42–48%",
+    profit: "$254,000 – $290,000",
+    note: "Fully booked most weeks. Exploring 2nd OC location or franchise licensing.",
     highlight: false,
   },
 ] as const;
@@ -171,7 +170,32 @@ export const BP_CAPACITY = {
   maxPerYear: 1248,
   realisticCapacity: 0.75,
   realisticPerYear: 936,
-  note: "6 days/week Mon–Sat, 4 sessions/day (60 min sessions + 15 min reset). At 75% capacity = 936 sessions/year.",
+  note: "6 days/week Mon–Sat, 4 sessions/day (60 min + 15 min reset). At 75% capacity = 936 sessions/year.",
+};
+
+export const BP_STARTUP_COSTS = {
+  oneTime: [
+    { item: "Studio build-out (4 enchanted sets)", low: 40000, high: 80000 },
+    { item: "Lighting & camera equipment", low: 8000, high: 15000 },
+    { item: "Props, costumes, sets", low: 10000, high: 20000 },
+    { item: "Signage & branding", low: 3000, high: 5000 },
+    { item: "Tech setup (computers, software, AI tools)", low: 3000, high: 5000 },
+    { item: "Initial marketing & launch", low: 5000, high: 10000 },
+  ],
+  totalLow: 69000,
+  totalHigh: 135000,
+  monthly: [
+    { item: "Rent (1,500–2,000 sqft OC)", low: 4000, high: 7000 },
+    { item: "Staff (2–3 part-time)", low: 4000, high: 6000 },
+    { item: "Utilities & internet", low: 400, high: 600 },
+    { item: "Insurance", low: 300, high: 500 },
+    { item: "Marketing (ads, social)", low: 2000, high: 3000 },
+    { item: "Software & subscriptions", low: 200, high: 400 },
+  ],
+  monthlyTotalLow: 10900,
+  monthlyTotalHigh: 17500,
+  breakEvenSessions: 55,
+  breakEvenNote: "At ~55 sessions/month (2–3/day, 5 days/week) you cover all overhead. Achievable by Month 3–6.",
 };
 
 export const BP_COMPETITOR_PRICING = {

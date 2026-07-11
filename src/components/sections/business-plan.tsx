@@ -31,6 +31,7 @@ import {
   BP_COMPETITOR_PRICING as COMPETITOR_PRICING,
   BP_COST_BREAKDOWN as COST_BREAKDOWN,
   BP_CAPACITY as CAPACITY,
+  BP_STARTUP_COSTS as STARTUP_COSTS,
 } from "@/lib/business-plan-content";
 import { StorybookPreview } from "@/components/sections/storybook-preview";
 
@@ -352,6 +353,47 @@ export function BusinessPlanSection() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          </section>
+
+          {/* Startup Costs */}
+          <section className="mb-10">
+            <SectionHeading icon={Building2}>Location Startup Investment</SectionHeading>
+            <div className="grid sm:grid-cols-2 gap-6 mb-4">
+              <div>
+                <h4 className="font-bold text-royal-blue mb-3">One-Time Build-Out Costs</h4>
+                <div className="space-y-2">
+                  {STARTUP_COSTS.oneTime.map((item) => (
+                    <div key={item.item} className="flex justify-between items-center p-2 rounded-lg bg-white border border-royal-gold/15 text-sm">
+                      <span className="text-royal-blue">{item.item}</span>
+                      <span className="font-mono font-bold text-royal-blue">${item.low.toLocaleString()}–${item.high.toLocaleString()}</span>
+                    </div>
+                  ))}
+                  <div className="flex justify-between items-center p-2 rounded-lg bg-royal-blue text-royal-cream font-bold text-sm">
+                    <span>Total Build-Out</span>
+                    <span className="font-mono text-royal-gold">${STARTUP_COSTS.totalLow.toLocaleString()}–${STARTUP_COSTS.totalHigh.toLocaleString()}</span>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <h4 className="font-bold text-royal-blue mb-3">Monthly Operating Overhead</h4>
+                <div className="space-y-2">
+                  {STARTUP_COSTS.monthly.map((item) => (
+                    <div key={item.item} className="flex justify-between items-center p-2 rounded-lg bg-white border border-royal-gold/15 text-sm">
+                      <span className="text-royal-blue">{item.item}</span>
+                      <span className="font-mono font-bold text-royal-blue">${item.low.toLocaleString()}–${item.high.toLocaleString()}</span>
+                    </div>
+                  ))}
+                  <div className="flex justify-between items-center p-2 rounded-lg bg-royal-blue text-royal-cream font-bold text-sm">
+                    <span>Total/Month</span>
+                    <span className="font-mono text-royal-gold">${STARTUP_COSTS.monthlyTotalLow.toLocaleString()}–${STARTUP_COSTS.monthlyTotalHigh.toLocaleString()}</span>
+                  </div>
+                </div>
+                <div className="mt-3 p-3 rounded-lg bg-green-50 border border-green-200 text-sm">
+                  <span className="font-bold text-green-700">Break-even: </span>
+                  <span className="text-green-600">~{STARTUP_COSTS.breakEvenSessions} sessions/month. {STARTUP_COSTS.breakEvenNote}</span>
+                </div>
+              </div>
             </div>
           </section>
 
