@@ -91,44 +91,37 @@ async function drawCoverPageAsync(doc: jsPDF, childName: string, coverImageUrl?:
     drawFallbackCover(doc);
   }
 
-  // Book title — light cream bands top and bottom
+  // Book title — elegant, smaller, refined
   const line1 = `${childName}'s`;
   const line2 = bookType === "portraits" ? "Royal Portraits" : "Kingdom Chronicles";
 
-  // Light cream overlay at top for name
-  doc.setFillColor(248, 244, 236);
-  doc.setGState(doc.GState({ opacity: 0.88 }));
-  doc.rect(0, 0, PAGE_W, PAGE_H * 0.20, "F");
+  // Subtle dark overlay strip at very bottom only
+  doc.setFillColor(10, 22, 40);
+  doc.setGState(doc.GState({ opacity: 0.55 }));
+  doc.rect(0, PAGE_H * 0.88, PAGE_W, PAGE_H * 0.12, "F");
   doc.setGState(doc.GState({ opacity: 1 }));
 
-  // Light cream overlay at bottom for branding
-  doc.setFillColor(248, 244, 236);
-  doc.setGState(doc.GState({ opacity: 0.88 }));
-  doc.rect(0, PAGE_H * 0.87, PAGE_W, PAGE_H * 0.13, "F");
-  doc.setGState(doc.GState({ opacity: 1 }));
-
-  // Gold border frame
-  doc.setDrawColor(...GOLD);
-  doc.setLineWidth(2);
-  doc.rect(10, 10, PAGE_W - 20, PAGE_H - 20, "S");
-
-  // Royal blue name text
+  // Name in elegant gold at top — small and refined
   doc.setFont("times", "bolditalic");
-  doc.setFontSize(48);
-  doc.setTextColor(10, 22, 40);
-  doc.text(line1, PAGE_W / 2, PAGE_H * 0.10, { align: "center" });
+  doc.setFontSize(22);
+  doc.setTextColor(212, 176, 90);
+  doc.text(line1, PAGE_W / 2, PAGE_H * 0.06, { align: "center" });
 
-  // Gold subtitle
   doc.setFont("times", "italic");
-  doc.setFontSize(34);
-  doc.setTextColor(150, 100, 20);
-  doc.text(line2, PAGE_W / 2, PAGE_H * 0.17, { align: "center" });
+  doc.setFontSize(18);
+  doc.setTextColor(185, 138, 25);
+  doc.text(line2, PAGE_W / 2, PAGE_H * 0.11, { align: "center" });
 
-  // Bottom branding
+  // Thin gold rule under name
+  doc.setDrawColor(...GOLD_DARK);
+  doc.setLineWidth(0.5);
+  doc.line(PAGE_W * 0.3, PAGE_H * 0.135, PAGE_W * 0.7, PAGE_H * 0.135);
+
+  // Bottom branding — small
   doc.setFont("times", "normal");
-  doc.setFontSize(11);
-  doc.setTextColor(150, 100, 20);
-  doc.text("Storybook Photos · Kingdom Quests", PAGE_W / 2, PAGE_H * 0.93, { align: "center" });
+  doc.setFontSize(9);
+  doc.setTextColor(212, 176, 90);
+  doc.text("Storybook Photos · Kingdom Quests", PAGE_W / 2, PAGE_H * 0.95, { align: "center" });
 }
 
 function drawFallbackCover(doc: jsPDF): void {
