@@ -160,5 +160,35 @@ export const BP_PROJECTIONS = [
   },
 ] as const;
 
+export const BP_COMPETITOR_PRICING = {
+  competitor: {
+    name: "Enchanted Fairies (Competitor)",
+    note: "High-end fantasy portrait studio",
+    items: [
+      { product: "1st 8x10 Portrait", price: "FREE with special", us: null },
+      { product: "8x10 Portrait", price: "$200", us: null },
+      { product: "11x14 Portrait", price: "$600", us: "$600" },
+      { product: "16x20 Portrait", price: "$975", us: "$975" },
+      { product: "24x30 Portrait", price: "$1,650", us: "$1,650" },
+      { product: "30x40 Portrait", price: "$2,650", us: "$2,650" },
+      { product: "Digital Image", price: "$500", us: "$500" },
+      { product: "Heirloom Storybook", price: "Starts at $3,000", us: "INCLUDED in packages" },
+      { product: "MP4 Digital Slideshow", price: "$1,400", us: "$299 (animated video)" },
+      { product: "Session / Package", price: "Unknown — add-on model", us: "$299–$799 all-in" },
+    ],
+  },
+  ourAdvantages: [
+    "Storybook INCLUDED in package — competitor charges $3,000+ extra",
+    "Transparent all-in pricing vs surprise add-on model",
+    "AI-personalized illustrations unique to each child",
+    "6 different adventure paths — competitor only offers one theme",
+    "Digital share link + PDF included — competitor charges $500/digital",
+    "Per-child book model scales with families (Sibling/Family packages)",
+    "Animated video at $299 vs competitor's $1,400 slideshow",
+    "Same print pricing (8x10–30x40) = competitive on wall art",
+  ],
+};
+
+
 export const BP_EXECUTIVE_SUMMARY =
   "Storybook Photos (Kingdom Quests) is a premium fantasy photo studio in Costa Mesa offering kingdom-themed photo sessions for children and families. Clients dress as kings, queens, and royalty and are photographed in custom-built sets. Every session includes the option of a personalized AI-assisted heirloom storybook where the child is the hero of their own adventure.";

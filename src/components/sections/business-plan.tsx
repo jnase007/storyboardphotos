@@ -28,6 +28,7 @@ import {
   BP_PROJECTIONS as PROJECTIONS,
   BP_REVENUE_POINTS as REVENUE_POINTS,
   BP_RISKS as RISKS,
+  BP_COMPETITOR_PRICING as COMPETITOR_PRICING,
 } from "@/lib/business-plan-content";
 import { StorybookPreview } from "@/components/sections/storybook-preview";
 
@@ -189,6 +190,59 @@ export function BusinessPlanSection() {
           >
             <StorybookPreview />
           </motion.div>
+
+          {/* Competitor Pricing Comparison */}
+          <section className="mb-14">
+            <SectionHeading icon={Target}>
+              Competitor Pricing — Market Analysis
+            </SectionHeading>
+            <p className="text-royal-blue/70 mb-2 text-sm">
+              <strong>{COMPETITOR_PRICING.competitor.name}</strong> — {COMPETITOR_PRICING.competitor.note}
+            </p>
+            <div className="overflow-x-auto rounded-xl border border-royal-gold/20 mb-6">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-royal-blue text-royal-cream">
+                    <th className="text-left p-3 font-semibold">Product</th>
+                    <th className="text-right p-3 font-semibold">Competitor</th>
+                    <th className="text-right p-3 font-semibold">Storybook Photos</th>
+                    <th className="text-center p-3 font-semibold">Advantage</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {COMPETITOR_PRICING.competitor.items.map((item, i) => (
+                    <tr key={item.product} className={i % 2 === 0 ? "bg-white" : "bg-royal-cream/30"}>
+                      <td className="p-3 font-medium text-royal-blue">{item.product}</td>
+                      <td className="p-3 text-right text-red-600 font-medium">{item.price}</td>
+                      <td className="p-3 text-right font-bold" style={{ color: item.us === "INCLUDED in packages" ? "#16a34a" : "#1e3a5f" }}>
+                        {item.us ?? item.price}
+                      </td>
+                      <td className="p-3 text-center">
+                        {item.us === "INCLUDED in packages" ? (
+                          <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700">✓ WE WIN</span>
+                        ) : item.us ? (
+                          <span className="px-2 py-0.5 rounded-full text-xs bg-blue-100 text-blue-700">Same</span>
+                        ) : (
+                          <span className="text-xs text-gray-400">—</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+              <h4 className="font-bold text-green-800 mb-3">Our Key Advantages</h4>
+              <ul className="space-y-1.5">
+                {COMPETITOR_PRICING.ourAdvantages.map((adv) => (
+                  <li key={adv} className="flex gap-2 text-sm text-green-700">
+                    <span className="text-green-500 font-bold mt-0.5">✓</span>
+                    {adv}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
 
           {/* Financial Projections */}
           <motion.section
