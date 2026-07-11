@@ -822,46 +822,6 @@ export function StorybookGenerator() {
               />
             </div>
 
-            {/* Additional children */}
-            <div>
-              <label className="block text-sm font-medium text-royal-blue mb-1.5">
-                Additional children in session (optional)
-              </label>
-              <div className="space-y-2">
-                {[1, 2].map((n) => (
-                  <div key={n} className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder={`Child ${n + 1} name`}
-                      className="flex-1 h-10 rounded-md border border-royal-gold/30 bg-royal-cream/40 px-3 text-sm text-royal-blue outline-none focus:border-royal-gold"
-                      onChange={(e) => {
-                        const val = e.target.value.trim();
-                        if (val) {
-                          setNotes((prev) => {
-                            const cleaned = prev.replace(new RegExp(`Child ${n + 1}: [^.]+\.?\s*`), "").trim();
-                            return cleaned ? `${cleaned}. Child ${n + 1}: ${val}` : `Child ${n + 1}: ${val}`;
-                          });
-                        }
-                      }}
-                    />
-                    <select
-                      className="h-10 rounded-md border border-royal-gold/30 bg-royal-cream/40 px-2 text-sm text-royal-blue outline-none focus:border-royal-gold"
-                      onChange={(e) => {
-                        const label = e.target.value === "girl" ? "Princess" : e.target.value === "boy" ? "Prince" : "Hero";
-                        setNotes((prev) => prev.includes(`Child ${n + 1}:`) ? prev.replace(new RegExp(`(Child ${n + 1}: \w+)`), `$1 (${label})`) : prev);
-                      }}
-                    >
-                      <option value="">Gender</option>
-                      <option value="girl">Girl</option>
-                      <option value="boy">Boy</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
-                ))}
-                <p className="text-xs text-royal-blue/40">Additional children will be woven into the story as companions</p>
-              </div>
-            </div>
-
             <div>
               <div className="flex flex-wrap items-end justify-between gap-2 mb-3">
                 <div>
