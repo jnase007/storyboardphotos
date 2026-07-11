@@ -30,6 +30,7 @@ import {
   BP_RISKS as RISKS,
   BP_COMPETITOR_PRICING as COMPETITOR_PRICING,
   BP_COST_BREAKDOWN as COST_BREAKDOWN,
+  BP_CAPACITY as CAPACITY,
 } from "@/lib/business-plan-content";
 import { StorybookPreview } from "@/components/sections/storybook-preview";
 
@@ -351,6 +352,28 @@ export function BusinessPlanSection() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          </section>
+
+          {/* Capacity Model */}
+          <section className="mb-8">
+            <div className="bg-royal-blue/5 border border-royal-gold/20 rounded-xl p-5 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+              <div>
+                <div className="text-2xl font-black text-royal-gold">{CAPACITY.maxPerDay}</div>
+                <div className="text-xs text-royal-blue/60 mt-1">Sessions/day max</div>
+              </div>
+              <div>
+                <div className="text-2xl font-black text-royal-gold">{CAPACITY.daysPerWeek}</div>
+                <div className="text-xs text-royal-blue/60 mt-1">Days/week (Mon–Sat)</div>
+              </div>
+              <div>
+                <div className="text-2xl font-black text-royal-gold">{CAPACITY.maxPerYear.toLocaleString()}</div>
+                <div className="text-xs text-royal-blue/60 mt-1">Max sessions/year</div>
+              </div>
+              <div>
+                <div className="text-2xl font-black text-emerald-600">{CAPACITY.realisticPerYear}</div>
+                <div className="text-xs text-royal-blue/60 mt-1">Realistic @ 75% cap</div>
+              </div>
             </div>
           </section>
 

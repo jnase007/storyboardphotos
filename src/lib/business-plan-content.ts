@@ -126,39 +126,53 @@ export const BP_PHASE_TWO = [
 ] as const;
 
 /**
- * Conservative projections: Year 1 builds awareness slowly.
- * Avg ticket assumes session fee + some print/digital upsells;
- * full $3k+ storybook conversion is upside, not the base case.
+ * 3-Year projections based on transparent pricing model ($349–$849/session).
+ * Open 6 days/week (Mon–Sat), 4 sessions/day max capacity.
+ * Full capacity = 24 sessions/week = 1,248 sessions/year.
+ * Avg ticket includes base package + print/digital upsells.
  */
 export const BP_PROJECTIONS = [
   {
     year: "Year 1",
-    sessions: "3–5 sessions/week average (≈ 160–250 sessions)",
-    avg: "$1,800 – $2,200",
-    revenue: "~$320,000 – $500,000",
-    margin: "Gross Margin: 65–75%",
-    profit: "$80,000 – $160,000",
+    sessions: "2–3 sessions/day · 4 days/week (≈ 400–500 sessions)",
+    avg: "$420 avg ticket",
+    revenue: "~$168,000 – $210,000",
+    margin: "Gross Margin: 40–45%",
+    profit: "$67,000 – $95,000",
+    note: "Building brand awareness, refining operations, local OC market",
     highlight: false,
   },
   {
     year: "Year 2",
-    sessions: "6–8 sessions/week (≈ 310–400 sessions)",
-    avg: "$2,000 – $2,400",
-    revenue: "~$650,000 – $900,000",
-    margin: null as string | null,
-    profit: "$220,000 – $350,000",
+    sessions: "3–4 sessions/day · 6 days/week (≈ 750–900 sessions)",
+    avg: "$480 avg ticket (more upsells)",
+    revenue: "~$360,000 – $430,000",
+    margin: "Gross Margin: 45–50%",
+    profit: "$162,000 – $215,000",
+    note: "Full 6-day operation, second photographer added, add-on revenue growing",
     highlight: true,
   },
   {
     year: "Year 3",
-    sessions: "10–12 sessions/week (≈ 500–600 sessions)",
-    avg: "$2,200 – $2,600",
-    revenue: "~$1.1 – $1.5 million",
-    margin: null as string | null,
-    profit: "$400,000 – $600,000",
+    sessions: "4 sessions/day · 6 days/week · 90% capacity (≈ 1,100 sessions)",
+    avg: "$550 avg ticket",
+    revenue: "~$550,000 – $605,000",
+    margin: "Gross Margin: 50–55%",
+    profit: "$275,000 – $333,000",
+    note: "Fully booked most weeks, possible 2nd location or franchise model",
     highlight: false,
   },
 ] as const;
+
+export const BP_CAPACITY = {
+  maxPerDay: 4,
+  daysPerWeek: 6,
+  maxPerWeek: 24,
+  maxPerYear: 1248,
+  realisticCapacity: 0.75,
+  realisticPerYear: 936,
+  note: "6 days/week Mon–Sat, 4 sessions/day (60 min sessions + 15 min reset). At 75% capacity = 936 sessions/year.",
+};
 
 export const BP_COMPETITOR_PRICING = {
   competitor: {
