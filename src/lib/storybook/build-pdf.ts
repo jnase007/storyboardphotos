@@ -24,7 +24,8 @@ export async function buildStorybookPdf(options: {
   pages: StoryPage[];
   includeCover?: boolean;
   includeBack?: boolean;
-  coverImageUrl?: string; // AI-generated cover with child's face
+  coverImageUrl?: string;
+  bookType?: "chronicles" | "portraits"; // which book type
 }): Promise<Blob> {
   const {
     bookTitle,
@@ -33,6 +34,7 @@ export async function buildStorybookPdf(options: {
     includeCover = true,
     includeBack = true,
     coverImageUrl,
+    bookType = "chronicles",
   } = options;
 
   const doc = new jsPDF({
@@ -47,7 +49,7 @@ export async function buildStorybookPdf(options: {
   if (includeCover) {
     if (pageCount > 0) doc.addPage();
     pageCount++;
-    await drawCoverPageAsync(doc, childName, coverImageUrl);
+    await drawCoverPageAsync(doc, childName, coverImageUrl, bookType);
   }
 
   // ── Interior pages ────────────────────────────────────────────────────────
@@ -71,9 +73,11 @@ export async function buildStorybookPdf(options: {
 // ─────────────────────────────────────────────────────────────────────────────
 // Cover Page
 // ─────────────────────────────────────────────────────────────────────────────
-async function drawCoverPageAsync(doc: jsPDF, childName: string, coverImageUrl?: string): Promise<void> {
+async function drawCoverPageAsync(doc: jsPDF, childName: string, coverImageUrl?: string, bookType: "chronicles" | "portraits" = "chronicles"): Promise<void> {
   // Use AI-generated cover with child's face if available, otherwise use castle scene
-  const COVER_URL = coverImageUrl ?? "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/cover-template.jpg";
+  const CHRONICLES_COVER = "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/cover-template.jpg";
+  const PORTRAITS_COVER = "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/portrait-album-cover.jpg";
+  const COVER_URL = coverImageUrl ?? (bookType === "portraits" ? PORTRAITS_COVER : CHRONICLES_COVER);
 
   try {
     const img = await fetchImageAsDataUrl(COVER_URL);
@@ -87,18 +91,21 @@ async function drawCoverPageAsync(doc: jsPDF, childName: string, coverImageUrl?:
     drawFallbackCover(doc);
   }
 
-  // Child name overlay — large and prominent in center of the arch
+  // Book title based on type
+  const line1 = `${childName}'s`;
+  const line2 = bookType === "portraits" ? "Royal Portraits" : "Kingdom Chronicles";
+
   // Shadow
   doc.setFont("times", "bolditalic");
   doc.setFontSize(46);
   doc.setTextColor(20, 10, 40);
-  doc.text(`${childName}\'s`, PAGE_W / 2 + 2, PAGE_H * 0.40 + 2, { align: "center" });
-  doc.text("Kingdom Chronicles", PAGE_W / 2 + 1, PAGE_H * 0.50 + 1, { align: "center" });
+  doc.text(line1, PAGE_W / 2 + 2, PAGE_H * 0.40 + 2, { align: "center" });
+  doc.text(line2, PAGE_W / 2 + 1, PAGE_H * 0.50 + 1, { align: "center" });
   // Gold text
   doc.setTextColor(220, 185, 100);
-  doc.text(`${childName}\'s`, PAGE_W / 2, PAGE_H * 0.40, { align: "center" });
+  doc.text(line1, PAGE_W / 2, PAGE_H * 0.40, { align: "center" });
   doc.setFontSize(38);
-  doc.text("Kingdom Chronicles", PAGE_W / 2, PAGE_H * 0.50, { align: "center" });
+  doc.text(line2, PAGE_W / 2, PAGE_H * 0.50, { align: "center" });
 }
 
 function drawFallbackCover(doc: jsPDF): void {
