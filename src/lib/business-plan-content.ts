@@ -199,5 +199,58 @@ export const BP_COMPETITOR_PRICING = {
 };
 
 
+export const BP_COST_BREAKDOWN = {
+  perSession: {
+    title: "Cost Per Session (Solo Quest)",
+    items: [
+      { label: "Your time (60 min @ $175/hr)", cost: 175, note: "Opportunity cost" },
+      { label: "Staff assist (if applicable)", cost: 25, note: "Part-time help" },
+      { label: "Set overhead (amortized)", cost: 20, note: "Props, costumes, maintenance" },
+      { label: "Mpix 8x8 hardcover book", cost: 32, note: "Printed and shipped" },
+      { label: "AI generation (Gemini)", cost: 1, note: "~$0.50-1 per book" },
+      { label: "Processing & admin (15 min)", cost: 10, note: "Post-session work" },
+      { label: "Marketing (per session avg)", cost: 15, note: "Ads, social, referrals" },
+    ],
+    totalCost: 278,
+  },
+  packages: [
+    {
+      name: "Solo Quest",
+      price: 349,
+      cost: 278,
+      margin: 71,
+      pct: 20,
+      sessions: { daily: [1, 2, 3], revenue: [349, 698, 1047] },
+    },
+    {
+      name: "Sibling Quest",
+      price: 549,
+      cost: 340, // extra time + 2nd book
+      margin: 209,
+      pct: 38,
+    },
+    {
+      name: "Family Quest",
+      price: 849,
+      cost: 415, // 90 min + 3 books
+      margin: 434,
+      pct: 51,
+    },
+  ],
+  monthly: {
+    conservative: { sessions: 15, avgTicket: 380, revenue: 5700, margin: 2280 },
+    moderate: { sessions: 25, avgTicket: 420, revenue: 10500, margin: 4200 },
+    strong: { sessions: 40, avgTicket: 480, revenue: 19200, margin: 7680 },
+  },
+  addOnMargins: [
+    { product: "Animated video", price: 299, cost: 5, margin: 294 },
+    { product: "Extra book copy", price: 45, cost: 32, margin: 13 },
+    { product: "Rush processing", price: 75, cost: 5, margin: 70 },
+    { product: "8x10 portrait print", price: 200, cost: 35, margin: 165 },
+    { product: "16x20 portrait print", price: 975, cost: 80, margin: 895 },
+  ],
+};
+
+
 export const BP_EXECUTIVE_SUMMARY =
   "Storybook Photos (Kingdom Quests) is a premium fantasy photo studio in Costa Mesa offering kingdom-themed photo sessions for children and families. Clients dress as kings, queens, and royalty and are photographed in custom-built sets. Every session includes the option of a personalized AI-assisted heirloom storybook where the child is the hero of their own adventure.";

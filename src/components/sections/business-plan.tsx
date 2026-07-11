@@ -29,6 +29,7 @@ import {
   BP_REVENUE_POINTS as REVENUE_POINTS,
   BP_RISKS as RISKS,
   BP_COMPETITOR_PRICING as COMPETITOR_PRICING,
+  BP_COST_BREAKDOWN as COST_BREAKDOWN,
 } from "@/lib/business-plan-content";
 import { StorybookPreview } from "@/components/sections/storybook-preview";
 
@@ -261,6 +262,95 @@ export function BusinessPlanSection() {
                   </li>
                 ))}
               </ul>
+            </div>
+          </section>
+
+          {/* Cost & Margin Breakdown */}
+          <section className="mb-14">
+            <SectionHeading icon={TrendingUp}>Unit Economics — Cost & Margin</SectionHeading>
+
+            {/* Per session cost table */}
+            <h3 className="font-bold text-royal-blue mb-3">Cost Per Solo Session</h3>
+            <div className="overflow-x-auto rounded-xl border border-royal-gold/20 mb-6">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-royal-blue text-royal-cream">
+                    <th className="text-left p-3">Cost Item</th>
+                    <th className="text-right p-3">Cost</th>
+                    <th className="text-left p-3 opacity-70">Note</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {COST_BREAKDOWN.perSession.items.map((item, i) => (
+                    <tr key={item.label} className={i % 2 === 0 ? "bg-white" : "bg-royal-cream/30"}>
+                      <td className="p-3 text-royal-blue">{item.label}</td>
+                      <td className="p-3 text-right font-mono font-bold text-royal-blue">${item.cost}</td>
+                      <td className="p-3 text-royal-blue/50 text-xs">{item.note}</td>
+                    </tr>
+                  ))}
+                  <tr className="bg-royal-blue/10 font-bold border-t-2 border-royal-gold/30">
+                    <td className="p-3 text-royal-blue">Total Cost</td>
+                    <td className="p-3 text-right font-mono text-royal-blue text-base">${COST_BREAKDOWN.perSession.totalCost}</td>
+                    <td className="p-3"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            {/* Package margins */}
+            <h3 className="font-bold text-royal-blue mb-3">Margin by Package</h3>
+            <div className="grid grid-cols-3 gap-3 mb-6">
+              {COST_BREAKDOWN.packages.map((pkg) => (
+                <div key={pkg.name} className="rounded-xl border border-royal-gold/25 p-4 bg-white">
+                  <div className="font-bold text-royal-blue mb-2">{pkg.name}</div>
+                  <div className="text-2xl font-black text-royal-gold mb-1">${pkg.price}</div>
+                  <div className="text-xs text-royal-blue/50 mb-2">cost: ${pkg.cost}</div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-green-600 font-bold">+${pkg.margin}</span>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 font-bold">{pkg.pct}% margin</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Monthly scenarios */}
+            <h3 className="font-bold text-royal-blue mb-3">Monthly Revenue Scenarios</h3>
+            <div className="grid grid-cols-3 gap-3 mb-6">
+              {Object.entries(COST_BREAKDOWN.monthly).map(([key, s]) => (
+                <div key={key} className={`rounded-xl p-4 text-center ${key === "moderate" ? "bg-royal-blue text-royal-cream" : "bg-white border border-royal-gold/20"}`}>
+                  <div className={`text-xs font-semibold uppercase tracking-wider mb-2 ${key === "moderate" ? "text-royal-gold" : "text-royal-blue/50"}`}>
+                    {key === "conservative" ? "Conservative" : key === "moderate" ? "Moderate ★" : "Strong"}
+                  </div>
+                  <div className={`text-lg font-bold mb-1 ${key === "moderate" ? "text-royal-cream" : "text-royal-blue"}`}>{s.sessions} sessions/mo</div>
+                  <div className={`text-2xl font-black ${key === "moderate" ? "text-royal-gold" : "text-royal-blue"}`}>${s.revenue.toLocaleString()}</div>
+                  <div className={`text-xs mt-1 ${key === "moderate" ? "text-royal-cream/60" : "text-royal-blue/40"}`}>~${s.margin.toLocaleString()} margin</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Add-on margins */}
+            <h3 className="font-bold text-royal-blue mb-3">Add-On Profit Margins</h3>
+            <div className="overflow-x-auto rounded-xl border border-royal-gold/20">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-royal-blue text-royal-cream">
+                    <th className="text-left p-3">Add-On</th>
+                    <th className="text-right p-3">Price</th>
+                    <th className="text-right p-3">Cost</th>
+                    <th className="text-right p-3">Profit</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {COST_BREAKDOWN.addOnMargins.map((item, i) => (
+                    <tr key={item.product} className={i % 2 === 0 ? "bg-white" : "bg-royal-cream/30"}>
+                      <td className="p-3 text-royal-blue">{item.product}</td>
+                      <td className="p-3 text-right font-mono">${item.price}</td>
+                      <td className="p-3 text-right font-mono text-red-500">${item.cost}</td>
+                      <td className="p-3 text-right font-mono font-bold text-green-600">+${item.margin}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </section>
 
