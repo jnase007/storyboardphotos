@@ -68,9 +68,8 @@ export function BookingSection() {
             Begin Their Kingdom Quest
           </h2>
           <p className="text-royal-blue/60 text-lg">
-            Reserve your session and share a few simple details — we&apos;ll
-            guide the adventure and create the heirloom storybook when you
-            arrive.
+            Tell us about your child and we&apos;ll handle everything. We curate the day around them —
+            their adventure, their story, their Kingdom Quest book. You simply show up and experience the magic.
           </p>
         </motion.div>
 
