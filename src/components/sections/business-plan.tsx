@@ -199,6 +199,11 @@ export function BusinessPlanSection() {
             <p className="text-royal-blue/70 mb-2 text-sm">
               <strong>{COMPETITOR_PRICING.competitor.name}</strong> — {COMPETITOR_PRICING.competitor.note}
             </p>
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4 text-sm">
+              <span className="font-bold text-red-700">Their Model: </span>
+              <span className="text-red-600 italic">&ldquo;Most clients invest $1,000–$3,000. Ask how to save 50% at your Ordering appointment.&rdquo;</span>
+              <div className="mt-1 text-red-500 text-xs">→ No upfront pricing. High-pressure ordering session after the shoot. Storybook starts at $3,000 extra.</div>
+            </div>
             <div className="overflow-x-auto rounded-xl border border-royal-gold/20 mb-6">
               <table className="w-full text-sm">
                 <thead>

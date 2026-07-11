@@ -164,6 +164,8 @@ export const BP_COMPETITOR_PRICING = {
   competitor: {
     name: "Enchanted Fairies (Competitor)",
     note: "High-end fantasy portrait studio",
+    pricingModel: "No transparent pricing. Clients spend $1,000–$3,000+ at a surprise 'Ordering appointment' after the shoot. Some $10,000+. High-pressure sales. Storybook starts at $3,000.",
+    theirQuote: "Most clients invest $1,000–$3,000. Ask how to save 50% at your Ordering appointment.",
     items: [
       { product: "1st 8x10 Portrait", price: "FREE with special", us: null },
       { product: "8x10 Portrait", price: "$200", us: null },
