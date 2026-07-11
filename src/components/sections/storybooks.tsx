@@ -142,7 +142,7 @@ export function StorybooksSection() {
             <div className="relative mx-auto max-w-md">
               <div className="relative aspect-[1746/1920] overflow-hidden rounded-lg border-2 border-royal-gold/50 shadow-2xl shadow-black/40 bg-royal-blue/40 glow-lantern">
                 <Image
-                  src="/storybook-cover.webp"
+                  src="https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/book-cover-hero.jpg"
                   alt="Personalized royal storybook cover from Storybook Photos"
                   fill
                   className="object-cover object-center"
