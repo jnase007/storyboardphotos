@@ -73,27 +73,14 @@ export function KingdomSetsSection() {
             const Icon = setIcons[index] ?? Castle;
             const hasPhoto = Boolean(set.image);
             const isAvailable = set.available;
+            const cardClass = `group text-left rounded-2xl overflow-hidden border transition-all bg-white ${
+              isAvailable
+                ? "border-royal-gold/40 hover:border-royal-gold/70 hover:shadow-xl hover:shadow-royal-gold/15 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-royal-gold focus-visible:ring-offset-2"
+                : "border-royal-gold/15 opacity-85 cursor-not-allowed"
+            }`;
 
-            return (
-              <motion.button
-                key={set.id}
-                type="button"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                onClick={() => hasPhoto && setActiveSet(set)}
-                className={`group text-left rounded-2xl overflow-hidden border transition-all bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-royal-gold focus-visible:ring-offset-2 ${
-                  isAvailable
-                    ? "border-royal-gold/40 hover:border-royal-gold/70 hover:shadow-xl hover:shadow-royal-gold/15"
-                    : "border-royal-gold/15 opacity-90"
-                }`}
-                aria-label={
-                  isAvailable
-                    ? `View larger photo of ${set.name}`
-                    : `${set.name} — coming soon`
-                }
-              >
+            const media = (
+              <>
                 <div
                   className={`aspect-[4/3] relative overflow-hidden ${
                     hasPhoto
@@ -107,12 +94,16 @@ export function KingdomSetsSection() {
                         src={set.image}
                         alt={set.name}
                         fill
-                        className={`object-cover transition-transform duration-500 group-hover:scale-105 ${
-                          isAvailable ? "" : "grayscale-[30%]"
+                        className={`object-cover transition-transform duration-500 ${
+                          isAvailable ? "group-hover:scale-105" : "grayscale-[35%]"
                         }`}
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-royal-blue/50 via-transparent to-transparent" />
+                      <div
+                        className={`absolute inset-0 bg-gradient-to-t from-royal-blue/50 via-transparent to-transparent ${
+                          isAvailable ? "" : "bg-royal-blue/25"
+                        }`}
+                      />
                       <span
                         className={`absolute top-3 left-3 inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-bold tracking-wide uppercase shadow-sm ${
                           isAvailable
@@ -122,14 +113,20 @@ export function KingdomSetsSection() {
                       >
                         {isAvailable ? "Open now" : "Coming soon"}
                       </span>
-                      <span className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-royal-blue shadow-sm opacity-90 group-hover:opacity-100 transition-opacity">
-                        <Expand className="h-3 w-3 text-royal-gold" />
-                        View larger
-                      </span>
+                      {isAvailable ? (
+                        <span className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-royal-blue shadow-sm opacity-90 group-hover:opacity-100 transition-opacity">
+                          <Expand className="h-3 w-3 text-royal-gold" />
+                          View larger
+                        </span>
+                      ) : (
+                        <span className="absolute bottom-3 right-3 inline-flex items-center rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-royal-blue/70 shadow-sm">
+                          Not bookable yet
+                        </span>
+                      )}
                     </>
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <Icon className="h-16 w-16 text-royal-gold/40 group-hover:scale-110 transition-transform duration-500" />
+                      <Icon className="h-16 w-16 text-royal-gold/40" />
                     </div>
                   )}
                 </div>
@@ -140,8 +137,42 @@ export function KingdomSetsSection() {
                   <p className="text-royal-blue/60 text-sm leading-relaxed">
                     {set.description}
                   </p>
+                  {!isAvailable && (
+                    <p className="text-xs font-semibold text-royal-gold mt-2">
+                      Coming soon — can&apos;t be selected yet
+                    </p>
+                  )}
                 </div>
+              </>
+            );
+
+            return isAvailable ? (
+              <motion.button
+                key={set.id}
+                type="button"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                onClick={() => hasPhoto && setActiveSet(set)}
+                className={cardClass}
+                aria-label={`View larger photo of ${set.name}`}
+              >
+                {media}
               </motion.button>
+            ) : (
+              <motion.div
+                key={set.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className={cardClass}
+                aria-disabled="true"
+                aria-label={`${set.name} — coming soon, not selectable`}
+              >
+                {media}
+              </motion.div>
             );
           })}
         </div>

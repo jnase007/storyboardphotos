@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { BookingForm } from "@/components/booking-form";
+import { KINGDOM_SETS } from "@/lib/constants";
 
 
 const QUESTS = [
@@ -16,7 +17,19 @@ const QUESTS = [
 ];
 
 export function BookingSection() {
+  // Launch: only Forest Garden sets are selectable
+  const [selectedSetIds, setSelectedSetIds] = useState<string[]>([
+    "royal-forest",
+    "royal-garden",
+  ]);
   const [selectedQuest, setSelectedQuest] = useState<string | null>(null);
+
+  function toggleSet(id: string, available: boolean) {
+    if (!available) return;
+    setSelectedSetIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  }
 
   return (
     <section id="book" className="py-24 bg-enchanted-cream">
@@ -37,12 +50,83 @@ export function BookingSection() {
               Forest Garden Experience
             </p>
             <p className="text-sm text-royal-blue/65 mt-1.5 leading-relaxed">
-              Sessions currently feature our open sets:{" "}
+              Only{" "}
               <span className="font-semibold text-royal-blue">Royal Forest</span>{" "}
               &{" "}
-              <span className="font-semibold text-royal-blue">Royal Garden</span>.
-              Throne Room and Chastle are coming soon.
+              <span className="font-semibold text-royal-blue">Royal Garden</span>{" "}
+              can be selected right now. Throne Room and Chastle stay visible as
+              coming soon.
             </p>
+          </div>
+        </div>
+
+        {/* Kingdom set selector — show all, only open sets selectable */}
+        <div className="max-w-4xl mx-auto mb-14">
+          <h3 className="text-center font-serif text-2xl font-bold text-royal-blue mb-2">
+            Choose Your Kingdom Sets
+          </h3>
+          <p className="text-center text-royal-blue/50 text-sm mb-6">
+            All four will be part of the full kingdom — only open sets can be
+            selected for booking today.
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {KINGDOM_SETS.map((set) => {
+              const selected = selectedSetIds.includes(set.id);
+              const available = set.available;
+              return (
+                <button
+                  key={set.id}
+                  type="button"
+                  disabled={!available}
+                  onClick={() => toggleSet(set.id, available)}
+                  className="rounded-xl overflow-hidden text-left transition-all relative"
+                  style={{
+                    border: selected
+                      ? "2px solid #B98A19"
+                      : available
+                        ? "2px solid #e5e7eb"
+                        : "2px solid #e8e4dc",
+                    background: selected ? "#F8F4EC" : "white",
+                    boxShadow: selected
+                      ? "0 0 0 3px rgba(185,138,25,0.15)"
+                      : "none",
+                    cursor: available ? "pointer" : "not-allowed",
+                    opacity: available ? 1 : 0.78,
+                  }}
+                  aria-disabled={!available}
+                  aria-pressed={selected}
+                >
+                  <div className="aspect-[4/3] overflow-hidden relative">
+                    <Image
+                      src={set.image}
+                      alt={set.name}
+                      fill
+                      className={`object-cover ${available ? "" : "grayscale-[40%]"}`}
+                    />
+                    <span
+                      className="absolute top-2 left-2 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full"
+                      style={{
+                        background: available ? "#059669" : "#0A1628",
+                        color: available ? "white" : "#C5A26F",
+                        border: available ? "none" : "1px solid rgba(197,162,111,0.45)",
+                      }}
+                    >
+                      {available ? (selected ? "Selected" : "Open now") : "Coming soon"}
+                    </span>
+                  </div>
+                  <div className="p-3">
+                    <div className="font-bold text-sm" style={{ color: "#0A1628" }}>
+                      {set.name}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-0.5 leading-relaxed line-clamp-2">
+                      {available
+                        ? set.description
+                        : "Coming soon — not selectable yet"}
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -108,7 +192,12 @@ export function BookingSection() {
           className="max-w-3xl mx-auto"
         >
           <div className="bg-white rounded-2xl border border-royal-gold/20 p-6 sm:p-8 lg:p-10 shadow-lg">
-            <BookingForm />
+            <BookingForm
+              selectedSetLabels={KINGDOM_SETS.filter((s) =>
+                selectedSetIds.includes(s.id)
+              ).map((s) => s.name)}
+              selectedQuestId={selectedQuest}
+            />
           </div>
         </motion.div>
       </div>
