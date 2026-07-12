@@ -173,6 +173,35 @@ export const BP_CAPACITY = {
   note: "6 days/week Mon–Sat, 4 sessions/day (60 min + 15 min reset). At 75% capacity = 936 sessions/year.",
 };
 
+/**
+ * Session timing standard — all packages (solo, sibling, family) stay inside 1 hour.
+ * Many families bring siblings; design the shoot as one family session, not stacked solos.
+ */
+export const BP_SESSION_TIMING = {
+  maxMinutes: 60,
+  resetMinutes: 15,
+  blockMinutes: 75,
+  rule: "1 hour max per shoot — including siblings",
+  principle:
+    "Treat multi-child bookings as one family session in a single 60-minute window, not two full solos back-to-back. Kids and parents usually peak in the first 45–60 minutes.",
+  flow: [
+    { minutes: "0–10", step: "Arrive, costumes, crowns, warm-up" },
+    { minutes: "10–30", step: "Kid 1 hero shots (2 sets max)" },
+    { minutes: "30–45", step: "Kid 2 hero shots (same 2 sets)" },
+    { minutes: "45–55", step: "Sibling together shots" },
+    { minutes: "55–60", step: "Quick wrap / optional parent shot" },
+  ],
+  rules: [
+    "Max 2–3 sets per session (even if marketing shows 4)",
+    "Pre-select outfits before arrival",
+    "One assistant for costume changes while photographer shoots",
+    "Sibling package = same hour, not +30 minutes free",
+    "Family of 3+ keeps the same 60-minute window with a tighter shot list",
+  ],
+  packaging:
+    "Solo / Sibling / Family: 60-minute kingdom session. Additional children included in the same session window.",
+};
+
 export const BP_STARTUP_COSTS = {
   oneTime: [
     { item: "Studio build-out (4 enchanted sets)", low: 40000, high: 80000 },

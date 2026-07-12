@@ -61,6 +61,54 @@ export function BusinessPlanDocument() {
           <strong>3–5 sessions per week</strong> while we build awareness —
           with room to grow toward 10–12/week as demand and staffing allow.
         </p>
+        <p className="leading-relaxed text-royal-blue/80 mt-3">
+          <strong>Session standard: 1 hour max per shoot — including siblings.</strong>{" "}
+          Many families bring siblings. Design every shoot as one family session
+          inside a single 60-minute window (plus ~15 min reset), not stacked solos.
+        </p>
+      </section>
+
+      <section className="break-inside-avoid">
+        <H2>Session Timing — 1 Hour Max</H2>
+        <p className="leading-relaxed text-royal-blue/80 mb-3">
+          Kids and parents usually peak in the first 45–60 minutes. Keep Solo,
+          Sibling, and Family packages inside the same hour to protect capacity
+          (~4 sessions/day).
+        </p>
+        <p className="text-sm font-semibold text-royal-blue mb-2">
+          Sample 60-minute flow
+        </p>
+        <ul className="list-none space-y-1.5 text-royal-blue/80 text-sm mb-4">
+          <li>
+            <strong>0–10:</strong> Arrive, costumes, crowns, warm-up
+          </li>
+          <li>
+            <strong>10–30:</strong> Kid 1 hero shots (2 sets max)
+          </li>
+          <li>
+            <strong>30–45:</strong> Kid 2 hero shots (same 2 sets)
+          </li>
+          <li>
+            <strong>45–55:</strong> Sibling together shots
+          </li>
+          <li>
+            <strong>55–60:</strong> Quick wrap / optional parent shot
+          </li>
+        </ul>
+        <p className="text-sm font-semibold text-royal-blue mb-2">
+          Rules that protect the hour
+        </p>
+        <ul className="list-disc pl-5 space-y-1 text-royal-blue/80 text-sm">
+          <li>Max 2–3 sets per session (even if marketing shows 4)</li>
+          <li>Pre-select outfits before arrival</li>
+          <li>One assistant for costume changes while photographer shoots</li>
+          <li>Sibling package = same hour, not +30 minutes free</li>
+          <li>Family of 3+ keeps the same 60-minute window with a tighter shot list</li>
+        </ul>
+        <p className="mt-3 text-sm text-royal-blue/80">
+          <strong>Packaging:</strong> Solo / Sibling / Family — 60-minute kingdom
+          session. Additional children included in the same session window.
+        </p>
       </section>
 
       <section className="break-inside-avoid">

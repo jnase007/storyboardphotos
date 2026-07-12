@@ -31,6 +31,7 @@ import {
   BP_COMPETITOR_PRICING as COMPETITOR_PRICING,
   BP_COST_BREAKDOWN as COST_BREAKDOWN,
   BP_CAPACITY as CAPACITY,
+  BP_SESSION_TIMING as SESSION_TIMING,
   BP_STARTUP_COSTS as STARTUP_COSTS,
 } from "@/lib/business-plan-content";
 import { StorybookPreview } from "@/components/sections/storybook-preview";
@@ -154,7 +155,7 @@ export function BusinessPlanSection() {
               className="rounded-2xl border border-royal-gold/25 bg-white/80 p-6 sm:p-7"
             >
               <SectionHeading icon={Building2}>Operations</SectionHeading>
-              <p className="text-royal-blue/75 leading-relaxed">
+              <p className="text-royal-blue/75 leading-relaxed mb-4">
                 Studio available Wednesday–Saturday. Year 1 target is modest —{" "}
                 <strong className="text-royal-blue">
                   3–5 sessions per week
@@ -162,6 +163,18 @@ export function BusinessPlanSection() {
                 while we build awareness — with room to grow toward 10–12/week
                 as demand and staffing allow.
               </p>
+              <div className="rounded-xl border border-royal-gold/30 bg-royal-gold/10 px-4 py-3">
+                <p className="text-xs font-semibold tracking-widest uppercase text-royal-gold mb-1">
+                  Session standard
+                </p>
+                <p className="font-serif text-lg font-bold text-royal-blue">
+                  {SESSION_TIMING.rule}
+                </p>
+                <p className="text-sm text-royal-blue/70 mt-1 leading-relaxed">
+                  Many families bring siblings. Design every shoot as one family
+                  session inside a single hour — not stacked solos.
+                </p>
+              </div>
             </motion.section>
 
             <motion.section
@@ -417,7 +430,93 @@ export function BusinessPlanSection() {
                 <div className="text-xs text-royal-blue/60 mt-1">Realistic @ 75% cap</div>
               </div>
             </div>
+            <p className="text-xs text-royal-blue/50 text-center mt-3">
+              {CAPACITY.note}
+            </p>
           </section>
+
+          {/* Session Timing — 1 hour max including siblings */}
+          <motion.section
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-10"
+          >
+            <SectionHeading icon={Building2}>
+              Session Timing — 1 Hour Max
+            </SectionHeading>
+            <p className="text-royal-blue/70 text-sm mb-5 leading-relaxed max-w-3xl">
+              {SESSION_TIMING.principle}
+            </p>
+
+            <div className="grid sm:grid-cols-3 gap-3 mb-5">
+              <div className="rounded-xl border border-royal-gold/25 bg-white p-4 text-center">
+                <div className="text-2xl font-black text-royal-gold">
+                  {SESSION_TIMING.maxMinutes} min
+                </div>
+                <div className="text-xs text-royal-blue/60 mt-1">
+                  Max shoot time (solo or siblings)
+                </div>
+              </div>
+              <div className="rounded-xl border border-royal-gold/25 bg-white p-4 text-center">
+                <div className="text-2xl font-black text-royal-gold">
+                  {SESSION_TIMING.resetMinutes} min
+                </div>
+                <div className="text-xs text-royal-blue/60 mt-1">
+                  Reset / turnaround
+                </div>
+              </div>
+              <div className="rounded-xl border border-royal-gold/25 bg-white p-4 text-center">
+                <div className="text-2xl font-black text-royal-gold">
+                  {SESSION_TIMING.blockMinutes} min
+                </div>
+                <div className="text-xs text-royal-blue/60 mt-1">
+                  Calendar block per family
+                </div>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-5">
+              <div className="rounded-2xl border border-royal-gold/25 bg-white/80 p-5">
+                <h3 className="font-serif text-lg font-bold text-royal-blue mb-3">
+                  Sample 60-minute flow
+                </h3>
+                <ul className="space-y-2.5">
+                  {SESSION_TIMING.flow.map((row) => (
+                    <li
+                      key={row.minutes}
+                      className="flex gap-3 text-sm text-royal-blue/75"
+                    >
+                      <span className="font-mono text-xs font-bold text-royal-gold shrink-0 w-14 pt-0.5">
+                        {row.minutes}
+                      </span>
+                      <span>{row.step}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="rounded-2xl border border-royal-gold/25 bg-white/80 p-5">
+                <h3 className="font-serif text-lg font-bold text-royal-blue mb-3">
+                  Rules that protect the hour
+                </h3>
+                <ul className="space-y-2.5">
+                  {SESSION_TIMING.rules.map((rule) => (
+                    <li
+                      key={rule}
+                      className="flex gap-2.5 text-sm text-royal-blue/75 leading-relaxed"
+                    >
+                      <span className="text-royal-gold shrink-0">•</span>
+                      {rule}
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-4 text-sm font-medium text-royal-blue border-t border-royal-gold/20 pt-3">
+                  Packaging: {SESSION_TIMING.packaging}
+                </p>
+              </div>
+            </div>
+          </motion.section>
 
           {/* Financial Projections */}
           <motion.section
