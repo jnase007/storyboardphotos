@@ -8,6 +8,8 @@ import {
   BP_FULFILLMENT_PROCESS,
   BP_GROWTH,
   BP_NEXT_STEPS,
+  BP_PHASE_ONE,
+  BP_PHASE_ONE_BIRTHDAYS,
   BP_PHASE_TWO,
   BP_PRINT_PARTNERS,
   BP_PROJECTIONS,
@@ -270,13 +272,41 @@ export function BusinessPlanDocument() {
       </section>
 
       <section className="break-inside-avoid">
+        <H2>Phase One — Sessions + Weekend Birthdays</H2>
+        <p className="leading-relaxed text-royal-blue/80 mb-3">
+          {BP_PHASE_ONE_BIRTHDAYS.summary}
+        </p>
+        <ol className="list-decimal pl-5 space-y-2 text-royal-blue/80 mb-4">
+          {BP_PHASE_ONE.map((item) => (
+            <li key={item.title}>
+              <strong>{item.title}.</strong> {item.detail}
+            </li>
+          ))}
+        </ol>
+        <p className="text-sm font-semibold text-royal-blue mb-2">
+          Birthday package ideas
+        </p>
+        <ul className="list-disc pl-5 space-y-1 text-royal-blue/80 text-sm mb-3">
+          {BP_PHASE_ONE_BIRTHDAYS.packageIdeas.map((pkg) => (
+            <li key={pkg.name}>
+              <strong>{pkg.name}</strong> ({pkg.price}) — {pkg.includes}
+            </li>
+          ))}
+        </ul>
+        <p className="text-sm font-semibold text-royal-blue mb-2">Ops notes</p>
+        <ul className="list-disc pl-5 space-y-1 text-royal-blue/80 text-sm">
+          {BP_PHASE_ONE_BIRTHDAYS.opsNotes.map((note) => (
+            <li key={note}>{note}</li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="break-inside-avoid">
         <H2>Phase Two — Our Own Home</H2>
         <p className="leading-relaxed text-royal-blue/80 mb-3">
-          After we prove the business works, we use the money to rent or buy a
-          place that is truly ours — with an enchanted tea house connected to
-          the studio. That gives us a kitchen and a second revenue stream for
-          birthdays and celebrations on weekends, while families stay inside the
-          same magical world.
+          After Phase 1 proves sessions + weekend birthdays, we reinvest into a
+          place that is truly ours — and upgrade parties with an enchanted tea
+          house connected to the studio (kitchen + dedicated celebration space).
         </p>
         <ol className="list-decimal pl-5 space-y-2 text-royal-blue/80">
           {BP_PHASE_TWO.map((item) => (

@@ -21,6 +21,8 @@ import {
   BP_FULFILLMENT_PROCESS as FULFILLMENT_PROCESS,
   BP_GROWTH as GROWTH,
   BP_NEXT_STEPS as NEXT_STEPS,
+  BP_PHASE_ONE as PHASE_ONE,
+  BP_PHASE_ONE_BIRTHDAYS as PHASE_ONE_BIRTHDAYS,
   BP_PHASE_TWO as PHASE_TWO,
   BP_PRINT_PARTNERS as PRINT_PARTNERS,
   BP_STORYBOOK_APIS as STORYBOOK_APIS,
@@ -809,6 +811,76 @@ export function BusinessPlanSection() {
             </ul>
           </motion.section>
 
+          {/* Phase One — Sessions + Weekend Birthdays */}
+          <motion.section
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="rounded-2xl border border-emerald-200 bg-gradient-to-br from-white via-emerald-50/50 to-royal-cream/40 p-6 sm:p-8"
+          >
+            <SectionHeading icon={Sparkles}>
+              Phase One — Sessions + Weekend Birthdays
+            </SectionHeading>
+            <p className="text-royal-blue/75 leading-relaxed mb-6">
+              {PHASE_ONE_BIRTHDAYS.summary}
+            </p>
+            <ul className="space-y-4 mb-6">
+              {PHASE_ONE.map((item, index) => (
+                <li
+                  key={item.title}
+                  className="flex gap-4 rounded-xl border border-emerald-200/80 bg-white/90 px-4 py-4 sm:px-5"
+                >
+                  <span className="font-serif text-lg font-bold text-emerald-600 shrink-0 tabular-nums">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <div>
+                    <h3 className="font-serif text-lg font-bold text-royal-blue mb-1">
+                      {item.title}
+                    </h3>
+                    <p className="text-sm sm:text-base text-royal-blue/70 leading-relaxed">
+                      {item.detail}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            <div className="rounded-xl border border-royal-gold/30 bg-white/90 p-5">
+              <p className="text-xs font-semibold tracking-widest uppercase text-royal-gold mb-3">
+                {PHASE_ONE_BIRTHDAYS.headline} — package ideas
+              </p>
+              <div className="grid sm:grid-cols-3 gap-3 mb-4">
+                {PHASE_ONE_BIRTHDAYS.packageIdeas.map((pkg) => (
+                  <div
+                    key={pkg.name}
+                    className="rounded-lg border border-royal-gold/20 bg-royal-cream/40 p-3"
+                  >
+                    <p className="font-serif font-bold text-royal-blue text-sm">
+                      {pkg.name}
+                    </p>
+                    <p className="font-mono text-xs font-bold text-emerald-700 mt-1">
+                      {pkg.price}
+                    </p>
+                    <p className="text-xs text-royal-blue/65 mt-2 leading-relaxed">
+                      {pkg.includes}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              <ul className="space-y-1.5">
+                {PHASE_ONE_BIRTHDAYS.opsNotes.map((note) => (
+                  <li
+                    key={note}
+                    className="flex gap-2 text-sm text-royal-blue/70 leading-relaxed"
+                  >
+                    <span className="text-royal-gold shrink-0">•</span>
+                    {note}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </motion.section>
+
           {/* Phase Two */}
           <motion.section
             initial={{ opacity: 0, y: 16 }}
@@ -818,11 +890,10 @@ export function BusinessPlanSection() {
           >
             <SectionHeading icon={Home}>Phase Two — Our Own Home</SectionHeading>
             <p className="text-royal-blue/75 leading-relaxed mb-6">
-              After we prove the business works, we use the money to rent or buy
-              a place that is truly ours — with an enchanted tea house connected
-              to the studio. That gives us a kitchen and a second revenue stream
-              for birthdays and celebrations on weekends, while families stay
-              inside the same magical world.
+              After Phase 1 proves sessions + weekend birthdays, we reinvest into
+              a place that is truly ours — and upgrade parties with an enchanted
+              tea house connected to the studio (kitchen + dedicated celebration
+              space), while families stay inside the same magical world.
             </p>
             <ul className="space-y-4">
               {PHASE_TWO.map((item, index) => (

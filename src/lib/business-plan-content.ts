@@ -18,6 +18,7 @@ export const BP_GROWTH = [
   "Instagram + local Christian mom groups marketing",
   "Church partnerships",
   "AI-powered fast digital storybooks",
+  "Phase 1 weekend birthday parties (second revenue stream before tea house)",
   "Expand days/staff in Year 2",
 ] as const;
 
@@ -107,11 +108,55 @@ export const BP_FULFILLMENT_PROCESS = [
   "Digital PDF delivery option for instant high-margin revenue",
 ] as const;
 
+/**
+ * Phase 1 — launch ops: photo sessions + weekend birthday parties
+ * (before owning a permanent home / full tea house).
+ */
+export const BP_PHASE_ONE = [
+  {
+    title: "Core product: kingdom photo sessions",
+    detail:
+      "Weekday + weekend sessions stay the engine — 60-minute max shoots (siblings included), transparent packages, and Kingdom Chronicles books.",
+  },
+  {
+    title: "Weekend birthday parties (Phase 1 add-on)",
+    detail:
+      "Add kingdom birthday parties on Saturdays/Sundays as a second revenue stream in Phase 1 — not waiting for Phase 2. Package a short royal photo moment + party time in the studio world (simple food/cake table + costumes/crowns). Higher ticket, high emotion, natural upsell into books and prints.",
+  },
+  {
+    title: "How weekends are scheduled",
+    detail:
+      "Protect photo capacity: e.g. morning session blocks + 1–2 birthday party slots in the afternoon/evening. Party packages can include mini-session portraits for the birthday child (and siblings) inside the same visit.",
+  },
+  {
+    title: "Why this belongs in Phase 1",
+    detail:
+      "Birthdays drive word-of-mouth, fill slower weekend hours, and raise average revenue per family visit — without needing a full tea house buildout yet. Phase 2 expands this into a dedicated enchanted party space.",
+  },
+] as const;
+
+export const BP_PHASE_ONE_BIRTHDAYS = {
+  headline: "Phase 1 — Weekend Birthdays",
+  summary:
+    "In Phase 1 we run standard kingdom photo sessions and add birthday parties on weekends. Families get the magic now; Phase 2 later upgrades the party experience with a dedicated tea house.",
+  packageIdeas: [
+    { name: "Royal Birthday Mini", price: "$399–$549", includes: "60–90 min party window · crowns/costumes · birthday child mini-session · digital share link" },
+    { name: "Kingdom Birthday Party", price: "$699–$999", includes: "Party host time · 2 sets for photos · birthday + sibling portraits · 1 hardcover book for birthday child" },
+    { name: "Royal Court Party", price: "$1,200–$1,800", includes: "Larger guest count · full sibling/family books option · prints package · premium party styling" },
+  ],
+  opsNotes: [
+    "Weekends only at first (Sat/Sun) so weekdays stay focused on efficient photo sessions",
+    "1 hour photo standard still applies to the portrait portion",
+    "Simple party setup: cake table, décor, crowns — full kitchen/tea house is Phase 2",
+    "Every birthday is a marketing event: shareable photos + storybook upsell",
+  ],
+};
+
 export const BP_PHASE_TWO = [
   {
     title: "Prove the model first",
     detail:
-      "Once we know the studio business works — sessions, storybooks, and margins — we reinvest profits into a permanent home of our own.",
+      "Once we know the studio business works — sessions, weekend birthdays, storybooks, and margins — we reinvest profits into a permanent home of our own.",
   },
   {
     title: "Own or lease our space",
@@ -121,7 +166,7 @@ export const BP_PHASE_TWO = [
   {
     title: "Enchanted tea house attached",
     detail:
-      "Connect a kitchen-equipped tea house to the studio — an enchanted gathering space for weekend birthday parties, celebrations, and family events that extend the kingdom experience beyond the photo session.",
+      "Upgrade Phase 1 weekend birthdays into a full kitchen-equipped tea house connected to the studio — a dedicated gathering space for larger parties, celebrations, and family events that keep everyone inside the same magical world.",
   },
 ] as const;
 
