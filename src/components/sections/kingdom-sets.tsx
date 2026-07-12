@@ -61,9 +61,10 @@ export function KingdomSetsSection() {
             Four Places to Remember Who They Are
           </h2>
           <p className="text-royal-blue/60 text-lg">
-            Each set is crafted to help children feel brave, special, and full
-            of wonder. Click any set to see it larger. Tell us which worlds
-            speak to your child when you book.
+            We're opening with the{" "}
+            <span className="font-semibold text-royal-blue">Forest Garden</span>{" "}
+            experience — Royal Forest & Royal Garden. Throne Room and Chastle
+            are coming soon as we build out the full kingdom.
           </p>
         </motion.div>
 
@@ -71,6 +72,7 @@ export function KingdomSetsSection() {
           {KINGDOM_SETS.map((set, index) => {
             const Icon = setIcons[index] ?? Castle;
             const hasPhoto = Boolean(set.image);
+            const isAvailable = set.available;
 
             return (
               <motion.button
@@ -81,8 +83,16 @@ export function KingdomSetsSection() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
                 onClick={() => hasPhoto && setActiveSet(set)}
-                className="group text-left rounded-2xl overflow-hidden border border-royal-gold/25 hover:border-royal-gold/55 transition-all hover:shadow-xl hover:shadow-royal-gold/15 bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-royal-gold focus-visible:ring-offset-2"
-                aria-label={`View larger photo of ${set.name}`}
+                className={`group text-left rounded-2xl overflow-hidden border transition-all bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-royal-gold focus-visible:ring-offset-2 ${
+                  isAvailable
+                    ? "border-royal-gold/40 hover:border-royal-gold/70 hover:shadow-xl hover:shadow-royal-gold/15"
+                    : "border-royal-gold/15 opacity-90"
+                }`}
+                aria-label={
+                  isAvailable
+                    ? `View larger photo of ${set.name}`
+                    : `${set.name} — coming soon`
+                }
               >
                 <div
                   className={`aspect-[4/3] relative overflow-hidden ${
@@ -97,10 +107,21 @@ export function KingdomSetsSection() {
                         src={set.image}
                         alt={set.name}
                         fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        className={`object-cover transition-transform duration-500 group-hover:scale-105 ${
+                          isAvailable ? "" : "grayscale-[30%]"
+                        }`}
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-royal-blue/50 via-transparent to-transparent" />
+                      <span
+                        className={`absolute top-3 left-3 inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-bold tracking-wide uppercase shadow-sm ${
+                          isAvailable
+                            ? "bg-royal-emerald text-white"
+                            : "bg-royal-blue/90 text-royal-gold border border-royal-gold/40"
+                        }`}
+                      >
+                        {isAvailable ? "Open now" : "Coming soon"}
+                      </span>
                       <span className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-royal-blue shadow-sm opacity-90 group-hover:opacity-100 transition-opacity">
                         <Expand className="h-3 w-3 text-royal-gold" />
                         View larger

@@ -21,12 +21,40 @@ export function BookingSection() {
   return (
     <section id="book" className="py-24 bg-enchanted-cream">
       <div className="container mx-auto px-4 lg:px-8">
+        {/* Launch set notice */}
+        <div className="max-w-3xl mx-auto mb-10">
+          <div
+            className="rounded-2xl border px-5 py-4 text-center"
+            style={{
+              background: "linear-gradient(135deg, #F8F4EC 0%, #fff 100%)",
+              borderColor: "rgba(185,138,25,0.35)",
+            }}
+          >
+            <p className="text-xs font-semibold tracking-[0.18em] uppercase text-royal-gold mb-1">
+              Now booking
+            </p>
+            <p className="font-serif text-xl font-bold text-royal-blue">
+              Forest Garden Experience
+            </p>
+            <p className="text-sm text-royal-blue/65 mt-1.5 leading-relaxed">
+              Sessions currently feature our open sets:{" "}
+              <span className="font-semibold text-royal-blue">Royal Forest</span>{" "}
+              &{" "}
+              <span className="font-semibold text-royal-blue">Royal Garden</span>.
+              Throne Room and Chastle are coming soon.
+            </p>
+          </div>
+        </div>
+
         {/* Quest Selector */}
         <div className="max-w-4xl mx-auto mb-16">
           <h3 className="text-center font-serif text-2xl font-bold text-royal-blue mb-2">
             Choose Your Quest
           </h3>
-          <p className="text-center text-royal-blue/50 text-sm mb-8">The child picks how their story goes (1 of 6)</p>
+          <p className="text-center text-royal-blue/50 text-sm mb-8">
+            The child picks how their story goes (1 of 6) — photos are captured in
+            Forest & Garden while we build the full kingdom.
+          </p>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {QUESTS.map((q) => (
               <button

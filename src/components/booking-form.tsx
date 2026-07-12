@@ -26,7 +26,9 @@ const VALID_PACKAGES = new Set<string>(PACKAGE_OPTIONS.map((p) => p.value));
 const MAX_CHILDREN = 6;
 
 function buildSpecialRequests(data: BookingFormData): string {
-  const parts: string[] = [];
+  const parts: string[] = [
+    "Studio sets for this booking: Forest Garden (Royal Forest + Royal Garden). Throne Room & Chastle coming soon.",
+  ];
 
   if (data.children.length > 1) {
     const extras = data.children
@@ -184,6 +186,20 @@ export function BookingForm() {
           <p className="text-sm text-royal-blue/55">
             Tell us who&apos;s coming and when you&apos;d like to visit.
           </p>
+          <div
+            className="mt-3 rounded-xl px-3.5 py-2.5 text-sm"
+            style={{
+              background: "rgba(185,138,25,0.08)",
+              border: "1px solid rgba(185,138,25,0.25)",
+              color: "#0A1628",
+            }}
+          >
+            <span className="font-semibold">Sets included now:</span> Forest
+            Garden — Royal Forest & Royal Garden.{" "}
+            <span className="text-royal-blue/60">
+              Throne Room & Chastle coming soon.
+            </span>
+          </div>
         </div>
 
         <div className="grid sm:grid-cols-2 gap-4">
