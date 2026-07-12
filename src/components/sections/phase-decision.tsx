@@ -16,6 +16,7 @@ import {
   BP_PHASE_ROADMAP,
   BP_PHASE_ECONOMICS,
   BP_SET_CAPACITY_NOTE,
+  BP_ONE_STORE_300K,
   computeBpPnl,
 } from "@/lib/business-plan-content";
 
@@ -330,6 +331,84 @@ export function PhaseDecisionSection() {
           <p className="text-xs text-royal-blue/45 mt-3">
             Retail+kitchen is the decision that multiplies birthday revenue and
             brand presence. Scale is only after retail demand overflows.
+          </p>
+        </section>
+
+        {/* $300K net one-store target */}
+        <section className="rounded-2xl border border-royal-gold/40 bg-royal-blue text-royal-cream p-5 sm:p-6 mb-8">
+          <p className="text-xs font-semibold tracking-[0.18em] uppercase text-royal-gold mb-2">
+            Your bar · one store
+          </p>
+          <h2 className="font-serif text-2xl font-bold mb-2">
+            {BP_ONE_STORE_300K.question}
+          </h2>
+          <p className="text-royal-cream/80 leading-relaxed mb-5 max-w-3xl">
+            {BP_ONE_STORE_300K.answer}
+          </p>
+
+          <div className="grid sm:grid-cols-2 gap-3 mb-5">
+            <div className="rounded-xl bg-white/10 border border-white/10 p-4">
+              <p className="text-[11px] uppercase tracking-wide text-royal-cream/50 font-semibold">
+                Soft retail (not enough)
+              </p>
+              <p className="font-mono text-2xl font-bold text-red-300 mt-1">
+                ~{money(BP_ONE_STORE_300K.notEnough.approxNet)} net
+              </p>
+              <p className="text-xs text-royal-cream/60 mt-2 leading-relaxed">
+                {BP_ONE_STORE_300K.notEnough.sessionsPerMonth} sessions/mo · $
+                {BP_ONE_STORE_300K.notEnough.avgTicket} ticket ·{" "}
+                {BP_ONE_STORE_300K.notEnough.note}
+              </p>
+            </div>
+            <div className="rounded-xl bg-emerald-500/15 border border-emerald-300/30 p-4">
+              <p className="text-[11px] uppercase tracking-wide text-emerald-200/80 font-semibold">
+                $300K net path
+              </p>
+              <p className="font-mono text-2xl font-bold text-emerald-300 mt-1">
+                ~{money(BP_ONE_STORE_300K.target.approxNet)} net
+              </p>
+              <p className="text-xs text-royal-cream/70 mt-2 leading-relaxed">
+                ~{BP_ONE_STORE_300K.target.sessionsPerMonth} sessions/mo · $
+                {BP_ONE_STORE_300K.target.avgTicket} ticket · ~{" "}
+                {money(BP_ONE_STORE_300K.target.approxRevenue)} rev ·{" "}
+                {BP_ONE_STORE_300K.target.note}
+              </p>
+            </div>
+          </div>
+
+          <div className="grid sm:grid-cols-3 gap-3 mb-5">
+            {BP_ONE_STORE_300K.paths.map((p) => (
+              <div
+                key={p.name}
+                className="rounded-xl bg-white/10 border border-white/10 p-3"
+              >
+                <p className="font-semibold text-royal-gold text-sm">{p.name}</p>
+                <p className="font-mono text-xs text-royal-cream/80 mt-1">
+                  {p.sessionsPerMonth}/mo @ ${p.ticket} · {p.partiesPerMonth}{" "}
+                  parties/mo
+                </p>
+                <p className="text-[11px] text-royal-cream/55 mt-2 leading-relaxed">
+                  {p.requires}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <ul className="space-y-1.5 mb-4">
+            {BP_ONE_STORE_300K.levers.map((l) => (
+              <li
+                key={l.lever}
+                className="text-sm text-royal-cream/75 flex gap-2 leading-relaxed"
+              >
+                <span className="text-royal-gold font-semibold shrink-0">
+                  {l.lever}:
+                </span>
+                {l.detail}
+              </li>
+            ))}
+          </ul>
+          <p className="text-sm font-medium text-royal-gold border-t border-white/10 pt-3 leading-relaxed">
+            {BP_ONE_STORE_300K.verdict}
           </p>
         </section>
 

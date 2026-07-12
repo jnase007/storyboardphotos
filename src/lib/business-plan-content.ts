@@ -949,5 +949,78 @@ export function computeProformaYear(input: {
   });
 }
 
+
+/**
+ * One-store target: can a single retail location clear $300K net?
+ * Answer: YES — but not on a soft 45 sessions/mo model. Needs strong volume
+ * (multi-set / 2nd photog throughput) or higher ticket + parties.
+ */
+export const BP_ONE_STORE_300K = {
+  question: "Can one store make at least $300K net?",
+  answer: "Yes — with roughly 70–80 photo sessions per month (or slightly fewer at a higher ticket), plus a real birthday program, and fixed OpEx held near ~$17–20K/month.",
+  notEnough: {
+    label: "Soft retail steady (not enough)",
+    sessionsPerMonth: 45,
+    avgTicket: 560,
+    partiesPerMonth: 6,
+    partyTicket: 850,
+    annualOpex: 207600,
+    approxNet: 108000,
+    note: "Healthy business, but ~$100K net — short of $300K.",
+  },
+  target: {
+    label: "One-store $300K net path",
+    sessionsPerMonth: 78,
+    sessionsPerYear: 936,
+    avgTicket: 560,
+    partiesPerMonth: 6,
+    partiesPerYear: 72,
+    partyTicket: 850,
+    annualOpex: 207600,
+    approxRevenue: 584000,
+    approxNet: 300000,
+    note: "Same OpEx as retail model; volume is the lever. ~78 sessions/mo is multi-set / 2-photographer territory — not office-beta sequential.",
+  },
+  levers: [
+    { lever: "Volume", detail: "~75–80 sessions/mo at ~$560, or ~67/mo at ~$650" },
+    { lever: "Parallel capacity", detail: "Retail multi-set + 2nd photographer — office scene-swaps cannot hit this alone" },
+    { lever: "Ticket", detail: "Sibling mix, both-books, light prints — every $50 of avg ticket lowers required volume" },
+    { lever: "Birthdays", detail: "Kitchen parties add high-margin weekend revenue on top of sessions" },
+    { lever: "OpEx control", detail: "Rent/staff discipline; if fixed costs jump to $25K+/mo, $300K net gets much harder" },
+  ],
+  paths: [
+    {
+      name: "Volume path",
+      sessionsPerMonth: 78,
+      ticket: 560,
+      partiesPerMonth: 6,
+      opexAnnual: 208000,
+      net: 300000,
+      requires: "2 sets standing + often 2 shooters or very full single-lane days",
+    },
+    {
+      name: "Higher-ticket path",
+      sessionsPerMonth: 67,
+      ticket: 650,
+      partiesPerMonth: 6,
+      opexAnnual: 220000,
+      net: 300000,
+      requires: "Strong sibling/family mix + print attach",
+    },
+    {
+      name: "Party-assisted path",
+      sessionsPerMonth: 70,
+      ticket: 580,
+      partiesPerMonth: 10,
+      opexAnnual: 230000,
+      net: 300000,
+      requires: "Kitchen busy on weekends + solid weekday sessions",
+    },
+  ],
+  verdict:
+    "One retail store can clear $300K net. Plan for ~$550–650K revenue and ~75 sessions/month-class throughput (or equivalent mix). Do not expect $300K net from office beta or a half-full single-lane calendar.",
+} as const;
+
+
 export const BP_EXECUTIVE_SUMMARY =
   "Storybook Photos (Kingdom Quests) is a premium fantasy photo studio in Costa Mesa offering kingdom-themed photo sessions for children and families. Clients dress as kings, queens, and royalty and are photographed in custom-built sets. Every session includes the option of a personalized AI-assisted Kingdom Chronicles where the child is the hero of their own adventure.";
