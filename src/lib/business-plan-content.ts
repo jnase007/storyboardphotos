@@ -174,6 +174,98 @@ export const BP_CAPACITY = {
 };
 
 /**
+ * Revenue growth scenarios (Years 1–3) for charts + capacity modeling.
+ * Baseline = single photographer / sequential sessions.
+ * Scaled = 4 sets running in parallel with multiple photographers.
+ *
+ * Math anchors (75-min blocks, 8-hour studio day ≈ 6 blocks/photographer):
+ * - 1 photog × 4 sessions/day × 6 days × 50 wks × 75% ≈ 900 sessions/yr
+ * - 4 photogs × 4 concurrent lanes × same cadence × 75% ≈ 3,600 sessions/yr
+ */
+export const BP_REVENUE_GROWTH = {
+  years: ["Year 1", "Year 2", "Year 3"] as const,
+  assumptions: [
+    "60-min max shoot + 15-min reset (75-min calendar block)",
+    "Avg ticket rises with siblings, both-books, and light print upsells",
+    "Baseline: 1 photographer, sessions run mostly one family at a time",
+    "Scaled: 4 kingdom sets live at once + multiple photographers (parallel lanes)",
+  ],
+  baseline: [
+    {
+      year: "Year 1",
+      sessions: 540,
+      avgTicket: 420,
+      revenue: 226800,
+      photographers: 1,
+      parallelSets: 1,
+      note: "Soft launch · 2–3 sessions/day · building demand",
+    },
+    {
+      year: "Year 2",
+      sessions: 900,
+      avgTicket: 480,
+      revenue: 432000,
+      photographers: 1,
+      parallelSets: 1,
+      note: "Full schedule · ~75% of single-lane capacity",
+    },
+    {
+      year: "Year 3",
+      sessions: 1100,
+      avgTicket: 550,
+      revenue: 605000,
+      photographers: 2,
+      parallelSets: 1,
+      note: "Near full single-lane book · 2nd photog for coverage",
+    },
+  ],
+  scaled: [
+    {
+      year: "Year 1",
+      sessions: 1200,
+      avgTicket: 450,
+      revenue: 540000,
+      photographers: 2,
+      parallelSets: 2,
+      note: "Early multi-set ops · 2 parallel lanes ramping",
+    },
+    {
+      year: "Year 2",
+      sessions: 2400,
+      avgTicket: 520,
+      revenue: 1248000,
+      photographers: 3,
+      parallelSets: 3,
+      note: "3 sets concurrent · multi-photographer team",
+    },
+    {
+      year: "Year 3",
+      sessions: 3600,
+      avgTicket: 600,
+      revenue: 2160000,
+      photographers: 4,
+      parallelSets: 4,
+      note: "4 sets running at once · full parallel studio",
+    },
+  ],
+  capacityCeiling: {
+    title: "Theoretical ceiling (4 parallel lanes)",
+    photographers: 4,
+    parallelSets: 4,
+    sessionsPerDayPerLane: 4,
+    daysPerWeek: 6,
+    weeksPerYear: 50,
+    utilization: 0.75,
+    sessionsPerYear: 3600,
+    atTicket550: 1980000,
+    atTicket650: 2340000,
+    atTicket800: 2880000,
+    formula:
+      "4 lanes × 4 sessions/day × 6 days × 50 weeks × 75% utilization = ~3,600 sessions/year",
+  },
+};
+
+/**
  * Session timing standard — all packages (solo, sibling, family) stay inside 1 hour.
  * Many families bring siblings; design the shoot as one family session, not stacked solos.
  */

@@ -36,6 +36,7 @@ import {
   BP_STARTUP_COSTS as STARTUP_COSTS,
 } from "@/lib/business-plan-content";
 import { StorybookPreview } from "@/components/sections/storybook-preview";
+import { RevenueGrowthChart } from "@/components/sections/revenue-growth-chart";
 
 function SectionHeading({
   icon: Icon,
@@ -635,6 +636,24 @@ export function BusinessPlanSection() {
                 </p>
               </div>
             </div>
+          </motion.section>
+
+          {/* Revenue Growth Chart */}
+          <motion.section
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-10"
+          >
+            <SectionHeading icon={TrendingUp}>
+              Revenue Growth Graph
+            </SectionHeading>
+            <p className="text-royal-blue/55 text-sm mb-5 max-w-3xl">
+              What growth looks like over 1–3 years on a normal path — and how
+              much revenue is possible if all 4 sets run at once with multiple
+              photographers.
+            </p>
+            <RevenueGrowthChart />
           </motion.section>
 
           {/* Financial Projections */}

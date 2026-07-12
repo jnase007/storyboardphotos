@@ -11,6 +11,7 @@ import {
   BP_PHASE_TWO,
   BP_PRINT_PARTNERS,
   BP_PROJECTIONS,
+  BP_REVENUE_GROWTH,
   BP_REVENUE_POINTS,
   BP_RISKS,
   BP_STORYBOOK_APIS,
@@ -154,6 +155,62 @@ export function BusinessPlanDocument() {
           naturally with sibling/family packages, both-books collection, 1–2
           high-margin prints, and digital download — families happily pay
           $500–$900+ without feeling tricked.
+        </p>
+      </section>
+
+      <section className="break-inside-avoid">
+        <H2>Revenue Growth — Baseline vs Scaled (4 Sets)</H2>
+        <p className="text-sm text-royal-blue/80 mb-3 leading-relaxed">
+          Baseline = single photographer / mostly one family at a time. Scaled =
+          up to 4 kingdom sets running in parallel with multiple photographers.
+        </p>
+        <div className="overflow-x-auto mb-3">
+          <table className="w-full text-sm border-collapse">
+            <thead>
+              <tr className="bg-royal-blue text-royal-cream">
+                <th className="text-left p-2.5 font-semibold">Year</th>
+                <th className="text-right p-2.5 font-semibold">Baseline rev</th>
+                <th className="text-right p-2.5 font-semibold">Baseline sessions</th>
+                <th className="text-right p-2.5 font-semibold">Scaled rev</th>
+                <th className="text-right p-2.5 font-semibold">Scaled sessions</th>
+                <th className="text-right p-2.5 font-semibold">Lanes / photogs</th>
+              </tr>
+            </thead>
+            <tbody>
+              {BP_REVENUE_GROWTH.baseline.map((b, i) => {
+                const s = BP_REVENUE_GROWTH.scaled[i];
+                return (
+                  <tr
+                    key={b.year}
+                    className={i % 2 === 0 ? "bg-royal-cream/60" : "bg-white"}
+                  >
+                    <td className="p-2.5 font-semibold border-b border-royal-gold/15">
+                      {b.year}
+                    </td>
+                    <td className="p-2.5 text-right border-b border-royal-gold/15 font-mono">
+                      ${b.revenue.toLocaleString()}
+                    </td>
+                    <td className="p-2.5 text-right border-b border-royal-gold/15">
+                      {b.sessions.toLocaleString()}
+                    </td>
+                    <td className="p-2.5 text-right border-b border-royal-gold/15 font-mono text-emerald-700 font-semibold">
+                      ${s.revenue.toLocaleString()}
+                    </td>
+                    <td className="p-2.5 text-right border-b border-royal-gold/15">
+                      {s.sessions.toLocaleString()}
+                    </td>
+                    <td className="p-2.5 text-right border-b border-royal-gold/15 text-xs">
+                      {s.parallelSets} / {s.photographers}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        <p className="text-sm text-royal-blue/80 leading-relaxed">
+          <strong>4-lane ceiling (~3,600 sessions/yr at 75% util):</strong>{" "}
+          ~$1.98M @ $550 · ~$2.34M @ $650 · ~$2.88M @ $800 avg ticket.
         </p>
       </section>
 
