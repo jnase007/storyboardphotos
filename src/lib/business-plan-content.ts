@@ -80,29 +80,29 @@ export const BP_PRINT_PARTNERS = [
 export const BP_STORYBOOK_APIS = [
   {
     api: "Image Generation",
-    purpose: "Consistent character illustrations",
-    provider: "fal.ai Flux (best)",
-    cost: "$0.30 – $1.20",
+    purpose: "Watercolor scenes + character likeness",
+    provider: "Google Imagen 4.0 + Gemini image (primary) · fal.ai Flux PuLID / Bria (likeness + BG remove)",
+    cost: "$0.40 – $2.50",
   },
   {
     api: "Story Generation",
-    purpose: "Personalized kingdom story",
-    provider: "Grok API or Claude",
+    purpose: "Personalized kingdom story (or scripted path)",
+    provider: "xAI Grok (primary) · Claude fallback · template scripts",
     cost: "<$0.10",
   },
   {
     api: "Storage & Database",
-    purpose: "Photos + generated files",
+    purpose: "Photos, generated art, PDFs, bookings",
     provider: "Supabase (already set up)",
     cost: "Free — very low",
   },
 ] as const;
 
 export const BP_STORYBOOK_AI_COST_TOTAL =
-  "Total estimated AI cost per book: $0.50 – $2.00 (very cheap)";
+  "Total estimated AI cost per book: $0.50 – $3.00 (still very cheap vs $299–$849 packages)";
 
 export const BP_FULFILLMENT_PROCESS = [
-  "AI-generated personalized story + consistent character illustrations (fal.ai Flux + Grok/Claude)",
+  "AI-generated personalized story (Grok/Claude or scripted adventure path) + watercolor illustrations (Imagen 4 / Gemini / fal.ai likeness)",
   "Human editing & curation",
   "Professional printing via Mpix on archival paper / hardcover photo books",
   "Digital PDF delivery option for instant high-margin revenue",
@@ -442,18 +442,18 @@ export const BP_COST_BREAKDOWN = {
       { label: "Staff assist (if applicable)", cost: 25, note: "Part-time help" },
       { label: "Set overhead (amortized)", cost: 20, note: "Props, costumes, maintenance" },
       { label: "Mpix 8x8 hardcover book", cost: 32, note: "Printed and shipped" },
-      { label: "AI generation (Gemini)", cost: 1, note: "~$0.50-1 per book" },
+      { label: "AI generation (Imagen/Grok/fal)", cost: 2, note: "~$0.50–$3 per book" },
       { label: "Processing & admin (15 min)", cost: 10, note: "Post-session work" },
       { label: "Marketing (per session avg)", cost: 15, note: "Ads, social, referrals" },
     ],
-    totalCost: 278,
+    totalCost: 279,
   },
   packages: [
     {
       name: "Solo Quest",
       price: 349,
-      cost: 278,
-      margin: 71,
+      cost: 279,
+      margin: 70,
       pct: 20,
       sessions: { daily: [1, 2, 3], revenue: [349, 698, 1047] },
     },
