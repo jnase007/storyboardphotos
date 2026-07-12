@@ -202,6 +202,37 @@ export const BP_SESSION_TIMING = {
     "Solo / Sibling / Family: 60-minute kingdom session. Additional children included in the same session window.",
 };
 
+/**
+ * Average customer spend — competitor pressure model vs our transparent ticket.
+ * Many families bring siblings; ticket grows with package mix + light add-ons.
+ */
+export const BP_AVG_CUSTOMER_SPEND = {
+  competitorAvg: 1300,
+  competitorRange: "$1,000–$3,000+",
+  competitorNote:
+    "Enchanted Fairies-style studios often average ~$1,300 per family after a high-pressure ordering appointment (storybook often $3,000+ extra).",
+  ourTargetAvg: 650,
+  ourRange: "$450–$900 typical · path to $1,000+ with prints",
+  ourNote:
+    "Transparent packages + sibling scale + optional prints. Win trust first; grow average without bait-and-switch.",
+  mix: [
+    { label: "Solo / single book", share: "≈40%", ticket: "$299–$349" },
+    { label: "Both books / stronger package", share: "≈20%", ticket: "≈$499" },
+    { label: "Sibling (2 kids)", share: "≈30%", ticket: "≈$549" },
+    { label: "Family (3 kids)", share: "≈10%", ticket: "≈$849" },
+  ],
+  withAddOns: [
+    { stage: "Core package average (siblings common)", amount: "$450–$650" },
+    { stage: "With digital + light print upsells", amount: "$700–$1,000" },
+    { stage: "Competitor-style pressure average", amount: "~$1,300" },
+  ],
+  strategy: [
+    "Do not copy their $1,300 via surprise sales",
+    "Raise average naturally: sibling/family packages, Royal Collection (both books), 1–2 high-margin prints, digital download",
+    "Position: families happily pay $500–$900+ without feeling tricked — room to grow toward $1,000+ cleanly",
+  ],
+};
+
 export const BP_STARTUP_COSTS = {
   oneTime: [
     { item: "Studio build-out (4 enchanted sets)", low: 40000, high: 80000 },

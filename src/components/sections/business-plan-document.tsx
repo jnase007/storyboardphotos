@@ -120,6 +120,43 @@ export function BusinessPlanDocument() {
         </ul>
       </section>
 
+      <section className="break-inside-avoid">
+        <H2>Average Customer Spend</H2>
+        <p className="leading-relaxed text-royal-blue/80 mb-3">
+          <strong>Competitor average: ~$1,300 / shoot</strong> (typical range
+          $1,000–$3,000+ after high-pressure ordering; storybook often $3,000+
+          extra).
+        </p>
+        <p className="leading-relaxed text-royal-blue/80 mb-3">
+          <strong>Storybook Photos target: ~$650 average</strong> (
+          $450–$900 typical; path to $1,000+ with prints). Transparent packages
+          + sibling scale + optional add-ons — not a surprise bill.
+        </p>
+        <p className="text-sm font-semibold text-royal-blue mb-2">
+          Expected mix (siblings common)
+        </p>
+        <ul className="list-disc pl-5 space-y-1 text-royal-blue/80 text-sm mb-3">
+          <li>Solo / single book ≈40% → $299–$349</li>
+          <li>Both books / stronger package ≈20% → ≈$499</li>
+          <li>Sibling (2 kids) ≈30% → ≈$549</li>
+          <li>Family (3 kids) ≈10% → ≈$849</li>
+        </ul>
+        <p className="text-sm font-semibold text-royal-blue mb-2">
+          How the average builds
+        </p>
+        <ul className="list-disc pl-5 space-y-1 text-royal-blue/80 text-sm mb-3">
+          <li>Core package average (siblings common): $450–$650</li>
+          <li>With digital + light print upsells: $700–$1,000</li>
+          <li>Competitor-style pressure average: ~$1,300</li>
+        </ul>
+        <p className="text-sm text-royal-blue/80">
+          Strategy: do not copy their $1,300 via surprise sales. Raise average
+          naturally with sibling/family packages, both-books collection, 1–2
+          high-margin prints, and digital download — families happily pay
+          $500–$900+ without feeling tricked.
+        </p>
+      </section>
+
       <section>
         <H2>3-Year Financial Projections (Conservative)</H2>
         <div className="overflow-x-auto">

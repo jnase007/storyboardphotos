@@ -32,6 +32,7 @@ import {
   BP_COST_BREAKDOWN as COST_BREAKDOWN,
   BP_CAPACITY as CAPACITY,
   BP_SESSION_TIMING as SESSION_TIMING,
+  BP_AVG_CUSTOMER_SPEND as AVG_SPEND,
   BP_STARTUP_COSTS as STARTUP_COSTS,
 } from "@/lib/business-plan-content";
 import { StorybookPreview } from "@/components/sections/storybook-preview";
@@ -195,8 +196,126 @@ export function BusinessPlanSection() {
                   </li>
                 ))}
               </ul>
+              <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50/80 px-4 py-3">
+                <p className="text-xs font-semibold tracking-widest uppercase text-emerald-700 mb-1">
+                  Average customer spend
+                </p>
+                <p className="font-serif text-lg font-bold text-royal-blue">
+                  Target ~${AVG_SPEND.ourTargetAvg} · Competitor ~$
+                  {AVG_SPEND.competitorAvg.toLocaleString()}
+                </p>
+                <p className="text-sm text-royal-blue/70 mt-1 leading-relaxed">
+                  {AVG_SPEND.ourRange}. Transparent ticket — not a surprise bill.
+                </p>
+              </div>
             </motion.section>
           </div>
+
+          {/* Average Customer Spend */}
+          <motion.section
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-2"
+          >
+            <SectionHeading icon={TrendingUp}>
+              Average Customer Spend
+            </SectionHeading>
+            <p className="text-royal-blue/70 text-sm mb-5 leading-relaxed max-w-3xl">
+              Competition often lands near{" "}
+              <strong className="text-royal-blue">
+                ${AVG_SPEND.competitorAvg.toLocaleString()}
+              </strong>{" "}
+              per shoot after pressure sales. We aim for a healthy average with
+              siblings + clear packages — trust first, then natural upsells.
+            </p>
+
+            <div className="grid sm:grid-cols-2 gap-4 mb-5">
+              <div className="rounded-2xl border border-red-200 bg-red-50/70 p-5">
+                <p className="text-xs font-semibold tracking-widest uppercase text-red-600 mb-1">
+                  Competitor average
+                </p>
+                <p className="font-serif text-3xl font-bold text-red-700">
+                  ~${AVG_SPEND.competitorAvg.toLocaleString()}
+                </p>
+                <p className="text-sm text-red-700/80 mt-1">
+                  Range {AVG_SPEND.competitorRange}
+                </p>
+                <p className="text-sm text-red-700/75 mt-3 leading-relaxed">
+                  {AVG_SPEND.competitorNote}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-emerald-200 bg-emerald-50/80 p-5">
+                <p className="text-xs font-semibold tracking-widest uppercase text-emerald-700 mb-1">
+                  Storybook Photos target
+                </p>
+                <p className="font-serif text-3xl font-bold text-emerald-800">
+                  ~${AVG_SPEND.ourTargetAvg}
+                </p>
+                <p className="text-sm text-emerald-800/80 mt-1">
+                  {AVG_SPEND.ourRange}
+                </p>
+                <p className="text-sm text-emerald-900/70 mt-3 leading-relaxed">
+                  {AVG_SPEND.ourNote}
+                </p>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-5">
+              <div className="rounded-2xl border border-royal-gold/25 bg-white/80 p-5">
+                <h3 className="font-serif text-lg font-bold text-royal-blue mb-3">
+                  Expected mix (siblings common)
+                </h3>
+                <ul className="space-y-2.5">
+                  {AVG_SPEND.mix.map((row) => (
+                    <li
+                      key={row.label}
+                      className="flex items-start justify-between gap-3 text-sm text-royal-blue/75"
+                    >
+                      <span>
+                        <span className="font-semibold text-royal-blue">
+                          {row.label}
+                        </span>
+                        <span className="text-royal-blue/50"> · {row.share}</span>
+                      </span>
+                      <span className="font-mono text-xs font-bold text-royal-gold shrink-0">
+                        {row.ticket}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="rounded-2xl border border-royal-gold/25 bg-white/80 p-5">
+                <h3 className="font-serif text-lg font-bold text-royal-blue mb-3">
+                  How the average builds
+                </h3>
+                <ul className="space-y-2.5 mb-4">
+                  {AVG_SPEND.withAddOns.map((row) => (
+                    <li
+                      key={row.stage}
+                      className="flex items-start justify-between gap-3 text-sm text-royal-blue/75"
+                    >
+                      <span>{row.stage}</span>
+                      <span className="font-mono text-xs font-bold text-royal-gold shrink-0">
+                        {row.amount}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                <ul className="space-y-2 border-t border-royal-gold/20 pt-3">
+                  {AVG_SPEND.strategy.map((item) => (
+                    <li
+                      key={item}
+                      className="flex gap-2.5 text-sm text-royal-blue/75 leading-relaxed"
+                    >
+                      <span className="text-royal-gold shrink-0">•</span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </motion.section>
 
           {/* Interactive sample storybook preview */}
           <motion.div
