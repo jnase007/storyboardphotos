@@ -73,10 +73,10 @@ export function KingdomSetsSection() {
             const Icon = setIcons[index] ?? Castle;
             const hasPhoto = Boolean(set.image);
             const isAvailable = set.available;
-            const cardClass = `group text-left rounded-2xl overflow-hidden border transition-all bg-white ${
+            const cardClass = `group text-left rounded-2xl overflow-hidden border transition-all ${
               isAvailable
-                ? "border-royal-gold/40 hover:border-royal-gold/70 hover:shadow-xl hover:shadow-royal-gold/15 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-royal-gold focus-visible:ring-offset-2"
-                : "border-royal-gold/15 opacity-85 cursor-not-allowed"
+                ? "bg-white border-royal-gold/40 hover:border-royal-gold/70 hover:shadow-xl hover:shadow-royal-gold/15 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-royal-gold focus-visible:ring-offset-2"
+                : "bg-gray-100 border-gray-200 opacity-55 cursor-default pointer-events-none select-none grayscale"
             }`;
 
             const media = (
@@ -95,20 +95,24 @@ export function KingdomSetsSection() {
                         alt={set.name}
                         fill
                         className={`object-cover transition-transform duration-500 ${
-                          isAvailable ? "group-hover:scale-105" : "grayscale-[35%]"
+                          isAvailable
+                            ? "group-hover:scale-105"
+                            : "grayscale brightness-90 contrast-90"
                         }`}
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                       />
                       <div
-                        className={`absolute inset-0 bg-gradient-to-t from-royal-blue/50 via-transparent to-transparent ${
-                          isAvailable ? "" : "bg-royal-blue/25"
+                        className={`absolute inset-0 ${
+                          isAvailable
+                            ? "bg-gradient-to-t from-royal-blue/50 via-transparent to-transparent"
+                            : "bg-gray-500/45"
                         }`}
                       />
                       <span
                         className={`absolute top-3 left-3 inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-bold tracking-wide uppercase shadow-sm ${
                           isAvailable
                             ? "bg-royal-emerald text-white"
-                            : "bg-royal-blue/90 text-royal-gold border border-royal-gold/40"
+                            : "bg-gray-600 text-white border border-white/20"
                         }`}
                       >
                         {isAvailable ? "Open now" : "Coming soon"}
@@ -118,11 +122,7 @@ export function KingdomSetsSection() {
                           <Expand className="h-3 w-3 text-royal-gold" />
                           View larger
                         </span>
-                      ) : (
-                        <span className="absolute bottom-3 right-3 inline-flex items-center rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-royal-blue/70 shadow-sm">
-                          Not bookable yet
-                        </span>
-                      )}
+                      ) : null}
                     </>
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center">
