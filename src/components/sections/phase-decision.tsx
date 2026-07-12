@@ -17,6 +17,7 @@ import {
   BP_PHASE_ECONOMICS,
   BP_SET_CAPACITY_NOTE,
   BP_ONE_STORE_300K,
+  BP_BETA_STRATEGY,
   computeBpPnl,
 } from "@/lib/business-plan-content";
 
@@ -99,6 +100,134 @@ export function PhaseDecisionSection() {
             {BP_PHASE_ROADMAP.summary}
           </p>
         </header>
+
+        {/* Beta strategy — product + CAC */}
+        <section className="rounded-2xl border border-royal-gold/30 bg-white p-5 sm:p-6 mb-8">
+          <p className="text-xs font-semibold tracking-[0.18em] uppercase text-royal-gold mb-1">
+            Phase 1 · Office beta strategy
+          </p>
+          <h2 className="font-serif text-xl font-bold text-royal-blue mb-2">
+            Product proof + CAC discovery
+          </h2>
+          <p className="text-sm text-royal-blue/70 leading-relaxed mb-4 max-w-3xl">
+            {BP_BETA_STRATEGY.purpose}
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-3 mb-5">
+            {BP_BETA_STRATEGY.pillars.map((p) => (
+              <div
+                key={p.title}
+                className="rounded-xl border border-royal-gold/20 bg-royal-cream/40 p-3"
+              >
+                <p className="font-semibold text-royal-blue text-sm mb-1">
+                  {p.title}
+                </p>
+                <p className="text-xs text-royal-blue/65 leading-relaxed">
+                  {p.detail}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-4 mb-4">
+            <h3 className="font-serif text-lg font-bold text-royal-blue mb-1">
+              {BP_BETA_STRATEGY.cacTest.title}
+            </h3>
+            <p className="text-sm text-royal-blue/70 mb-3 leading-relaxed">
+              {BP_BETA_STRATEGY.cacTest.why}
+            </p>
+            <div className="grid sm:grid-cols-2 gap-3 text-sm text-royal-blue/75 mb-3">
+              <p>
+                <span className="font-semibold text-royal-blue">Budget: </span>
+                {BP_BETA_STRATEGY.cacTest.budget}
+              </p>
+              <p>
+                <span className="font-semibold text-royal-blue">Offer: </span>
+                {BP_BETA_STRATEGY.cacTest.offer}
+              </p>
+              <p className="sm:col-span-2">
+                <span className="font-semibold text-royal-blue">Creative: </span>
+                {BP_BETA_STRATEGY.cacTest.creative}
+              </p>
+              <p className="sm:col-span-2">
+                <span className="font-semibold text-royal-blue">Channels: </span>
+                {BP_BETA_STRATEGY.cacTest.channels.join(" · ")}
+              </p>
+            </div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-emerald-800 mb-2">
+              Track
+            </p>
+            <div className="flex flex-wrap gap-1.5 mb-3">
+              {BP_BETA_STRATEGY.cacTest.track.map((t) => (
+                <span
+                  key={t}
+                  className="text-[11px] rounded-full bg-white border border-emerald-200 px-2 py-0.5 text-royal-blue/70"
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-emerald-800 mb-2">
+              CAC bands
+            </p>
+            <ul className="space-y-1 mb-3">
+              {BP_BETA_STRATEGY.cacTest.targets.map((t) => (
+                <li
+                  key={t.band}
+                  className="text-xs text-royal-blue/75 flex flex-col sm:flex-row sm:gap-2"
+                >
+                  <span className="font-mono font-bold text-emerald-800 shrink-0">
+                    {t.band}
+                  </span>
+                  <span>{t.read}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="text-sm text-royal-blue/80 font-medium leading-relaxed border-t border-emerald-200 pt-3">
+              {BP_BETA_STRATEGY.cacTest.ruleOfThumb}
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-royal-blue/50 mb-2">
+                Beta scorecard
+              </p>
+              <ul className="space-y-2">
+                {BP_BETA_STRATEGY.scorecard.map((s) => (
+                  <li
+                    key={s.metric}
+                    className="text-sm text-royal-blue/75 leading-relaxed"
+                  >
+                    <span className="font-semibold text-royal-blue">
+                      {s.metric}:
+                    </span>{" "}
+                    {s.target}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-royal-blue/50 mb-2">
+                Sequence
+              </p>
+              <ol className="space-y-1.5 list-decimal pl-4">
+                {BP_BETA_STRATEGY.sequence.map((step) => (
+                  <li
+                    key={step}
+                    className="text-sm text-royal-blue/75 leading-relaxed"
+                  >
+                    {step}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </div>
+          <p className="text-sm text-royal-blue/70 mt-4 leading-relaxed border-t border-royal-gold/20 pt-3">
+            <strong className="text-royal-blue">Decision rule: </strong>
+            {BP_BETA_STRATEGY.decisionRule}
+          </p>
+        </section>
 
         {/* Set capacity reality */}
         <section className="rounded-2xl border border-royal-gold/30 bg-white p-5 sm:p-6 mb-8">

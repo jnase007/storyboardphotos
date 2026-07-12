@@ -138,6 +138,7 @@ export const BP_PHASE_ROADMAP = {
         "Can siblings finish in 60 minutes?",
         "What is real average ticket (solo vs sibling vs add-ons)?",
         "Can we fill ~12–20 sessions/month from warm network + light ads?",
+        "What is real paid CAC (ad spend per paying family)?",
       ],
       includes: [
         "One main set at the office (scenes swap out — not permanent rooms)",
@@ -1020,6 +1021,79 @@ export const BP_ONE_STORE_300K = {
   verdict:
     "One retail store can clear $300K net. Plan for ~$550–650K revenue and ~75 sessions/month-class throughput (or equivalent mix). Do not expect $300K net from office beta or a half-full single-lane calendar.",
 } as const;
+
+/**
+ * Phase 1 office beta strategy — product proof + CAC discovery.
+ * The critical unknown is ad cost to acquire a paying family.
+ */
+export const BP_BETA_STRATEGY = {
+  purpose:
+    "Office beta exists to prove two things before a retail lease: (1) product/session quality, (2) paid acquisition CAC — what it costs to get a paying client.",
+  pillars: [
+    {
+      title: "Product proof",
+      detail:
+        "One main set with scene swaps. 3–10 real sessions. Confirm 60-minute flow (including siblings), gift-worthy books, and transparent package pricing parents accept.",
+    },
+    {
+      title: "CAC discovery (critical unknown)",
+      detail:
+        "Run real ads against a real offer after beta creative exists. Learn cost per deposited/paid session — not likes or clicks. This number decides whether scaling is profitable.",
+    },
+    {
+      title: "Ops learning",
+      detail:
+        "Sequential sessions only at the office. Document SOPs, show rate, rework rate, and fulfillment time before multi-set retail volume.",
+    },
+  ],
+  cacTest: {
+    title: "Beta CAC ad test",
+    why: "Marketing ability is strong; the unknown is conversion cost. Beta + ads answers it cheaply.",
+    budget: "$1,500–$3,000 learning budget (or $50–$150/day for 2–3 weeks)",
+    offer: "Clear kingdom session + storybook offer with transparent pricing / from-price. Deposit required.",
+    creative: "Real beta kids/sessions only — no fake stock once tests start",
+    channels: ["Meta local (primary)", "Warm/organic baseline for comparison", "Optional Google/local search"],
+    track: [
+      "Ad spend",
+      "Leads",
+      "Booked sessions",
+      "Show-ups",
+      "Paying families (deposited/paid)",
+      "Average ticket",
+      "CAC = ad spend ÷ paying families",
+      "Ticket ÷ CAC payback signal",
+    ],
+    targets: [
+      { band: "<$75 CAC", read: "Excellent — scale aggressively once ops ready" },
+      { band: "$75–$150 CAC", read: "Strong / scalable for this model" },
+      { band: "$150–$250 CAC", read: "Workable if ticket/siblings/add-ons strong" },
+      { band: "$250–$350 CAC", read: "Tight — improve offer/creative before retail bet" },
+      { band: ">$350 CAC", read: "Do not scale spend; fix funnel or offer first" },
+    ],
+    ruleOfThumb:
+      "Aim for CAC under ~25–30% of average ticket early. Example: $560 ticket → keep CAC ideally ≤ $150–170, better near $100–120.",
+  },
+  scorecard: [
+    { metric: "CAC to paid session", target: "Discover real number; green if ≤ $150 (stretch ≤ $120)" },
+    { metric: "Average ticket", target: "≥ $480 (path to $520–$560+)" },
+    { metric: "Show rate", target: "≥ 85–90% of booked" },
+    { metric: "Book quality / rework", target: "< 15% major redo" },
+    { metric: "Sibling session time", target: "Complete in 60 minutes" },
+    { metric: "Sessions/month (organic+paid)", target: "≥ 12–16 before retail conversation hardens" },
+  ],
+  sequence: [
+    "Build one main office set (scene-swap capable)",
+    "Run 3–5 private/friends-family sessions → sample books + ad creative",
+    "Lock landing page + booking + deposit",
+    "Launch $1.5–3K CAC ad test",
+    "Review scorecard weekly",
+    "Only then model retail lease against proven CAC + ticket",
+  ],
+  decisionRule:
+    "If CAC is healthy and product quality holds, marketing can fill a retail store. If CAC is ugly, do not lease — fix offer/funnel first. Beta is for learning CAC and product, not for forcing $300K-net volume.",
+} as const;
+
+
 
 
 export const BP_EXECUTIVE_SUMMARY =
