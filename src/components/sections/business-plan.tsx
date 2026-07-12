@@ -104,6 +104,13 @@ export function BusinessPlanSection() {
 
         <div className="mb-8 flex flex-col sm:flex-row sm:justify-end gap-2 print:hidden">
           <Link
+            href="/business-plan/phases"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-royal-gold/40 bg-white px-5 text-sm font-semibold text-royal-blue shadow-sm hover:border-royal-gold hover:bg-royal-gold/10 transition-colors"
+          >
+            <Target className="h-4 w-4 text-royal-gold" />
+            Phase Decision
+          </Link>
+          <Link
             href="/business-plan/proforma"
             className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-royal-gold/40 bg-white px-5 text-sm font-semibold text-royal-blue shadow-sm hover:border-royal-gold hover:bg-royal-gold/10 transition-colors"
           >

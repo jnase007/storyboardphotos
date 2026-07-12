@@ -40,7 +40,15 @@ const ADMIN_LINKS = [
       (path.startsWith("/business-plan/") &&
         !path.startsWith("/business-plan/print") &&
         !path.startsWith("/business-plan/cost-breakdown") &&
-        !path.startsWith("/business-plan/proforma")),
+        !path.startsWith("/business-plan/proforma") &&
+        !path.startsWith("/business-plan/phases")),
+  },
+  {
+    href: "/business-plan/phases",
+    label: "Phases",
+    shortLabel: "Phases",
+    icon: ClipboardList,
+    match: (path: string) => path.startsWith("/business-plan/phases"),
   },
   {
     href: "/business-plan/cost-breakdown",

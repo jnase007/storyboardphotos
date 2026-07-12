@@ -109,66 +109,233 @@ export const BP_FULFILLMENT_PROCESS = [
 ] as const;
 
 /**
- * Phase 1 — launch ops: photo sessions + weekend birthday parties
- * (before owning a permanent home / full tea house).
+ * Three-phase roadmap (real decision path):
+ * 1) Beta at Brandastic office
+ * 2) Full retail location + kitchen (birthdays) — most likely next scale step
+ * 3) Multi-set / multi-photographer scale
  */
+export const BP_PHASE_ROADMAP = {
+  summary:
+    "Phase 1 proves the product at our office (low capital). Phase 2 is the real scale decision: full retail + kitchen for birthdays — only after beta numbers clear the gate. Phase 3 adds parallel sets/team once the retail location is full.",
+  phases: [
+    {
+      id: "beta",
+      name: "Phase 1 — Beta at the Office",
+      likelihood: "Now",
+      goal: "Prove session flow, book quality, demand, and unit economics with minimal rent risk.",
+      location: "Brandastic / existing office space",
+      capitalMid: 25000,
+      capitalRange: "$10K–$40K",
+      monthlyFixedOpex: 4500,
+      sessionsPerMonthTarget: 16,
+      avgTicket: 500,
+      birthdayPartiesPerMonth: 2,
+      birthdayAvgTicket: 650,
+      annualizedRevIfSteady: 112800,
+      whatWeLearn: [
+        "Do parents love the experience enough to pay transparent package prices?",
+        "Is the storybook gift-worthy every time?",
+        "Can siblings finish in 60 minutes?",
+        "What is real average ticket (solo vs sibling vs add-ons)?",
+        "Can we fill ~12–20 sessions/month from warm network + light ads?",
+      ],
+      includes: [
+        "1–2 sets (not full 4-set build)",
+        "Photo sessions + simple birthday add-ons",
+        "Full book production pipeline",
+        "Booking, deposits, SOPs",
+      ],
+      notYet: [
+        "Full retail lease",
+        "Commercial kitchen / tea house",
+        "Multi-photographer staffing",
+      ],
+    },
+    {
+      id: "retail",
+      name: "Phase 2 — Full Retail + Kitchen",
+      likelihood: "Most likely scale step",
+      goal: "Purpose-built customer location: sessions all week + real birthday parties with kitchen capability.",
+      location: "Leased retail / studio with kitchen (OC)",
+      capitalMid: 175000,
+      capitalRange: "$130K–$250K",
+      monthlyFixedOpex: 16000,
+      sessionsPerMonthTarget: 45,
+      avgTicket: 560,
+      birthdayPartiesPerMonth: 6,
+      birthdayAvgTicket: 850,
+      annualizedRevIfSteady: 363600,
+      triggerToPull:
+        "Only after beta clears the gate metrics — do not sign a big retail lease on hope.",
+      gateMetrics: [
+        { metric: "Sessions / month (beta)", target: "≥ 16 for 2 consecutive months" },
+        { metric: "Average ticket", target: "≥ $480" },
+        { metric: "Show-up / completion rate", target: "≥ 90%" },
+        { metric: "Book rework rate", target: "< 15% needing major redo" },
+        { metric: "Contribution after COGS", target: "≥ $400 / session" },
+        { metric: "Warm demand waitlist", target: "≥ 25 families interested in retail open" },
+        { metric: "Owner capacity", target: "Can staff 3–4 session days/week without burning Brandastic" },
+      ],
+      includes: [
+        "Full set build (2–4 kingdom sets)",
+        "Retail storefront experience",
+        "Kitchen for birthday parties / tea-house style gatherings",
+        "Higher birthday ticket + more weekend party slots",
+        "Part-time staff / assistant coverage",
+      ],
+      rentCaution:
+        "If rent pushes fixed OpEx above ~$18–20K/mo, recalculate break-even before signing. Pretty space that can't break even is a trap.",
+    },
+    {
+      id: "scale",
+      name: "Phase 3 — Scale (Multi-Set / Team)",
+      likelihood: "After retail is full",
+      goal: "Parallel lanes: multiple sets running, multiple photographers, higher birthday volume.",
+      location: "Same retail home (expanded ops) or second site later",
+      capitalMid: 80000,
+      capitalRange: "$50K–$150K incremental",
+      monthlyFixedOpex: 35000,
+      sessionsPerMonthTarget: 120,
+      avgTicket: 600,
+      birthdayPartiesPerMonth: 12,
+      birthdayAvgTicket: 950,
+      annualizedRevIfSteady: 1008000,
+      triggerToPull:
+        "Retail calendar is consistently full; turning away customers; contribution margins still healthy after staff costs.",
+      includes: [
+        "4 sets concurrent where layout allows",
+        "2–4 photographers",
+        "Birthday program fully staffed",
+        "Systems for QA, scheduling, fulfillment at volume",
+      ],
+    },
+  ],
+} as const;
+
+/** @deprecated Use BP_PHASE_ROADMAP — kept as aliases for existing UI sections */
 export const BP_PHASE_ONE = [
   {
-    title: "Core product: kingdom photo sessions",
+    title: "Beta at the office (now)",
     detail:
-      "Weekday + weekend sessions stay the engine — 60-minute max shoots (siblings included), transparent packages, and Kingdom Chronicles books.",
+      "Run sessions out of our existing office with 1–2 sets. Prove demand, 60-minute flow, book quality, and real average ticket before any big retail lease.",
   },
   {
-    title: "Weekend birthday parties (Phase 1 add-on)",
+    title: "What beta must prove",
     detail:
-      "Add kingdom birthday parties on Saturdays/Sundays as a second revenue stream in Phase 1 — not waiting for Phase 2. Package a short royal photo moment + party time in the studio world (simple food/cake table + costumes/crowns). Higher ticket, high emotion, natural upsell into books and prints.",
+      "Parents pay transparent prices, siblings finish in an hour, books are gift-worthy, and we can fill ~12–20 sessions/month without a storefront.",
   },
   {
-    title: "How weekends are scheduled",
+    title: "Simple birthdays only",
     detail:
-      "Protect photo capacity: e.g. morning session blocks + 1–2 birthday party slots in the afternoon/evening. Party packages can include mini-session portraits for the birthday child (and siblings) inside the same visit.",
+      "Light weekend party add-ons possible in beta (cake table / crowns) — full kitchen parties wait for retail Phase 2.",
   },
   {
-    title: "Why this belongs in Phase 1",
+    title: "Capital stays light",
     detail:
-      "Birthdays drive word-of-mouth, fill slower weekend hours, and raise average revenue per family visit — without needing a full tea house buildout yet. Phase 2 expands this into a dedicated enchanted party space.",
+      "Phase 1 is about learning with limited capital ($10–40K), not building the dream location yet.",
   },
 ] as const;
 
 export const BP_PHASE_ONE_BIRTHDAYS = {
-  headline: "Phase 1 — Weekend Birthdays",
+  headline: "Birthdays by phase",
   summary:
-    "In Phase 1 we run standard kingdom photo sessions and add birthday parties on weekends. Families get the magic now; Phase 2 later upgrades the party experience with a dedicated tea house.",
+    "Beta: simple party add-ons only. Phase 2 retail + kitchen: real birthday program (most likely scale investment). Phase 3: high-volume parties with staff.",
   packageIdeas: [
-    { name: "Royal Birthday Mini", price: "$399–$549", includes: "60–90 min party window · crowns/costumes · birthday child mini-session · digital share link" },
-    { name: "Kingdom Birthday Party", price: "$699–$999", includes: "Party host time · 2 sets for photos · birthday + sibling portraits · 1 hardcover book for birthday child" },
-    { name: "Royal Court Party", price: "$1,200–$1,800", includes: "Larger guest count · full sibling/family books option · prints package · premium party styling" },
+    { name: "Beta Birthday Mini", price: "$399–$549", includes: "Simple party window at office · mini-session · digital share link" },
+    { name: "Retail Kingdom Party", price: "$699–$999", includes: "Kitchen-capable space · 2 sets · birthday + sibling portraits · 1 hardcover book" },
+    { name: "Royal Court Party", price: "$1,200–$1,800", includes: "Larger guests · premium styling · books/prints package (Phase 2+)" },
   ],
   opsNotes: [
-    "Weekends only at first (Sat/Sun) so weekdays stay focused on efficient photo sessions",
-    "1 hour photo standard still applies to the portrait portion",
-    "Simple party setup: cake table, décor, crowns — full kitchen/tea house is Phase 2",
-    "Every birthday is a marketing event: shareable photos + storybook upsell",
+    "Do not build kitchen capacity until beta gate metrics clear",
+    "Phase 2 kitchen is the birthday unlock — and the big lease decision",
+    "Protect photo session blocks even when parties grow",
+    "Every party should still drive a book/print upsell",
   ],
 };
 
 export const BP_PHASE_TWO = [
   {
-    title: "Prove the model first",
+    title: "This is the real 'pull the trigger' decision",
     detail:
-      "Once we know the studio business works — sessions, weekend birthdays, storybooks, and margins — we reinvest profits into a permanent home of our own.",
+      "Full retail location with kitchen is more likely than staying in the office forever — but only after beta numbers make the lease math work.",
   },
   {
-    title: "Own or lease our space",
+    title: "What you're buying in Phase 2",
     detail:
-      "Rent or buy a dedicated location so we are no longer limited by a beta / shared setup, with room to grow sets, staff, and session capacity.",
+      "Customer-facing location, full sets, kitchen for birthdays, higher capacity, brand presence. Capital mid ~$175K + higher monthly fixed costs.",
   },
   {
-    title: "Enchanted tea house attached",
+    title: "Gate before signing",
     detail:
-      "Upgrade Phase 1 weekend birthdays into a full kitchen-equipped tea house connected to the studio — a dedicated gathering space for larger parties, celebrations, and family events that keep everyone inside the same magical world.",
+      "Hit beta metrics (volume, ticket, quality, waitlist). Recalculate break-even with the actual rent. If rent is too high, walk — the location should serve the model, not the other way around.",
   },
 ] as const;
+
+/**
+ * Phase decision economics — office beta vs retail+kitchen vs scale.
+ * Used on proforma / phase decision page so we know when to pull the trigger.
+ */
+export const BP_PHASE_ECONOMICS = {
+  beta: {
+    id: "beta",
+    name: "Phase 1 · Office beta",
+    sessionsPerYear: 192,
+    avgTicket: 500,
+    birthdayPartiesPerYear: 24,
+    birthdayAvgTicket: 650,
+    expenses: [
+      { label: "Extra office overhead / utilities share", annual: 6000 },
+      { label: "Part-time assist (as needed)", annual: 18000 },
+      { label: "Marketing", annual: 18000 },
+      { label: "Insurance (photo rider)", annual: 2400 },
+      { label: "Software / AI / tools", annual: 3600 },
+      { label: "Props refresh / supplies", annual: 3600 },
+      { label: "Misc / admin", annual: 2400 },
+    ],
+    capitalMid: 25000,
+    note: "Low rent risk. Proves product. Not the ceiling.",
+  },
+  retail: {
+    id: "retail",
+    name: "Phase 2 · Retail + kitchen",
+    sessionsPerYear: 540,
+    avgTicket: 560,
+    birthdayPartiesPerYear: 72,
+    birthdayAvgTicket: 850,
+    expenses: [
+      { label: "Rent (retail + kitchen)", annual: 84000 },
+      { label: "Staff / assistants", annual: 48000 },
+      { label: "Marketing", annual: 36000 },
+      { label: "Insurance", annual: 7200 },
+      { label: "Utilities", annual: 9600 },
+      { label: "Software / AI", annual: 4800 },
+      { label: "Maintenance / props / kitchen supplies", annual: 12000 },
+      { label: "Misc / admin", annual: 6000 },
+    ],
+    capitalMid: 175000,
+    note: "Most likely next step after beta. Kitchen unlocks real birthday revenue.",
+  },
+  scale: {
+    id: "scale",
+    name: "Phase 3 · Multi-set scale",
+    sessionsPerYear: 1440,
+    avgTicket: 600,
+    birthdayPartiesPerYear: 144,
+    birthdayAvgTicket: 950,
+    expenses: [
+      { label: "Rent", annual: 96000 },
+      { label: "Photographers & staff", annual: 220000 },
+      { label: "Marketing", annual: 72000 },
+      { label: "Insurance", annual: 12000 },
+      { label: "Utilities", annual: 12000 },
+      { label: "Software / AI", annual: 9600 },
+      { label: "Maintenance / props / kitchen", annual: 24000 },
+      { label: "Misc / admin", annual: 12000 },
+    ],
+    capitalMid: 80000,
+    note: "Incremental capital after retail is full. Team + parallel capacity.",
+  },
+} as const;
 
 /**
  * 3-Year projections — fully operational studio with leased location in OC.
