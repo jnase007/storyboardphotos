@@ -5,6 +5,7 @@ import { PromoBar } from "@/components/promo-bar";
 import { Navbar } from "@/components/layout/navbar";
 import { AdminNav } from "@/components/layout/admin-nav";
 import { Footer } from "@/components/layout/footer";
+import { SiteChrome } from "@/components/layout/site-chrome";
 import { CookieConsent } from "@/components/cookie-consent";
 import { CursorSparkles } from "@/components/cursor-sparkles";
 import { SITE } from "@/lib/constants";
@@ -98,13 +99,17 @@ export default function RootLayout({
     <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
       <body className="min-h-screen">
         <StructuredData />
-        <PromoBar />
-        <Navbar />
-        <AdminNav />
+        <SiteChrome>
+          <PromoBar />
+          <Navbar />
+          <AdminNav />
+        </SiteChrome>
         <main>{children}</main>
-        <Footer />
-        <CookieConsent />
-        <CursorSparkles />
+        <SiteChrome>
+          <Footer />
+          <CookieConsent />
+          <CursorSparkles />
+        </SiteChrome>
         <Toaster
           position="top-center"
           richColors

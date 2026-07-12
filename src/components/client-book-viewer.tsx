@@ -20,7 +20,16 @@ type Book = {
 };
 
 function BookPage({ page, pageNum, total }: { page: StoryPage; pageNum: number; total: number }) {
-  const skipTitles = ["Title Page", "The Dragon Quest", "The Rescue Mission", "The Lost Crown", "The Forest Guardian", "The Kindness Quest", "The Light Treasure", "The Kingdom of Light"];
+  const skipTitles = [
+    "Title Page",
+    "The Dragon Quest",
+    "The Rescue Mission",
+    "The Lost Crown",
+    "The Forest Guardian",
+    "The Kindness Quest",
+    "The Light Treasure",
+    "The Kingdom of Light",
+  ];
   const showTitle = page.title && !skipTitles.includes(page.title);
 
   return (
@@ -28,6 +37,7 @@ function BookPage({ page, pageNum, total }: { page: StoryPage; pageNum: number; 
       {/* Image — top 60% */}
       <div className="flex-shrink-0" style={{ height: "60%" }}>
         {page.imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
           <img src={page.imageUrl} alt={page.title} className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center" style={{ background: "#0A1628" }}>
@@ -51,7 +61,9 @@ function BookPage({ page, pageNum, total }: { page: StoryPage; pageNum: number; 
         </p>
         {/* Page number */}
         <div className="text-center mt-2">
-          <span className="text-xs italic" style={{ color: "#B98A19" }}>{pageNum}</span>
+          <span className="text-xs italic" style={{ color: "#B98A19" }}>
+            {pageNum}
+          </span>
         </div>
       </div>
     </div>
@@ -81,18 +93,30 @@ export function ClientBookViewer({ book }: { book: Book }) {
   return (
     <div
       className="flex flex-col items-center justify-center overflow-hidden"
-      style={{ background: "linear-gradient(135deg, #0A1628 0%, #2D1B4E 100%)", height: "100dvh", paddingTop: "0px", padding: "12px" }}
+      style={{
+        background: "linear-gradient(135deg, #0A1628 0%, #2D1B4E 100%)",
+        minHeight: "100dvh",
+        height: "100dvh",
+        padding: isMobile ? "16px 8px" : "20px 12px",
+        boxSizing: "border-box",
+      }}
     >
       {/* Header */}
-      <div className="text-center mb-4">
-        <h1 className="text-xl font-bold" style={{ color: "#C5A26F", fontFamily: "Georgia, serif" }}>
-          {book.child_name}&apos;s Kingdom Chronicles
+      <div className="text-center mb-3 sm:mb-4 shrink-0">
+        <h1 className="text-lg sm:text-xl font-bold" style={{ color: "#C5A26F", fontFamily: "Georgia, serif" }}>
+          {book.child_name}'s Kingdom Chronicles
         </h1>
         <p className="text-white/40 text-xs mt-1">A Storybook Photos Adventure</p>
       </div>
 
       {/* Book spread */}
-      <div className="flex items-stretch w-full max-w-4xl" style={{ height: isMobile ? "calc(100dvh - 160px)" : "calc(100dvh - 170px)" }}>
+      <div
+        className="flex items-stretch w-full max-w-4xl min-h-0"
+        style={{
+          height: isMobile ? "calc(100dvh - 150px)" : "calc(100dvh - 160px)",
+          maxHeight: "calc(100dvh - 150px)",
+        }}
+      >
         {/* Left arrow */}
         <button
           onClick={() => setSpreadIndex((i) => Math.max(0, i - 1))}
@@ -105,7 +129,7 @@ export function ClientBookViewer({ book }: { book: Book }) {
 
         {/* Book pages */}
         <div
-          className="flex-1 flex rounded-xl overflow-hidden shadow-2xl"
+          className="flex-1 flex rounded-xl overflow-hidden shadow-2xl relative"
           style={{
             boxShadow: "0 25px 60px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(197,162,111,0.2)",
           }}
@@ -128,7 +152,10 @@ export function ClientBookViewer({ book }: { book: Book }) {
           {!isMobile && rightPage && (
             <div
               className="absolute left-1/2 top-0 bottom-0 w-4 -translate-x-1/2 pointer-events-none"
-              style={{ background: "linear-gradient(90deg, rgba(0,0,0,0.15), rgba(0,0,0,0.05), rgba(0,0,0,0.15))", zIndex: 10 }}
+              style={{
+                background: "linear-gradient(90deg, rgba(0,0,0,0.15), rgba(0,0,0,0.05), rgba(0,0,0,0.15))",
+                zIndex: 10,
+              }}
             />
           )}
         </div>
@@ -145,7 +172,7 @@ export function ClientBookViewer({ book }: { book: Book }) {
       </div>
 
       {/* Dot indicators */}
-      <div className="flex gap-2 mt-4">
+      <div className="flex gap-2 mt-3 sm:mt-4 shrink-0">
         {Array.from({ length: totalSpreads }).map((_, i) => (
           <button
             key={i}
@@ -156,7 +183,7 @@ export function ClientBookViewer({ book }: { book: Book }) {
         ))}
       </div>
 
-      <p className="text-white/20 text-xs mt-4">storybookphotos.com</p>
+      <p className="text-white/20 text-xs mt-3 sm:mt-4 shrink-0">storybookphotos.com</p>
     </div>
   );
 }
