@@ -496,5 +496,126 @@ export const BP_COST_BREAKDOWN = {
 };
 
 
+
+/**
+ * Full P&L capacity scenarios — Small vs Large studio.
+ * Annual view: Revenue, COGS, Gross Margin, OpEx, Net.
+ *
+ * COGS per session (cash, excludes owner opportunity cost):
+ *   books/print ~$45 blended, AI ~$2, set consumables ~$8, payment fees ~3% of ticket
+ * Variable marketing tracked in OpEx (ads) rather than COGS for clarity.
+ */
+export const BP_PNL_SCENARIOS = {
+  assumptions: [
+    "60-min max shoot + 15-min reset; siblings included in same hour",
+    "Avg ticket includes package mix + light digital/print attach",
+    "COGS = books, AI, consumables, payment processing (cash costs only)",
+    "Owner draw / opportunity cost is NOT in OpEx (shown separately as note)",
+    "Small = 1 photographer lane · Large = up to 4 parallel set lanes",
+    "Birthday party revenue included as modest weekend add-on in each model",
+  ],
+  cogsPerSession: {
+    bookPrintBlended: 45,
+    ai: 2,
+    consumables: 8,
+    paymentFeeRate: 0.03,
+    note: "Blended hardcover + packaging; AI generation; crowns/props wear; ~3% card fees on ticket",
+  },
+  small: {
+    id: "small",
+    name: "Small Capacity",
+    subtitle: "1 photographer · 1 family at a time · Phase 1 studio",
+    photographers: 1,
+    parallelLanes: 1,
+    sessionsPerYear: 540,
+    avgTicket: 520,
+    birthdayPartiesPerYear: 36,
+    birthdayAvgTicket: 750,
+    expenses: [
+      { label: "Rent", annual: 60000 },
+      { label: "Staff / assistants", annual: 36000 },
+      { label: "Marketing & ads", annual: 30000 },
+      { label: "Insurance", annual: 4800 },
+      { label: "Utilities & internet", annual: 6000 },
+      { label: "Software & AI tools", annual: 3600 },
+      { label: "Maintenance / props refresh", annual: 6000 },
+      { label: "Misc / admin", annual: 4800 },
+    ],
+  },
+  large: {
+    id: "large",
+    name: "Large Capacity",
+    subtitle: "4 sets concurrent · multi-photographer team",
+    photographers: 4,
+    parallelLanes: 4,
+    sessionsPerYear: 3600,
+    avgTicket: 600,
+    birthdayPartiesPerYear: 100,
+    birthdayAvgTicket: 950,
+    expenses: [
+      { label: "Rent (larger / dedicated)", annual: 96000 },
+      { label: "Photographers & staff", annual: 280000 },
+      { label: "Marketing & ads", annual: 90000 },
+      { label: "Insurance", annual: 12000 },
+      { label: "Utilities & internet", annual: 12000 },
+      { label: "Software & AI tools", annual: 12000 },
+      { label: "Maintenance / props / costumes", annual: 24000 },
+      { label: "Misc / admin / accounting", annual: 18000 },
+    ],
+  },
+} as const;
+
+export type BpPnlScenarioInput = typeof BP_PNL_SCENARIOS.small | typeof BP_PNL_SCENARIOS.large;
+
+export function computeBpPnl(scenario: {
+  sessionsPerYear: number;
+  avgTicket: number;
+  birthdayPartiesPerYear: number;
+  birthdayAvgTicket: number;
+  expenses: readonly { label: string; annual: number }[];
+}) {
+  const cogs = BP_PNL_SCENARIOS.cogsPerSession;
+  const sessionRevenue = scenario.sessionsPerYear * scenario.avgTicket;
+  const birthdayRevenue =
+    scenario.birthdayPartiesPerYear * scenario.birthdayAvgTicket;
+  const revenue = sessionRevenue + birthdayRevenue;
+
+  const sessionCogsUnit =
+    cogs.bookPrintBlended +
+    cogs.ai +
+    cogs.consumables +
+    scenario.avgTicket * cogs.paymentFeeRate;
+  const birthdayCogsUnit =
+    60 + // party supplies / simple setup
+    scenario.birthdayAvgTicket * cogs.paymentFeeRate +
+    40; // optional mini book / prints blend
+
+  const cogsSessions = scenario.sessionsPerYear * sessionCogsUnit;
+  const cogsBirthdays = scenario.birthdayPartiesPerYear * birthdayCogsUnit;
+  const cogsTotal = cogsSessions + cogsBirthdays;
+  const grossProfit = revenue - cogsTotal;
+  const grossMarginPct = revenue > 0 ? (grossProfit / revenue) * 100 : 0;
+  const opex = scenario.expenses.reduce((sum, e) => sum + e.annual, 0);
+  const net = grossProfit - opex;
+  const netMarginPct = revenue > 0 ? (net / revenue) * 100 : 0;
+
+  return {
+    sessionRevenue,
+    birthdayRevenue,
+    revenue,
+    sessionCogsUnit,
+    birthdayCogsUnit,
+    cogsSessions,
+    cogsBirthdays,
+    cogsTotal,
+    grossProfit,
+    grossMarginPct,
+    opex,
+    net,
+    netMarginPct,
+    expenses: scenario.expenses,
+  };
+}
+
 export const BP_EXECUTIVE_SUMMARY =
   "Storybook Photos (Kingdom Quests) is a premium fantasy photo studio in Costa Mesa offering kingdom-themed photo sessions for children and families. Clients dress as kings, queens, and royalty and are photographed in custom-built sets. Every session includes the option of a personalized AI-assisted Kingdom Chronicles where the child is the hero of their own adventure.";
