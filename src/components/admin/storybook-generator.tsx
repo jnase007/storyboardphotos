@@ -12,6 +12,7 @@ const ADVENTURE_CARD_IMAGES: Record<string, string> = {
 
 import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   BookOpen,
@@ -191,6 +192,9 @@ function GeneratingView({ status }: { status: string }) {
  * Internal staff tool: upload session photos by set → generate story + art → edit → PDF.
  */
 export function StorybookGenerator() {
+  const searchParams = useSearchParams();
+  const loadId = searchParams.get("id");
+  const [loadingExisting, setLoadingExisting] = useState(Boolean(loadId));
   const [step, setStep] = useState<Step>("form");
   const [childName, setChildName] = useState("");
   const [childAge, setChildAge] = useState(6);
@@ -215,6 +219,81 @@ export function StorybookGenerator() {
   const [genStatus, setGenStatus] = useState("Preparing…");
 
   const page = book?.pages[pageIndex];
+
+  // ── Load existing book from Books Library (?id=...) ─────────────────────
+  useEffect(() => {
+    if (!loadId) {
+      setLoadingExisting(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    async function loadExistingBook() {
+      setLoadingExisting(true);
+      try {
+        const res = await fetch(`/api/admin/storybooks/${loadId}`, {
+          headers: adminHeaders,
+        });
+        const data = await readApiJson<
+          {
+            error?: string;
+            id?: string;
+            child_name?: string;
+            child_age?: number;
+            gender?: StoryGender;
+            notes?: string | null;
+            photo_urls?: string[];
+            pages?: StoryPage[];
+            status?: string;
+            adventure_path?: AdventurePathId;
+          }
+        >(res);
+
+        if (!res.ok) {
+          throw new Error(data.error || "Could not load book");
+        }
+
+        if (cancelled) return;
+
+        const loaded: GeneratedBook = {
+          id: data.id || loadId!,
+          bookTitle: `${data.child_name || "Child"}'s Kingdom Chronicles`,
+          child_name: data.child_name || "Child",
+          child_age: data.child_age || 6,
+          gender: (data.gender as StoryGender) || "other",
+          notes: data.notes ?? null,
+          adventure_path: data.adventure_path,
+          photo_urls: data.photo_urls || [],
+          pages: data.pages || [],
+          status: data.status || "ready",
+        };
+
+        setBook(loaded);
+        setChildName(loaded.child_name);
+        setChildAge(loaded.child_age);
+        setGender(loaded.gender);
+        setNotes(loaded.notes || "");
+        if (loaded.adventure_path) setAdventurePath(loaded.adventure_path);
+        setPageIndex(0);
+        setEditMode(false);
+        setStep("preview");
+        toast.success(`Loaded ${loaded.child_name}'s book`);
+      } catch (err) {
+        if (!cancelled) {
+          toast.error(err instanceof Error ? err.message : "Failed to load book");
+          setStep("form");
+        }
+      } finally {
+        if (!cancelled) setLoadingExisting(false);
+      }
+    }
+
+    loadExistingBook();
+    return () => {
+      cancelled = true;
+    };
+  }, [loadId]);
 
   // ── Character portrait handlers ─────────────────────────────────────────
 
@@ -564,6 +643,17 @@ export function StorybookGenerator() {
     () => SET_UPLOAD_SLOTS.reduce((n, s) => n + setFiles[s.id].length, 0),
     [setFiles]
   );
+
+  if (loadingExisting) {
+    return (
+      <div className="min-h-screen bg-enchanted-cream flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-royal-gold mx-auto mb-3" />
+          <p className="text-royal-blue/60 text-sm">Loading book…</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-enchanted-cream">

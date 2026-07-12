@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { PageShell } from "@/components/layout/page-shell";
 import { PasswordGate } from "@/components/password-gate";
 import { StorybookGenerator } from "@/components/admin/storybook-generator";
@@ -22,7 +23,15 @@ export default function StorybookGeneratorPage() {
         description="Internal staff tool — enter the access code to continue."
         buttonLabel="Open Generator"
       >
-        <StorybookGenerator />
+        <Suspense
+          fallback={
+            <div className="min-h-[40vh] flex items-center justify-center text-royal-blue/50 text-sm">
+              Loading generator…
+            </div>
+          }
+        >
+          <StorybookGenerator />
+        </Suspense>
       </PasswordGate>
     </PageShell>
   );
