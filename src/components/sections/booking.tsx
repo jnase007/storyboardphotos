@@ -73,27 +73,63 @@ export function BookingSection() {
             {KINGDOM_SETS.map((set) => {
               const selected = selectedSetIds.includes(set.id);
               const available = set.available;
+              if (!available) {
+                return (
+                  <div
+                    key={set.id}
+                    className="rounded-xl overflow-hidden text-left relative pointer-events-none select-none grayscale"
+                    style={{
+                      border: "2px solid #d1d5db",
+                      background: "#f3f4f6",
+                      opacity: 0.5,
+                      filter: "grayscale(100%)",
+                    }}
+                    aria-disabled="true"
+                  >
+                    <div className="aspect-[4/3] overflow-hidden relative">
+                      <Image
+                        src={set.image}
+                        alt={set.name}
+                        fill
+                        className="object-cover grayscale brightness-90"
+                      />
+                      <div className="absolute inset-0 bg-gray-500/40" />
+                      <span
+                        className="absolute top-2 left-2 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full"
+                        style={{
+                          background: "#6b7280",
+                          color: "white",
+                        }}
+                      >
+                        Coming soon
+                      </span>
+                    </div>
+                    <div className="p-3 bg-gray-100">
+                      <div className="font-bold text-sm text-gray-500">
+                        {set.name}
+                      </div>
+                      <div className="text-xs text-gray-400 mt-0.5 leading-relaxed line-clamp-2">
+                        Coming soon
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
               return (
                 <button
                   key={set.id}
                   type="button"
-                  disabled={!available}
-                  onClick={() => toggleSet(set.id, available)}
+                  onClick={() => toggleSet(set.id, true)}
                   className="rounded-xl overflow-hidden text-left transition-all relative"
                   style={{
-                    border: selected
-                      ? "2px solid #B98A19"
-                      : available
-                        ? "2px solid #e5e7eb"
-                        : "2px solid #e8e4dc",
+                    border: selected ? "2px solid #B98A19" : "2px solid #e5e7eb",
                     background: selected ? "#F8F4EC" : "white",
                     boxShadow: selected
                       ? "0 0 0 3px rgba(185,138,25,0.15)"
                       : "none",
-                    cursor: available ? "pointer" : "not-allowed",
-                    opacity: available ? 1 : 0.78,
+                    cursor: "pointer",
                   }}
-                  aria-disabled={!available}
                   aria-pressed={selected}
                 >
                   <div className="aspect-[4/3] overflow-hidden relative">
@@ -101,17 +137,16 @@ export function BookingSection() {
                       src={set.image}
                       alt={set.name}
                       fill
-                      className={`object-cover ${available ? "" : "grayscale-[40%]"}`}
+                      className="object-cover"
                     />
                     <span
                       className="absolute top-2 left-2 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full"
                       style={{
-                        background: available ? "#059669" : "#0A1628",
-                        color: available ? "white" : "#C5A26F",
-                        border: available ? "none" : "1px solid rgba(197,162,111,0.45)",
+                        background: "#059669",
+                        color: "white",
                       }}
                     >
-                      {available ? (selected ? "Selected" : "Open now") : "Coming soon"}
+                      {selected ? "Selected" : "Open now"}
                     </span>
                   </div>
                   <div className="p-3">
@@ -119,9 +154,7 @@ export function BookingSection() {
                       {set.name}
                     </div>
                     <div className="text-xs text-gray-500 mt-0.5 leading-relaxed line-clamp-2">
-                      {available
-                        ? set.description
-                        : "Coming soon — not selectable yet"}
+                      {set.description}
                     </div>
                   </div>
                 </button>
