@@ -140,16 +140,20 @@ export const BP_PHASE_ROADMAP = {
         "Can we fill ~12–20 sessions/month from warm network + light ads?",
       ],
       includes: [
-        "1–2 sets (not full 4-set build)",
+        "One main set at the office (scenes swap out — not permanent rooms)",
+        "Sequential sessions only (one family at a time)",
         "Photo sessions + simple birthday add-ons",
         "Full book production pipeline",
         "Booking, deposits, SOPs",
       ],
       notYet: [
-        "Full retail lease",
-        "Commercial kitchen / tea house",
+        "Multiple permanent set rooms",
+        "Parallel shoots at the same time",
+        "Full retail lease + kitchen",
         "Multi-photographer staffing",
       ],
+      opsModel:
+        "Single main set footprint. Change scenes/backdrops/props between sessions or mid-session as needed. Throughput is one shoot at a time — prove demand and quality, not parallel capacity.",
     },
     {
       id: "retail",
@@ -177,12 +181,15 @@ export const BP_PHASE_ROADMAP = {
         { metric: "Owner capacity", target: "Can staff 3–4 session days/week without burning Brandastic" },
       ],
       includes: [
-        "Full set build (2–4 kingdom sets)",
+        "Multiple permanent sets built at once (individual scene rooms/areas)",
+        "Parallel shoots — more than one family/session at the same time when staffed",
         "Retail storefront experience",
         "Kitchen for birthday parties / tea-house style gatherings",
         "Higher birthday ticket + more weekend party slots",
-        "Part-time staff / assistant coverage",
+        "Part-time staff / assistant + path to 2nd photographer",
       ],
+      opsModel:
+        "True multi-set layout. Unlike office beta scene-swaps, sets stay standing so capacity can scale with photographers — feed multiple shoots in parallel.",
       rentCaution:
         "If rent pushes fixed OpEx above ~$18–20K/mo, recalculate break-even before signing. Pretty space that can't break even is a trap.",
     },
@@ -203,11 +210,13 @@ export const BP_PHASE_ROADMAP = {
       triggerToPull:
         "Retail calendar is consistently full; turning away customers; contribution margins still healthy after staff costs.",
       includes: [
-        "4 sets concurrent where layout allows",
-        "2–4 photographers",
+        "All set rooms running in parallel",
+        "2–4 photographers feeding simultaneous shoots",
         "Birthday program fully staffed",
         "Systems for QA, scheduling, fulfillment at volume",
       ],
+      opsModel:
+        "Maximize utilization of permanent multi-set retail footprint — the capacity unlock that office scene-swapping cannot match.",
     },
   ],
 } as const;
@@ -217,7 +226,7 @@ export const BP_PHASE_ONE = [
   {
     title: "Beta at the office (now)",
     detail:
-      "Run sessions out of our existing office with 1–2 sets. Prove demand, 60-minute flow, book quality, and real average ticket before any big retail lease.",
+      "One main set at the office — swap scenes/props as needed (not separate rooms). One family at a time. Prove demand, 60-minute flow, book quality, and real average ticket before any big retail lease.",
   },
   {
     title: "What beta must prove",
@@ -262,7 +271,7 @@ export const BP_PHASE_TWO = [
   {
     title: "What you're buying in Phase 2",
     detail:
-      "Customer-facing location, full sets, kitchen for birthdays, higher capacity, brand presence. Capital mid ~$175K + higher monthly fixed costs.",
+      "Customer-facing location with multiple permanent sets (not scene swaps), kitchen for birthdays, parallel shoots when staffed, brand presence. Capital mid ~$175K + higher monthly fixed costs. This is the throughput jump the office cannot do.",
   },
   {
     title: "Gate before signing",
@@ -275,6 +284,16 @@ export const BP_PHASE_TWO = [
  * Phase decision economics — office beta vs retail+kitchen vs scale.
  * Used on proforma / phase decision page so we know when to pull the trigger.
  */
+/** Office beta vs retail: set footprint difference */
+export const BP_SET_CAPACITY_NOTE = {
+  beta:
+    "Office beta: one main set. Scenes can be switched out (different looks), but there are not individual rooms for each kingdom set. Sessions run one at a time.",
+  retail:
+    "Retail: build multiple permanent sets at once. Multiple shoots can run in parallel when staffed — real capacity scale, not just nicer space.",
+  implication:
+    "Beta proves willingness to pay and product quality. Retail unlocks simultaneous throughput (multi-set, multi-shoot feed). Don't model office beta as if it had 4 standing rooms.",
+};
+
 export const BP_PHASE_ECONOMICS = {
   beta: {
     id: "beta",

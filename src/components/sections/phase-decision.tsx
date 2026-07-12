@@ -15,6 +15,7 @@ import {
 import {
   BP_PHASE_ROADMAP,
   BP_PHASE_ECONOMICS,
+  BP_SET_CAPACITY_NOTE,
   computeBpPnl,
 } from "@/lib/business-plan-content";
 
@@ -98,6 +99,35 @@ export function PhaseDecisionSection() {
           </p>
         </header>
 
+        {/* Set capacity reality */}
+        <section className="rounded-2xl border border-royal-gold/30 bg-white p-5 sm:p-6 mb-8">
+          <h2 className="font-serif text-xl font-bold text-royal-blue mb-3">
+            The real capacity difference
+          </h2>
+          <div className="grid md:grid-cols-2 gap-4 mb-3">
+            <div className="rounded-xl border border-royal-gold/20 bg-royal-cream/40 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-royal-gold mb-1">
+                Office beta
+              </p>
+              <p className="text-sm text-royal-blue/75 leading-relaxed">
+                {BP_SET_CAPACITY_NOTE.beta}
+              </p>
+            </div>
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700 mb-1">
+                Retail location
+              </p>
+              <p className="text-sm text-royal-blue/75 leading-relaxed">
+                {BP_SET_CAPACITY_NOTE.retail}
+              </p>
+            </div>
+          </div>
+          <p className="text-sm text-royal-blue/65 leading-relaxed">
+            <strong className="text-royal-blue">Implication:</strong>{" "}
+            {BP_SET_CAPACITY_NOTE.implication}
+          </p>
+        </section>
+
         {/* Path strip */}
         <div className="flex flex-col sm:flex-row items-stretch gap-2 mb-10">
           {["1. Office beta", "2. Retail + kitchen", "3. Multi-set scale"].map(
@@ -148,6 +178,14 @@ export function PhaseDecisionSection() {
                 <p className="text-sm text-royal-blue/70 leading-relaxed">
                   {phase.goal}
                 </p>
+                {"opsModel" in phase && phase.opsModel && (
+                  <p className="text-xs text-royal-blue/55 leading-relaxed rounded-lg bg-royal-blue/[0.03] border border-royal-gold/15 p-2.5">
+                    <span className="font-semibold text-royal-blue/70">
+                      Ops:{" "}
+                    </span>
+                    {phase.opsModel}
+                  </p>
+                )}
                 <div className="grid grid-cols-2 gap-2">
                   <div className="rounded-lg bg-royal-cream/50 p-2.5">
                     <p className="text-[10px] uppercase text-royal-blue/45 font-semibold">
