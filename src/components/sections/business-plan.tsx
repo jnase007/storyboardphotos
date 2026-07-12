@@ -16,6 +16,7 @@ import {
   Home,
   FileDown,
   PartyPopper,
+  ClipboardList,
 } from "lucide-react";
 import {
   BP_ADVANTAGES as ADVANTAGES,
@@ -102,6 +103,13 @@ export function BusinessPlanSection() {
         </motion.div>
 
         <div className="mb-8 flex flex-col sm:flex-row sm:justify-end gap-2 print:hidden">
+          <Link
+            href="/business-plan/proforma"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-royal-gold/40 bg-white px-5 text-sm font-semibold text-royal-blue shadow-sm hover:border-royal-gold hover:bg-royal-gold/10 transition-colors"
+          >
+            <ClipboardList className="h-4 w-4 text-royal-gold" />
+            Pre-Launch Proforma
+          </Link>
           <Link
             href="/business-plan/cost-breakdown"
             className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-royal-gold/40 bg-white px-5 text-sm font-semibold text-royal-blue shadow-sm hover:border-royal-gold hover:bg-royal-gold/10 transition-colors"

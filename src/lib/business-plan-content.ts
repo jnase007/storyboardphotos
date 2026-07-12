@@ -617,5 +617,151 @@ export function computeBpPnl(scenario: {
   };
 }
 
+/**
+ * Pre-launch proforma — what we need to know before we start.
+ * Startup capital, monthly ramp Year 1, annual Y1–Y3, break-even, cash buffer.
+ */
+export const BP_PROFORMA = {
+  purpose:
+    "Planning proforma before launch: capital to open, monthly ramp, Year 1–3 P&L, break-even sessions, and cash buffer so we know the number before we start.",
+  startupUses: [
+    { item: "Studio build-out (kingdom sets)", mid: 60000, note: "Throne / forest / garden / castle sets" },
+    { item: "Lighting & camera", mid: 12000, note: "Primary + backup kit" },
+    { item: "Props, costumes, crowns", mid: 15000, note: "Child sizes + refresh stock" },
+    { item: "Signage & branding", mid: 4000, note: "Exterior + in-studio" },
+    { item: "Tech / computers / AI tools", mid: 4000, note: "Editing + generator stack" },
+    { item: "Launch marketing", mid: 8000, note: "Ads, soft, partnerships" },
+    { item: "Deposits, legal, insurance setup", mid: 7000, note: "Lease deposit, LLC, policies" },
+    { item: "Opening inventory / supplies", mid: 3000, note: "Packaging, books buffer" },
+  ],
+  workingCapital: {
+    monthsOpExReserve: 3,
+    monthlyOpExMid: 14000,
+    reserve: 42000,
+    note: "3 months operating expenses as cash buffer before volume stabilizes",
+  },
+  totalCapitalNeededMid: 155000,
+  capitalRange: { low: 120000, high: 200000 },
+  capitalNote:
+    "Mid case ~$155K = ~$113K one-time build/launch + ~$42K working capital. Raise/save enough to open without living session-to-session.",
+  year1MonthlyRamp: [
+    { month: "M1", sessions: 8, avgTicket: 450, birthdayParties: 0, note: "Soft open / friends & family" },
+    { month: "M2", sessions: 12, avgTicket: 470, birthdayParties: 1, note: "Local ads live" },
+    { month: "M3", sessions: 16, avgTicket: 490, birthdayParties: 1, note: "Referrals starting" },
+    { month: "M4", sessions: 20, avgTicket: 500, birthdayParties: 2, note: "Weekend birthdays begin" },
+    { month: "M5", sessions: 24, avgTicket: 510, birthdayParties: 2, note: "Toward break-even pace" },
+    { month: "M6", sessions: 28, avgTicket: 520, birthdayParties: 3, note: "Break-even zone" },
+    { month: "M7", sessions: 32, avgTicket: 530, birthdayParties: 3, note: "Steady marketing" },
+    { month: "M8", sessions: 36, avgTicket: 540, birthdayParties: 3, note: "Church / mom groups" },
+    { month: "M9", sessions: 40, avgTicket: 550, birthdayParties: 4, note: "Holiday interest" },
+    { month: "M10", sessions: 42, avgTicket: 560, birthdayParties: 4, note: "Peak season prep" },
+    { month: "M11", sessions: 45, avgTicket: 570, birthdayParties: 4, note: "Holiday bookings" },
+    { month: "M12", sessions: 48, avgTicket: 580, birthdayParties: 5, note: "Strong close" },
+  ],
+  birthdayAvgTicket: 750,
+  monthlyFixedOpEx: [
+    { label: "Rent", amount: 5000 },
+    { label: "Staff / assist", amount: 3500 },
+    { label: "Marketing", amount: 2500 },
+    { label: "Insurance", amount: 400 },
+    { label: "Utilities", amount: 500 },
+    { label: "Software / AI", amount: 300 },
+    { label: "Maintenance / misc", amount: 800 },
+  ],
+  annualYears: [
+    {
+      year: "Year 1",
+      sessions: 351,
+      avgTicket: 530,
+      birthdayParties: 32,
+      birthdayAvgTicket: 750,
+      opex: 156000,
+      note: "Ramp year — not full capacity. Prove product + local demand.",
+    },
+    {
+      year: "Year 2",
+      sessions: 720,
+      avgTicket: 560,
+      birthdayParties: 48,
+      birthdayAvgTicket: 800,
+      opex: 180000,
+      note: "Full schedule developing. 2nd part-time help. Birthdays steady.",
+    },
+    {
+      year: "Year 3",
+      sessions: 960,
+      avgTicket: 600,
+      birthdayParties: 60,
+      birthdayAvgTicket: 850,
+      opex: 210000,
+      note: "Near single-lane capacity. Option to add parallel sets / 2nd photog.",
+    },
+  ],
+  breakEven: {
+    monthlyFixedMid: 13000,
+    contributionPerSession: 450,
+    sessionsPerMonth: 29,
+    note: "Roughly ~29 sessions/month at ~$520 ticket (~$450 contribution after COGS) covers ~$13K fixed OpEx. Target by Month 5–7.",
+  },
+  goNoGo: [
+    "Capital ready: mid ~$155K (or phased open with lower set build)",
+    "Location locked with parking + kid-friendly access",
+    "1 complete sample book + portrait workflow proven",
+    "Booking site + packages live; calendar can take deposits",
+    "3-month cash reserve still in bank after build-out",
+    "Owner can run sessions 3–4 days/week for first 6 months",
+  ],
+} as const;
+
+export function computeProformaMonth(input: {
+  sessions: number;
+  avgTicket: number;
+  birthdayParties: number;
+  birthdayAvgTicket: number;
+  fixedOpex: number;
+}) {
+  const cogs = BP_PNL_SCENARIOS.cogsPerSession;
+  const sessionRevenue = input.sessions * input.avgTicket;
+  const birthdayRevenue = input.birthdayParties * input.birthdayAvgTicket;
+  const revenue = sessionRevenue + birthdayRevenue;
+  const sessionCogs =
+    input.sessions *
+    (cogs.bookPrintBlended +
+      cogs.ai +
+      cogs.consumables +
+      input.avgTicket * cogs.paymentFeeRate);
+  const birthdayCogs =
+    input.birthdayParties *
+    (60 + input.birthdayAvgTicket * cogs.paymentFeeRate + 40);
+  const cogsTotal = sessionCogs + birthdayCogs;
+  const gross = revenue - cogsTotal;
+  const net = gross - input.fixedOpex;
+  return {
+    sessionRevenue,
+    birthdayRevenue,
+    revenue,
+    cogsTotal,
+    gross,
+    fixedOpex: input.fixedOpex,
+    net,
+  };
+}
+
+export function computeProformaYear(input: {
+  sessions: number;
+  avgTicket: number;
+  birthdayParties: number;
+  birthdayAvgTicket: number;
+  opex: number;
+}) {
+  return computeProformaMonth({
+    sessions: input.sessions,
+    avgTicket: input.avgTicket,
+    birthdayParties: input.birthdayParties,
+    birthdayAvgTicket: input.birthdayAvgTicket,
+    fixedOpex: input.opex,
+  });
+}
+
 export const BP_EXECUTIVE_SUMMARY =
   "Storybook Photos (Kingdom Quests) is a premium fantasy photo studio in Costa Mesa offering kingdom-themed photo sessions for children and families. Clients dress as kings, queens, and royalty and are photographed in custom-built sets. Every session includes the option of a personalized AI-assisted Kingdom Chronicles where the child is the hero of their own adventure.";

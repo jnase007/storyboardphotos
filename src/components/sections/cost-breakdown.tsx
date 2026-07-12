@@ -225,13 +225,19 @@ export function CostBreakdownSection() {
   return (
     <article className="py-12 sm:py-16 bg-enchanted-cream">
       <div className="container mx-auto px-4 lg:px-8 max-w-6xl">
-        <div className="mb-6">
+        <div className="mb-6 flex flex-wrap gap-3">
           <Link
             href="/business-plan"
             className="inline-flex items-center gap-2 text-sm font-semibold text-royal-blue/70 hover:text-royal-blue"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Business Plan
+            Business Plan
+          </Link>
+          <Link
+            href="/business-plan/proforma"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-royal-blue/70 hover:text-royal-blue"
+          >
+            Pre-Launch Proforma
           </Link>
         </div>
 
