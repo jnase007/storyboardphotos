@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -14,6 +15,7 @@ import {
   Printer,
   Home,
   FileDown,
+  PartyPopper,
 } from "lucide-react";
 import {
   BP_ADVANTAGES as ADVANTAGES,
@@ -60,6 +62,28 @@ function SectionHeading({
 }
 
 export function BusinessPlanSection() {
+  const [tab, setTab] = useState<
+    | "overview"
+    | "operations"
+    | "revenue"
+    | "market"
+    | "growth"
+    | "phases"
+    | "product"
+    | "risks"
+  >("overview");
+
+  const tabs = [
+    { id: "overview" as const, label: "Overview", icon: Crown },
+    { id: "operations" as const, label: "Operations", icon: Building2 },
+    { id: "revenue" as const, label: "Revenue", icon: TrendingUp },
+    { id: "market" as const, label: "Market", icon: Target },
+    { id: "growth" as const, label: "Growth", icon: TrendingUp },
+    { id: "phases" as const, label: "Phases", icon: PartyPopper },
+    { id: "product" as const, label: "Product", icon: BookOpen },
+    { id: "risks" as const, label: "Risks & Next", icon: ShieldAlert },
+  ];
+
   return (
     <article className="py-12 sm:py-16 bg-enchanted-cream print:bg-white print:py-6">
       <div className="container mx-auto px-4 lg:px-8 max-w-4xl">
@@ -116,7 +140,39 @@ export function BusinessPlanSection() {
           </p>
         </motion.header>
 
+        {/* Tabs — screen only; print still shows full plan via PDF/Print */}
+        <div className="mb-8 print:hidden sticky top-16 z-20 -mx-1 px-1">
+          <div className="rounded-2xl border border-royal-gold/30 bg-white/95 backdrop-blur shadow-sm p-2 overflow-x-auto">
+            <div className="flex gap-1.5 min-w-max">
+              {tabs.map((t) => {
+                const Icon = t.icon;
+                const active = tab === t.id;
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => {
+                      setTab(t.id);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold transition-colors ${
+                      active
+                        ? "bg-royal-blue text-royal-cream shadow-sm"
+                        : "text-royal-blue/65 hover:bg-royal-gold/10 hover:text-royal-blue"
+                    }`}
+                  >
+                    <Icon className={`h-3.5 w-3.5 ${active ? "text-royal-gold" : "text-royal-gold/70"}`} />
+                    {t.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
         <div className="space-y-12 sm:space-y-14">
+
+          <div className={tab === "overview" ? "space-y-12 sm:space-y-14" : "hidden print:block print:space-y-12"}>
           {/* Executive Summary */}
           <motion.section
             initial={{ opacity: 0, y: 16 }}
@@ -130,6 +186,9 @@ export function BusinessPlanSection() {
             </p>
           </motion.section>
 
+          </div>
+
+          <div className={tab === "overview" ? "space-y-12 sm:space-y-14" : "hidden print:block print:space-y-12"}>
           {/* Key Advantages */}
           <motion.section
             initial={{ opacity: 0, y: 16 }}
@@ -150,6 +209,9 @@ export function BusinessPlanSection() {
             </ul>
           </motion.section>
 
+          </div>
+
+          <div className={tab === "operations" ? "space-y-12 sm:space-y-14" : "hidden print:block print:space-y-12"}>
           {/* Operations + Revenue */}
           <div className="grid md:grid-cols-2 gap-6">
             <motion.section
@@ -214,6 +276,9 @@ export function BusinessPlanSection() {
             </motion.section>
           </div>
 
+          </div>
+
+          <div className={tab === "revenue" ? "space-y-12 sm:space-y-14" : "hidden print:block print:space-y-12"}>
           {/* Average Customer Spend */}
           <motion.section
             initial={{ opacity: 0, y: 16 }}
@@ -320,6 +385,9 @@ export function BusinessPlanSection() {
             </div>
           </motion.section>
 
+          </div>
+
+          <div className={tab === "product" ? "space-y-12 sm:space-y-14" : "hidden print:block print:space-y-12"}>
           {/* Interactive sample storybook preview */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -329,6 +397,9 @@ export function BusinessPlanSection() {
             <StorybookPreview />
           </motion.div>
 
+          </div>
+
+          <div className={tab === "market" ? "space-y-12 sm:space-y-14" : "hidden print:block print:space-y-12"}>
           {/* Competitor Pricing Comparison */}
           <section className="mb-14">
             <SectionHeading icon={Target}>
@@ -402,6 +473,9 @@ export function BusinessPlanSection() {
             </div>
           </section>
 
+          </div>
+
+          <div className={tab === "revenue" ? "space-y-12 sm:space-y-14" : "hidden print:block print:space-y-12"}>
           {/* Cost & Margin Breakdown */}
           <section className="mb-14">
             <SectionHeading icon={TrendingUp}>Unit Economics — Cost & Margin</SectionHeading>
@@ -491,6 +565,9 @@ export function BusinessPlanSection() {
             </div>
           </section>
 
+          </div>
+
+          <div className={tab === "revenue" ? "space-y-12 sm:space-y-14" : "hidden print:block print:space-y-12"}>
           {/* Startup Costs */}
           <section className="mb-10">
             <SectionHeading icon={Building2}>Location Startup Investment</SectionHeading>
@@ -532,6 +609,9 @@ export function BusinessPlanSection() {
             </div>
           </section>
 
+          </div>
+
+          <div className={tab === "operations" ? "space-y-12 sm:space-y-14" : "hidden print:block print:space-y-12"}>
           {/* Capacity Model */}
           <section className="mb-8">
             <div className="bg-royal-blue/5 border border-royal-gold/20 rounded-xl p-5 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
@@ -557,6 +637,9 @@ export function BusinessPlanSection() {
             </p>
           </section>
 
+          </div>
+
+          <div className={tab === "operations" ? "space-y-12 sm:space-y-14" : "hidden print:block print:space-y-12"}>
           {/* Session Timing — 1 hour max including siblings */}
           <motion.section
             initial={{ opacity: 0, y: 16 }}
@@ -640,6 +723,9 @@ export function BusinessPlanSection() {
             </div>
           </motion.section>
 
+          </div>
+
+          <div className={tab === "growth" ? "space-y-12 sm:space-y-14" : "hidden print:block print:space-y-12"}>
           {/* Revenue Growth Chart */}
           <motion.section
             initial={{ opacity: 0, y: 16 }}
@@ -658,6 +744,9 @@ export function BusinessPlanSection() {
             <RevenueGrowthChart />
           </motion.section>
 
+          </div>
+
+          <div className={tab === "growth" ? "space-y-12 sm:space-y-14" : "hidden print:block print:space-y-12"}>
           {/* Financial Projections */}
           <motion.section
             initial={{ opacity: 0, y: 16 }}
@@ -790,6 +879,9 @@ export function BusinessPlanSection() {
             </div>
           </motion.section>
 
+          </div>
+
+          <div className={tab === "growth" ? "space-y-12 sm:space-y-14" : "hidden print:block print:space-y-12"}>
           {/* Growth Strategy */}
           <motion.section
             initial={{ opacity: 0, y: 16 }}
@@ -811,6 +903,9 @@ export function BusinessPlanSection() {
             </ul>
           </motion.section>
 
+          </div>
+
+          <div className={tab === "phases" ? "space-y-12 sm:space-y-14" : "hidden print:block print:space-y-12"}>
           {/* Phase One — Sessions + Weekend Birthdays */}
           <motion.section
             initial={{ opacity: 0, y: 16 }}
@@ -881,6 +976,9 @@ export function BusinessPlanSection() {
             </div>
           </motion.section>
 
+          </div>
+
+          <div className={tab === "phases" ? "space-y-12 sm:space-y-14" : "hidden print:block print:space-y-12"}>
           {/* Phase Two */}
           <motion.section
             initial={{ opacity: 0, y: 16 }}
@@ -917,6 +1015,9 @@ export function BusinessPlanSection() {
             </ul>
           </motion.section>
 
+          </div>
+
+          <div className={tab === "product" ? "space-y-12 sm:space-y-14" : "hidden print:block print:space-y-12"}>
           {/* Production & Fulfillment */}
           <motion.section
             initial={{ opacity: 0, y: 16 }}
@@ -1068,6 +1169,9 @@ export function BusinessPlanSection() {
             </p>
           </motion.section>
 
+          </div>
+
+          <div className={tab === "risks" ? "space-y-12 sm:space-y-14" : "hidden print:block print:space-y-12"}>
           {/* Risks */}
           <motion.section
             initial={{ opacity: 0, y: 16 }}
@@ -1106,6 +1210,9 @@ export function BusinessPlanSection() {
             </div>
           </motion.section>
 
+          </div>
+
+          <div className={tab === "risks" ? "space-y-12 sm:space-y-14" : "hidden print:block print:space-y-12"}>
           {/* Next Steps */}
           <motion.section
             initial={{ opacity: 0, y: 16 }}
@@ -1145,6 +1252,7 @@ export function BusinessPlanSection() {
               ))}
             </ol>
           </motion.section>
+          </div>
         </div>
 
         <p className="mt-12 text-center text-xs text-royal-blue/40">
