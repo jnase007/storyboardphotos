@@ -25,15 +25,8 @@ import { PROMO_CODE } from "@/components/promo-bar";
 const VALID_PACKAGES = new Set<string>(PACKAGE_OPTIONS.map((p) => p.value));
 const MAX_CHILDREN = 6;
 
-function buildSpecialRequests(
-  data: BookingFormData,
-  selectedSetLabels?: string[]
-): string {
-  const setLine =
-    selectedSetLabels && selectedSetLabels.length > 0
-      ? `Selected studio sets: ${selectedSetLabels.join(", ")}. Throne Room & Chastle coming soon (not selectable yet).`
-      : "Studio sets for this booking: Forest Garden (Royal Forest + Royal Garden). Throne Room & Chastle coming soon.";
-  const parts: string[] = [setLine];
+function buildSpecialRequests(data: BookingFormData): string {
+  const parts: string[] = [];
 
   if (data.children.length > 1) {
     const extras = data.children
@@ -65,16 +58,7 @@ function buildSpecialRequests(
   return parts.join("\n\n");
 }
 
-type BookingFormProps = {
-  /** Human labels for selected open sets (e.g. Royal Forest) */
-  selectedSetLabels?: string[];
-  selectedQuestId?: string | null;
-};
-
-export function BookingForm({
-  selectedSetLabels,
-  selectedQuestId,
-}: BookingFormProps = {}) {
+export function BookingForm() {
   const searchParams = useSearchParams();
   const packageFromUrl = searchParams.get("package") ?? "";
   const defaultPackage = VALID_PACKAGES.has(packageFromUrl)
@@ -114,10 +98,6 @@ export function BookingForm({
   const onSubmit = async (data: BookingFormData) => {
     try {
       const primary = data.children[0];
-      const notes = buildSpecialRequests(data, selectedSetLabels);
-      const withQuest = selectedQuestId
-        ? `${notes}\n\nSelected quest: ${selectedQuestId}`
-        : notes;
       const payload = {
         parent_name: data.parent_name,
         email: data.email,
@@ -127,7 +107,7 @@ export function BookingForm({
         preferred_date: data.preferred_date,
         num_people: data.num_people,
         package_type: data.package_type,
-        special_requests: withQuest || null,
+        special_requests: buildSpecialRequests(data) || null,
       };
 
       const response = await fetch("/api/bookings", {
@@ -204,20 +184,6 @@ export function BookingForm({
           <p className="text-sm text-royal-blue/55">
             Tell us who&apos;s coming and when you&apos;d like to visit.
           </p>
-          <div
-            className="mt-3 rounded-xl px-3.5 py-2.5 text-sm"
-            style={{
-              background: "rgba(185,138,25,0.08)",
-              border: "1px solid rgba(185,138,25,0.25)",
-              color: "#0A1628",
-            }}
-          >
-            <span className="font-semibold">Sets included now:</span> Forest
-            Garden — Royal Forest & Royal Garden.{" "}
-            <span className="text-royal-blue/60">
-              Throne Room & Chastle coming soon.
-            </span>
-          </div>
         </div>
 
         <div className="grid sm:grid-cols-2 gap-4">

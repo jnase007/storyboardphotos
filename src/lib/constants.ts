@@ -109,8 +109,6 @@ export const KINGDOM_SETS = [
     description:
       "A royal throne room fit for kings and queens — where your story begins.",
     image: "/sets/throne-room.jpg",
-    /** Physical set not built yet — show as coming soon */
-    available: false,
   },
   {
     id: "royal-forest",
@@ -118,8 +116,6 @@ export const KINGDOM_SETS = [
     description:
       "A peaceful woodland kingdom with lantern light and ancient trees — wonder without fear.",
     image: "/sets/royal-forest.webp",
-    /** Opening set for launch (Forest Garden experience) */
-    available: true,
   },
   {
     id: "royal-garden",
@@ -127,8 +123,6 @@ export const KINGDOM_SETS = [
     description:
       "Lush gardens and quiet beauty — a soft, enchanted place to bloom.",
     image: "/sets/royal-garden.webp",
-    /** Opening set for launch (Forest Garden experience) */
-    available: true,
   },
   {
     id: "chastle",
@@ -136,13 +130,8 @@ export const KINGDOM_SETS = [
     description:
       "An enchanted castle realm of bravery and wonder — where heroes rise.",
     image: "/sets/chastle.webp",
-    /** Physical set not built yet — show as coming soon */
-    available: false,
   },
 ] as const;
-
-/** Sets open for booking right now (Forest Garden launch) */
-export const AVAILABLE_KINGDOM_SETS = KINGDOM_SETS.filter((s) => s.available);
 
 export const AI_STYLE_PRESETS = [
   {
