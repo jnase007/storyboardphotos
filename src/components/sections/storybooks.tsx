@@ -147,7 +147,6 @@ export function StorybooksSection() {
                   fill
                   className="object-cover object-center"
                   sizes="(max-width: 1024px) 100vw, 28rem"
-                  priority
                 />
               </div>
               <div className="absolute -right-3 top-3 bottom-3 w-full rounded-lg bg-royal-gold/10 border border-royal-gold/20 -z-10" />

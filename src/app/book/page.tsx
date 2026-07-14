@@ -21,6 +21,9 @@ export default function BookPage() {
           { name: "Book Your Session", path: "/book" },
         ]}
       />
+      <h1 className="sr-only">
+        Book Your Kingdom Photo Session in Costa Mesa
+      </h1>
       <Suspense
         fallback={
           <div className="py-24 text-center text-royal-blue/60">

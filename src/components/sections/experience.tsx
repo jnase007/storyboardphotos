@@ -53,7 +53,6 @@ export function ExperienceSection() {
                 height={938}
                 className="w-full h-auto object-contain drop-shadow-2xl"
                 sizes="(max-width: 1024px) 380px, 460px"
-                priority
               />
             </div>
           </motion.div>

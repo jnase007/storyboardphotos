@@ -37,6 +37,27 @@ export const NAV_LINKS = [
   { href: "/faq", label: "FAQ" },
 ] as const;
 
+export const LOCAL_PAGES = [
+  {
+    href: "/kids-photographer-costa-mesa",
+    label: "Kids Photographer Costa Mesa",
+    navLabel: "Kids Photographer in Costa Mesa",
+    priority: 0.9,
+  },
+  {
+    href: "/children-photography-orange-county",
+    label: "Children Photography Orange County",
+    navLabel: "Children Photography in Orange County",
+    priority: 0.85,
+  },
+  {
+    href: "/storybook-photo-session",
+    label: "Storybook Photo Session",
+    navLabel: "Storybook Photo Sessions",
+    priority: 0.85,
+  },
+] as const;
+
 export const SITE_PAGES = [
   { href: "/", label: "Home", priority: 1 },
   { href: "/experience", label: "The Experience", priority: 0.9 },
@@ -47,6 +68,11 @@ export const SITE_PAGES = [
   { href: "/testimonials", label: "Testimonials", priority: 0.7 },
   { href: "/faq", label: "FAQ", priority: 0.7 },
   { href: "/book", label: "Book Your Session", priority: 1 },
+  ...LOCAL_PAGES.map((page) => ({
+    href: page.href,
+    label: page.label,
+    priority: page.priority,
+  })),
   { href: "/privacy", label: "Privacy Policy", priority: 0.3 },
   { href: "/terms", label: "Terms of Service", priority: 0.3 },
 ] as const;

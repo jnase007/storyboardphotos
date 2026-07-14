@@ -154,10 +154,21 @@ export function StructuredData() {
 
 /** FAQPage schema for AEO / featured-snippet eligibility. */
 export function FaqStructuredData() {
+  return <FaqStructuredDataFromItems items={FAQ_ITEMS} id="ld-faq" />;
+}
+
+/** FAQPage schema from page-specific Q&A pairs (local landings, etc.). */
+export function FaqStructuredDataFromItems({
+  items,
+  id = "ld-faq-custom",
+}: {
+  items: ReadonlyArray<{ question: string; answer: string }>;
+  id?: string;
+}) {
   const data: JsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: FAQ_ITEMS.map((item) => ({
+    mainEntity: items.map((item) => ({
       "@type": "Question",
       name: item.question,
       acceptedAnswer: {
@@ -167,7 +178,7 @@ export function FaqStructuredData() {
     })),
   };
 
-  return <JsonLdScript id="ld-faq" data={data} />;
+  return <JsonLdScript id={id} data={data} />;
 }
 
 type BreadcrumbItem = {

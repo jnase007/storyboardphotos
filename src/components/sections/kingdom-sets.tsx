@@ -158,7 +158,6 @@ export function KingdomSetsSection() {
                   fill
                   className="object-contain"
                   sizes="(max-width: 1100px) 96vw, 1100px"
-                  priority
                 />
                 {/* Prev/Next arrows */}
                 <button

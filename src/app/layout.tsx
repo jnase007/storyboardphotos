@@ -74,8 +74,11 @@ export const metadata: Metadata = {
     canonical: SITE.url,
   },
   icons: {
-    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
-    shortcut: ["/favicon.svg"],
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: ["/favicon.ico"],
   },
   other: {
     "geo.region": "US-CA",

@@ -91,7 +91,6 @@ export function HomeTeasers() {
                 height={840}
                 className="relative z-10 w-full h-auto object-contain drop-shadow-2xl"
                 sizes="(max-width: 1024px) 380px, 480px"
-                priority
               />
               {/* Soft gold line at eye level */}
               <div

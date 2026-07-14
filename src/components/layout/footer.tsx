@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { Crown, Mail, Phone, MapPin, Instagram, Facebook } from "lucide-react";
-import { SITE, NAV_LINKS } from "@/lib/constants";
+import { Crown, Mail, Phone, MapPin } from "lucide-react";
+import { LOCAL_PAGES, NAV_LINKS, SITE } from "@/lib/constants";
 
 export function Footer() {
   return (
@@ -27,22 +27,10 @@ export function Footer() {
             <p className="text-royal-cream/50 text-sm leading-relaxed mb-4">
               {SITE.tagline}
             </p>
-            <div className="flex gap-3">
-              <a
-                href="#"
-                className="p-2 rounded-lg bg-white/5 hover:bg-royal-gold/20 transition-colors"
-                aria-label="Instagram"
-              >
-                <Instagram className="h-4 w-4 text-royal-cream/70" />
-              </a>
-              <a
-                href="#"
-                className="p-2 rounded-lg bg-white/5 hover:bg-royal-gold/20 transition-colors"
-                aria-label="Facebook"
-              >
-                <Facebook className="h-4 w-4 text-royal-cream/70" />
-              </a>
-            </div>
+            <p className="text-royal-cream/40 text-sm leading-relaxed">
+              Kingdom-themed kids photography and personalized storybooks in{" "}
+              {SITE.location}.
+            </p>
           </div>
 
           {/* Quick Links */}
@@ -61,15 +49,50 @@ export function Footer() {
                   </Link>
                 </li>
               ))}
+              <li>
+                <Link
+                  href="/book"
+                  className="text-royal-cream/50 hover:text-royal-gold text-sm transition-colors"
+                >
+                  Book Your Session
+                </Link>
+              </li>
             </ul>
           </div>
 
-          {/* Contact */}
+          {/* Local SEO links */}
+          <div>
+            <h4 className="font-serif font-bold text-royal-cream mb-4">
+              Serving Orange County
+            </h4>
+            <ul className="space-y-2">
+              {LOCAL_PAGES.map((page) => (
+                <li key={page.href}>
+                  <Link
+                    href={page.href}
+                    className="text-royal-cream/50 hover:text-royal-gold text-sm transition-colors"
+                  >
+                    {page.navLabel}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <Link
+                  href="/pricing"
+                  className="text-royal-cream/50 hover:text-royal-gold text-sm transition-colors"
+                >
+                  Session Pricing
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Contact + CTA */}
           <div>
             <h4 className="font-serif font-bold text-royal-cream mb-4">
               Contact
             </h4>
-            <ul className="space-y-3">
+            <ul className="space-y-3 mb-6">
               <li>
                 <a
                   href={`mailto:${SITE.email}`}
@@ -93,17 +116,6 @@ export function Footer() {
                 {SITE.address}
               </li>
             </ul>
-          </div>
-
-          {/* CTA */}
-          <div>
-            <h4 className="font-serif font-bold text-royal-cream mb-4">
-              Ready to Begin?
-            </h4>
-            <p className="text-royal-cream/50 text-sm mb-4">
-              Limited sessions available each month. Give your child a kingdom
-              adventure they&apos;ll never forget.
-            </p>
             <Link
               href="/book"
               className="inline-flex items-center justify-center px-6 py-3 bg-royal-gold text-royal-blue font-semibold rounded-md hover:bg-[#D4B480] transition-colors text-sm"

@@ -68,7 +68,6 @@ export function FAQSection() {
                 height={905}
                 className="relative z-10 w-full h-auto object-contain drop-shadow-2xl"
                 sizes="(max-width: 640px) 300px, (max-width: 1024px) 380px, 460px"
-                priority
               />
               {/* Soft gold line at eye level, extending to the right */}
               <div
