@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { SITE } from "@/lib/constants";
 
 const DEFAULT_OG_IMAGE = {
-  url: "/og-image.jpg",
+  // Absolute www URL avoids metadataBase/env host drift (apex vs www).
+  url: `${SITE.url}/og-image.jpg`,
   width: 1024,
   height: 744,
   alt: `${SITE.name} — ${SITE.tagline}`,
