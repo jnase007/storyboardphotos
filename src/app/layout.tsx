@@ -8,7 +8,7 @@ import { Footer } from "@/components/layout/footer";
 import { SiteChrome } from "@/components/layout/site-chrome";
 import { CookieConsent } from "@/components/cookie-consent";
 import { CursorSparkles } from "@/components/cursor-sparkles";
-import { SITE } from "@/lib/constants";
+import { SITE, SEO_KEYWORDS } from "@/lib/constants";
 import { StructuredData } from "@/components/structured-data";
 import "./globals.css";
 
@@ -25,43 +25,31 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? SITE.url
-  ),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? SITE.url),
   title: {
     default: `${SITE.name} | ${SITE.subtitle} — Kingdom Photo Studio in Costa Mesa`,
     template: `%s | ${SITE.name}`,
   },
   description: SITE.description,
-  keywords: [
-    "storybook photos",
-    "storybookphotos.com",
-    "kingdom quests",
-    "kings and queens photos",
-    "children photography Costa Mesa",
-    "Kingdom Chronicles",
-    "royal photo shoot",
-    "fantasy photo studio",
-    "self esteem for kids",
-    "Kingdom Chronicles",
-    "family photography Orange County",
-  ],
+  keywords: [...SEO_KEYWORDS],
   authors: [{ name: SITE.name, url: SITE.url }],
   creator: SITE.name,
   publisher: SITE.name,
+  category: "Photography",
+  applicationName: SITE.name,
   openGraph: {
     type: "website",
     locale: "en_US",
     url: SITE.url,
-    siteName: `${SITE.name} | ${SITE.subtitle}`,
+    siteName: SITE.name,
     title: `${SITE.name} — ${SITE.tagline}`,
     description: SITE.description,
     images: [
       {
-        url: "/hero-kingdom.jpg",
+        url: "/og-image.jpg",
         width: 1024,
         height: 744,
-        alt: `${SITE.name} — Remind Your Child They Are Royalty`,
+        alt: `${SITE.name} — ${SITE.tagline}`,
       },
     ],
   },
@@ -69,7 +57,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: `${SITE.name} — ${SITE.tagline}`,
     description: SITE.description,
-    images: ["/hero-kingdom.jpg"],
+    images: ["/og-image.jpg"],
   },
   robots: {
     index: true,
@@ -86,7 +74,14 @@ export const metadata: Metadata = {
     canonical: SITE.url,
   },
   icons: {
-    icon: "/favicon.svg",
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+    shortcut: ["/favicon.svg"],
+  },
+  other: {
+    "geo.region": "US-CA",
+    "geo.placename": "Costa Mesa",
+    "geo.position": "33.6846;-117.8865",
+    ICBM: "33.6846, -117.8865",
   },
 };
 

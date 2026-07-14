@@ -2,15 +2,14 @@ import type { Metadata } from "next";
 import { PageShell } from "@/components/layout/page-shell";
 import { PasswordGate } from "@/components/password-gate";
 import { BusinessPlanSection } from "@/components/sections/business-plan";
+import { buildMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildMetadata({
   title: "Business Plan (Internal)",
   description: "Internal business plan for Storybook Photos | Kingdom Quests.",
-  robots: {
-    index: false,
-    follow: false,
-  },
-};
+  path: "/business-plan",
+  noIndex: true,
+});
 
 export default function BusinessPlanPage() {
   return (

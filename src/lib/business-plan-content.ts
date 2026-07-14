@@ -10,7 +10,7 @@ export const BP_ADVANTAGES = [
 export const BP_REVENUE_POINTS = [
   "Session packages starting at $450 (2 kingdom sets included)",
   "Mid and premium tiers at $750 and $1,200 for deeper set coverage + storybooks",
-  "High-margin upsells: fine art prints, digital files, and Kingdom Chronicless (starting at $3,000)",
+  "High-margin upsells: fine art prints, digital files, and Kingdom Chronicles (starting at $3,000)",
   "Digital-only storybooks for instant high-margin revenue",
 ] as const;
 
@@ -66,7 +66,7 @@ export const BP_PRINT_PARTNERS = [
   },
   {
     name: "Artifact Uprising",
-    role: "Optional luxury lay-flat Kingdom Chronicless for premium upgrades",
+    role: "Optional luxury lay-flat Kingdom Chronicles for premium upgrades",
     url: null as string | null,
   },
   {

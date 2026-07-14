@@ -2,16 +2,15 @@ import type { Metadata } from "next";
 import { PageShell } from "@/components/layout/page-shell";
 import { PasswordGate } from "@/components/password-gate";
 import { ProformaSection } from "@/components/sections/proforma";
+import { buildMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildMetadata({
   title: "Pre-Launch Proforma (Internal)",
   description:
     "Startup capital, monthly ramp, break-even, and Year 1–3 proforma P&L before launch.",
-  robots: {
-    index: false,
-    follow: false,
-  },
-};
+  path: "/business-plan/proforma",
+  noIndex: true,
+});
 
 export default function ProformaPage() {
   return (

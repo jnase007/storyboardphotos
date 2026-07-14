@@ -3,12 +3,13 @@ import Link from "next/link";
 import { PageShell } from "@/components/layout/page-shell";
 import { LegalPage, LegalSection } from "@/components/legal-page";
 import { SITE } from "@/lib/constants";
+import { buildMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildMetadata({
   title: "Terms of Service",
   description: `Terms governing use of the ${SITE.name} website and photography services.`,
-  alternates: { canonical: `${SITE.url}/terms` },
-};
+  path: "/terms",
+});
 
 export default function TermsOfServicePage() {
   return (
@@ -36,7 +37,7 @@ export default function TermsOfServicePage() {
         <LegalSection title="2. Services">
           <p>
             We provide immersive studio photography sessions, digital and print
-            products, and Kingdom Chronicless as described on our website.
+            products, and Kingdom Chronicles as described on our website.
             Package details, pricing, and inclusions may change; the description
             at the time of booking controls unless we agree otherwise in writing.
           </p>

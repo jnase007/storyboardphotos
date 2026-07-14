@@ -20,7 +20,7 @@ const features = [
   },
   {
     icon: BookOpen,
-    title: "Kingdom Chronicless",
+    title: "Kingdom Chronicles",
     description:
       "Personalized books where your child is the hero — loved, brave, and made for adventure.",
   },
@@ -73,9 +73,9 @@ export function ExperienceSection() {
             <p className="text-royal-gold font-medium tracking-widest uppercase text-sm mb-3">
               The Experience
             </p>
-            <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-royal-blue mb-4">
+            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-royal-blue mb-4">
               Where Wonder Becomes Memory
-            </h2>
+            </h1>
             <p className="text-royal-blue/60 text-lg max-w-xl mx-auto lg:mx-0">
               Step into our Costa Mesa studio and help your child feel like
               royalty — with portraits and storybooks that build lasting

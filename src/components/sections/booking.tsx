@@ -23,9 +23,12 @@ export function BookingSection() {
       <div className="container mx-auto px-4 lg:px-8">
         {/* Quest Selector */}
         <div className="max-w-4xl mx-auto mb-16">
-          <h3 className="text-center font-serif text-2xl font-bold text-royal-blue mb-2">
+          <h1 className="text-center font-serif text-2xl sm:text-3xl font-bold text-royal-blue mb-2">
+            Book Your Kingdom Session
+          </h1>
+          <h2 className="text-center font-serif text-xl font-semibold text-royal-blue/80 mb-2">
             Choose Your Quest
-          </h3>
+          </h2>
           <p className="text-center text-royal-blue/50 text-sm mb-8">The child picks how their story goes (1 of 6)</p>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {QUESTS.map((q) => (

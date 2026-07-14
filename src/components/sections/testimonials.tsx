@@ -17,9 +17,9 @@ export function TestimonialsSection() {
           <p className="text-royal-gold font-medium tracking-widest uppercase text-sm mb-3">
             Testimonials
           </p>
-          <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-royal-cream mb-4">
+          <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-royal-cream mb-4">
             Families Who Found Confidence
-          </h2>
+          </h1>
           <p className="text-royal-cream/60 text-lg">
             Hear from parents whose children left standing taller — reminded
             they are children of the King.

@@ -57,9 +57,9 @@ export function KingdomSetsSection() {
           <p className="text-royal-gold font-medium tracking-widest uppercase text-sm mb-3">
             The Kingdom Sets
           </p>
-          <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-royal-blue mb-4">
+          <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-royal-blue mb-4">
             Four Places to Remember Who They Are
-          </h2>
+          </h1>
           <p className="text-royal-blue/60 text-lg">
             Each set is crafted to help children feel brave, special, and full
             of wonder. Click any set to see it larger. Tell us which worlds

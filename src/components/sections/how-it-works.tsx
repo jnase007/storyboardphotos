@@ -36,9 +36,9 @@ export function HowItWorksSection() {
           <p className="text-royal-gold font-medium tracking-widest uppercase text-sm mb-3">
             How It Works
           </p>
-          <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-royal-cream mb-4">
+          <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-royal-cream mb-4">
             Your Royal Journey
-          </h2>
+          </h1>
           <p className="text-royal-cream/60 text-lg">
             From first click to heirloom delivery — five simple steps to a
             keepsake that builds lasting confidence and wonder.

@@ -2,15 +2,14 @@ import type { Metadata } from "next";
 import { PageShell } from "@/components/layout/page-shell";
 import { PasswordGate } from "@/components/password-gate";
 import { BooksLibrary } from "@/components/admin/books-library";
+import { buildMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Books Library | Storybook Photos Admin",
+export const metadata: Metadata = buildMetadata({
+  title: "Books Library (Internal)",
   description: "All generated storybooks — share, download, or delete.",
-  robots: {
-    index: false,
-    follow: false,
-  },
-};
+  path: "/admin/books",
+  noIndex: true,
+});
 
 export default function BooksPage() {
   return (

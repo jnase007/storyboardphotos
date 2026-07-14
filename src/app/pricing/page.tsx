@@ -1,26 +1,25 @@
 import type { Metadata } from "next";
 import { PageShell } from "@/components/layout/page-shell";
 import { PricingSection } from "@/components/sections/pricing";
-import { SITE } from "@/lib/constants";
+import { BreadcrumbStructuredData } from "@/components/structured-data";
+import { buildMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Pricing & Packages — Choose Your Royal Quest",
+export const metadata: Metadata = buildMetadata({
+  title: "Pricing & Packages — Kingdom Chronicles from $299",
   description:
-    "Kings & Queens packages: Royal Portrait $450, Kingdom Adventure $750, Heirloom Legacy $1,200. Free portrait included. Heirloom prints & storybooks available. Costa Mesa, CA.",
-  alternates: {
-    canonical: `${SITE.url}/pricing`,
-  },
-  openGraph: {
-    title: `Pricing & Packages | ${SITE.name}`,
-    description:
-      "Choose your royal quest — transparent packages from $450 with a free portrait included. Payment plans available.",
-    url: `${SITE.url}/pricing`,
-  },
-};
+    "Transparent Storybook Photos packages: Kingdom Chronicles $299, Royal Portrait Album $299, and The Royal Collection $499. Costa Mesa kids photo studio with printed hardcovers included.",
+  path: "/pricing",
+});
 
 export default function PricingPage() {
   return (
     <PageShell>
+      <BreadcrumbStructuredData
+        items={[
+          { name: "Home", path: "/" },
+          { name: "Pricing", path: "/pricing" },
+        ]}
+      />
       <PricingSection />
     </PageShell>
   );

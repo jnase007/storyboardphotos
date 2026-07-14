@@ -23,9 +23,9 @@ export function FAQSection() {
           <p className="text-royal-gold font-medium tracking-widest uppercase text-sm mb-3">
             FAQ
           </p>
-          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-royal-blue mb-4">
+          <h1 className="font-serif text-3xl sm:text-4xl font-bold text-royal-blue mb-4">
             Frequently Asked Questions
-          </h2>
+          </h1>
           <p className="text-royal-blue/60">
             Everything you need to know before your royal adventure.
           </p>

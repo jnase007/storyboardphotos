@@ -93,15 +93,15 @@ export function StorybooksSection() {
             viewport={{ once: true }}
           >
             <p className="text-royal-gold font-medium tracking-widest uppercase text-sm mb-3">
-              Kingdom Chronicless
+              Kingdom Chronicles
             </p>
-            <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-royal-cream mb-6">
+            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-royal-cream mb-6">
               A Story They&apos;ll
               <br />
               <span className="text-gradient-gold-shine">Never Forget</span>
-            </h2>
+            </h1>
             <p className="text-royal-cream/70 text-lg leading-relaxed mb-8">
-              Beyond beautiful portraits, we craft Kingdom Chronicless that
+              Beyond beautiful portraits, we craft Kingdom Chronicles that
               help your child see themselves as royal, beloved, and made for
               adventure. Every page is illustrated with their professional
               photos — a keepsake that builds lasting confidence.

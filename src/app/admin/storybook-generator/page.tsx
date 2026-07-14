@@ -3,15 +3,14 @@ import { Suspense } from "react";
 import { PageShell } from "@/components/layout/page-shell";
 import { PasswordGate } from "@/components/password-gate";
 import { StorybookGenerator } from "@/components/admin/storybook-generator";
+import { buildMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildMetadata({
   title: "Storybook Generator (Internal)",
   description: "Internal staff tool to generate personalized kingdom storybooks.",
-  robots: {
-    index: false,
-    follow: false,
-  },
-};
+  path: "/admin/storybook-generator",
+  noIndex: true,
+});
 
 export default function StorybookGeneratorPage() {
   return (

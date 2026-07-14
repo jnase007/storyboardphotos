@@ -22,9 +22,9 @@ export function PricingSection() {
           <p className="text-royal-gold font-medium tracking-widest uppercase text-sm mb-3">
             Pricing & Packages
           </p>
-          <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-royal-blue mb-4">
+          <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-royal-blue mb-4">
             Choose Your Royal Quest
-          </h2>
+          </h1>
           <p className="text-royal-blue/60 text-lg">
             Transparent session packages with a free portrait included. Add
             heirloom art only if you love what you see — never any obligation.

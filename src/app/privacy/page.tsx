@@ -3,12 +3,13 @@ import Link from "next/link";
 import { PageShell } from "@/components/layout/page-shell";
 import { LegalPage, LegalSection } from "@/components/legal-page";
 import { SITE } from "@/lib/constants";
+import { buildMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildMetadata({
   title: "Privacy Policy",
   description: `How ${SITE.name} collects, uses, and protects your personal information.`,
-  alternates: { canonical: `${SITE.url}/privacy` },
-};
+  path: "/privacy",
+});
 
 export default function PrivacyPolicyPage() {
   return (
@@ -18,7 +19,7 @@ export default function PrivacyPolicyPage() {
           <p>
             {SITE.name} (&ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;)
             operates the website {SITE.domain} and provides faith-centered
-            photography sessions and Kingdom Chronicless from our studio at{" "}
+            photography sessions and Kingdom Chronicles from our studio at{" "}
             {SITE.address}.
           </p>
           <p>

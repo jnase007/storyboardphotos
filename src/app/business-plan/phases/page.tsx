@@ -2,16 +2,15 @@ import type { Metadata } from "next";
 import { PageShell } from "@/components/layout/page-shell";
 import { PasswordGate } from "@/components/password-gate";
 import { PhaseDecisionSection } from "@/components/sections/phase-decision";
+import { buildMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Phase Decision — Beta → Retail → Scale (Internal)",
+export const metadata: Metadata = buildMetadata({
+  title: "Phase Decision (Internal)",
   description:
     "Office beta vs full retail + kitchen vs multi-set scale — economics and gate metrics before pulling the trigger.",
-  robots: {
-    index: false,
-    follow: false,
-  },
-};
+  path: "/business-plan/phases",
+  noIndex: true,
+});
 
 export default function PhaseDecisionPage() {
   return (

@@ -1,16 +1,31 @@
 export const SITE = {
   name: "Storybook Photos",
   subtitle: "Kings & Queens",
-  domain: "storybookphotos.com",
-  url: "https://storybookphotos.com",
+  domain: "www.storybookphotos.com",
+  url: "https://www.storybookphotos.com",
   tagline: "Remind Your Child They Are Royalty",
   description:
-    "Kingdom-themed photo studio in Costa Mesa, CA. Magical royal photo shoots and Kingdom Chronicless that help kids feel brave, beloved, and full of wonder.",
+    "Kingdom-themed kids photo studio in Costa Mesa, CA. Magical royal photo shoots and personalized Kingdom Chronicles storybooks that help children feel brave, beloved, and full of wonder.",
   location: "Costa Mesa, CA",
   email: "hello@storybookphotos.com",
   phone: "(949) 637-2226",
   address: "3525 Hyland Ave, Suite 235, Costa Mesa, CA 92626",
+  social: [] as string[],
 } as const;
+
+export const SEO_KEYWORDS = [
+  "storybook photos",
+  "kids photo studio Costa Mesa",
+  "children photography Orange County",
+  "kingdom photo shoot",
+  "personalized children's storybook",
+  "Kingdom Chronicles",
+  "royal kids photos",
+  "fantasy photo studio",
+  "family photography Costa Mesa",
+  "children portrait studio Orange County",
+  "storybook photo session",
+] as const;
 
 export const NAV_LINKS = [
   { href: "/experience", label: "The Experience" },
@@ -270,6 +285,16 @@ export const FAQ_ITEMS = [
     question: "What is Storybook Photos?",
     answer:
       "We're a kingdom-themed photo studio in Costa Mesa. Kids dress as royalty, explore immersive sets, and can receive a Kingdom Chronicles where they are the hero of the adventure.",
+  },
+  {
+    question: "Where can I book a kingdom photo shoot near Costa Mesa?",
+    answer:
+      "Storybook Photos is located at 3525 Hyland Ave, Suite 235, Costa Mesa, CA 92626. We serve families across Orange County, including Newport Beach, Irvine, Huntington Beach, and surrounding cities. You can book online at storybookphotos.com/book.",
+  },
+  {
+    question: "How much does a Storybook Photos session cost?",
+    answer:
+      "Packages start at $299 for Kingdom Chronicles or the Royal Portrait Album. The Royal Collection, which includes both books, starts at $499. Every package includes a studio session and a premium printed hardcover book.",
   },
   {
     question: "What ages are best for a session?",
