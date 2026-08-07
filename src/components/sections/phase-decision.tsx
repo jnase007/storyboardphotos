@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -18,6 +19,7 @@ import {
   BP_SET_CAPACITY_NOTE,
   BP_ONE_STORE_300K,
   BP_BETA_STRATEGY,
+  BP_RETAIL_CONCEPTS,
   computeBpPnl,
 } from "@/lib/business-plan-content";
 
@@ -255,6 +257,62 @@ export function PhaseDecisionSection() {
           <p className="text-sm text-royal-blue/65 leading-relaxed">
             <strong className="text-royal-blue">Implication:</strong>{" "}
             {BP_SET_CAPACITY_NOTE.implication}
+          </p>
+        </section>
+
+        {/* Phase 2 retail visual concepts */}
+        <section className="rounded-2xl border border-emerald-200 bg-white p-5 sm:p-6 mb-8">
+          <p className="text-xs font-semibold tracking-[0.18em] uppercase text-emerald-700 mb-1">
+            Phase 2 · Visual target
+          </p>
+          <h2 className="font-serif text-xl font-bold text-royal-blue mb-2">
+            {BP_RETAIL_CONCEPTS.headline}
+          </h2>
+          <p className="text-sm text-royal-blue/70 leading-relaxed mb-5 max-w-3xl">
+            {BP_RETAIL_CONCEPTS.summary}
+          </p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {BP_RETAIL_CONCEPTS.concepts.map((concept) => (
+              <figure
+                key={concept.id}
+                className="rounded-xl border border-royal-gold/25 overflow-hidden bg-royal-cream/30 flex flex-col"
+              >
+                <div className="relative aspect-[4/3] bg-royal-blue/5">
+                  <Image
+                    src={concept.image}
+                    alt={concept.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
+                </div>
+                <figcaption className="p-3.5 flex-1">
+                  <div className="flex flex-wrap gap-1 mb-1.5">
+                    {concept.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="text-[10px] font-semibold tracking-wide uppercase text-emerald-800 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  <h3 className="font-serif font-bold text-royal-blue text-base">
+                    {concept.title}
+                  </h3>
+                  <p className="text-[11px] text-royal-blue/50 mb-1.5">
+                    {concept.subtitle}
+                  </p>
+                  <p className="text-xs text-royal-blue/70 leading-relaxed">
+                    {concept.caption}
+                  </p>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+          <p className="mt-4 text-xs text-royal-blue/45 leading-relaxed">
+            Concept art only — not a signed lease or final build. Share with set
+            builders, landlords, and birthday package design.
           </p>
         </section>
 

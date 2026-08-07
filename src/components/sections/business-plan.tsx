@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -27,6 +28,7 @@ import {
   BP_PHASE_ONE as PHASE_ONE,
   BP_PHASE_ONE_BIRTHDAYS as PHASE_ONE_BIRTHDAYS,
   BP_PHASE_TWO as PHASE_TWO,
+  BP_RETAIL_CONCEPTS as RETAIL_CONCEPTS,
   BP_PRINT_PARTNERS as PRINT_PARTNERS,
   BP_STORYBOOK_APIS as STORYBOOK_APIS,
   BP_STORYBOOK_AI_COST_TOTAL as STORYBOOK_AI_COST_TOTAL,
@@ -1035,6 +1037,65 @@ export function BusinessPlanSection() {
                 </li>
               ))}
             </ul>
+          </motion.section>
+
+          {/* Phase 2 Retail Concepts */}
+          <motion.section
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="rounded-2xl border border-royal-gold/35 bg-white p-6 sm:p-8"
+          >
+            <SectionHeading icon={Building2}>
+              {RETAIL_CONCEPTS.headline}
+            </SectionHeading>
+            <p className="text-royal-blue/75 leading-relaxed mb-6">
+              {RETAIL_CONCEPTS.summary}
+            </p>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {RETAIL_CONCEPTS.concepts.map((concept) => (
+                <figure
+                  key={concept.id}
+                  className="rounded-xl border border-royal-gold/25 bg-royal-cream/30 overflow-hidden flex flex-col"
+                >
+                  <div className="relative aspect-[4/3] bg-royal-blue/5">
+                    <Image
+                      src={concept.image}
+                      alt={concept.title}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    />
+                  </div>
+                  <figcaption className="p-4 flex-1 flex flex-col">
+                    <div className="flex flex-wrap gap-1.5 mb-2">
+                      {concept.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="text-[10px] font-semibold tracking-wide uppercase text-royal-gold bg-royal-gold/10 px-2 py-0.5 rounded-md"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    <h3 className="font-serif text-lg font-bold text-royal-blue">
+                      {concept.title}
+                    </h3>
+                    <p className="text-xs font-medium text-royal-blue/50 mb-2">
+                      {concept.subtitle}
+                    </p>
+                    <p className="text-sm text-royal-blue/70 leading-relaxed">
+                      {concept.caption}
+                    </p>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+            <p className="mt-5 text-xs text-royal-blue/45 leading-relaxed">
+              Concept art for planning only — not a signed lease or final build.
+              Use these looks when talking set builders, landlords, and birthday
+              package design.
+            </p>
           </motion.section>
 
           </div>

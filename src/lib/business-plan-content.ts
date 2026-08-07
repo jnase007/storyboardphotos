@@ -282,6 +282,45 @@ export const BP_PHASE_TWO = [
 ] as const;
 
 /**
+ * Phase 2 retail visual concepts — concept art for storefront, studio interior, and birthday party set.
+ * Used on business plan Phases tab + phase decision page.
+ */
+export const BP_RETAIL_CONCEPTS = {
+  headline: "Phase 2 Retail Concepts",
+  summary:
+    "Target look for a full Storybook Photos retail home: polished lifestyle center storefront, immersive multi-set studio interior, and a birthday / tea-house celebration space that keeps families inside the same magical world.",
+  concepts: [
+    {
+      id: "storefront",
+      title: "Retail Storefront",
+      subtitle: "Lifestyle center presence",
+      image: "/retail-concepts/storefront-the-groves.jpg",
+      caption:
+        "Customer-facing brand at a high-end outdoor center (The Groves-style). Glass + warm wood, clear Storybook Photos identity next to premium neighbors — walk-by discovery and trust before they book.",
+      tags: ["Phase 2", "Location", "Brand"],
+    },
+    {
+      id: "studio-interior",
+      title: "Enchanted Studio Interior",
+      subtitle: "Permanent multi-set experience",
+      image: "/retail-concepts/enchanted-studio-interior.jpg",
+      caption:
+        "Immersive forest / kingdom set floor: sculpted tree, bridge, mushrooms, fairy lights, reception desk. Multiple permanent scenes stay standing so sessions (and parallel shoots when staffed) feel like a destination, not a backdrop swap.",
+      tags: ["Phase 2", "Sets", "Sessions"],
+    },
+    {
+      id: "birthday-party",
+      title: "Birthday / Tea House Set",
+      subtitle: "Kitchen-capable celebration room",
+      image: "/retail-concepts/birthday-party-set.jpg",
+      caption:
+        "Princess / enchanted birthday layout with throne tree, tea table, balloons, and mini tea house. This is the Phase 2 kitchen unlock — real parties, higher tickets, still driving book and print upsells.",
+      tags: ["Phase 2", "Birthdays", "Kitchen"],
+    },
+  ],
+} as const;
+
+/**
  * Phase decision economics — office beta vs retail+kitchen vs scale.
  * Used on proforma / phase decision page so we know when to pull the trigger.
  */

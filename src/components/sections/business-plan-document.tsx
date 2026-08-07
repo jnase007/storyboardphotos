@@ -2,6 +2,7 @@
  * Print-friendly business plan document — no Framer Motion.
  * Used by /business-plan/print so Save as PDF captures every page.
  */
+import Image from "next/image";
 import {
   BP_ADVANTAGES,
   BP_EXECUTIVE_SUMMARY,
@@ -11,6 +12,7 @@ import {
   BP_PHASE_ONE,
   BP_PHASE_ONE_BIRTHDAYS,
   BP_PHASE_TWO,
+  BP_RETAIL_CONCEPTS,
   BP_PRINT_PARTNERS,
   BP_PROJECTIONS,
   BP_REVENUE_GROWTH,
@@ -315,6 +317,42 @@ export function BusinessPlanDocument() {
             </li>
           ))}
         </ol>
+
+        <h3 className="font-serif font-bold text-royal-blue mt-6 mb-2">
+          {BP_RETAIL_CONCEPTS.headline}
+        </h3>
+        <p className="leading-relaxed text-royal-blue/80 mb-4 text-sm">
+          {BP_RETAIL_CONCEPTS.summary}
+        </p>
+        <div className="grid sm:grid-cols-3 gap-4">
+          {BP_RETAIL_CONCEPTS.concepts.map((concept) => (
+            <figure key={concept.id} className="break-inside-avoid">
+              <div className="relative aspect-[4/3] rounded-lg overflow-hidden border border-royal-gold/25 mb-2">
+                <Image
+                  src={concept.image}
+                  alt={concept.title}
+                  fill
+                  className="object-cover"
+                  sizes="33vw"
+                />
+              </div>
+              <figcaption>
+                <p className="font-serif font-bold text-royal-blue text-sm">
+                  {concept.title}
+                </p>
+                <p className="text-xs text-royal-blue/55 mb-1">
+                  {concept.subtitle}
+                </p>
+                <p className="text-xs text-royal-blue/70 leading-relaxed">
+                  {concept.caption}
+                </p>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+        <p className="text-xs text-royal-blue/45 mt-3">
+          Concept art for planning only — not a signed lease or final build.
+        </p>
       </section>
 
       <section>
