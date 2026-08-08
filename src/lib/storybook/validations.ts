@@ -17,7 +17,7 @@ const setPhotosSchema = z
 export const createStorybookSchema = z.object({
   child_name: z.string().min(1, "Child's name is required").max(80),
   child_age: z.coerce.number().int().min(1).max(18),
-  gender: z.enum(["girl", "boy", "other"]),
+  gender: z.enum(["girl", "boy"]),
   notes: z.string().max(1000).optional().nullable(),
   /** Choose-your-own-adventure path (kiosk option) */
   adventure_path: z.enum(ADVENTURE_PATH_IDS).optional().default("dragon-slayer"),
@@ -72,13 +72,16 @@ export const createStorybookSchema = z.object({
       "chastle": setPhotosSchema,
     })
     .optional(),
-  /** Flat list kept for backwards compatibility */
-  photo_urls: z.array(photoUrlSchema).min(4).max(12).optional(),
-  /** Optional character portrait (white background) — base64 data URL or uploaded URL */
-  character_photo: z.string().optional().nullable(),
+  /** Legacy studio set photos — ignored for page art (coloring book only) */
+  photo_urls: z.array(photoUrlSchema).max(12).optional(),
+  /** Kid face / profile photo — required for personalized coloring-book hero */
+  character_photo: z.string().min(1, "Child face photo is required"),
 }).refine(
-  (data) => Boolean(data.photos_by_set) || Boolean(data.photo_urls?.length),
-  { message: "photos_by_set or photo_urls is required" }
+  (data) =>
+    Boolean(data.character_photo) ||
+    Boolean(data.photos_by_set) ||
+    Boolean(data.photo_urls?.length),
+  { message: "character_photo (kid face) is required" }
 );
 
 export const updatePagesSchema = z.object({

@@ -39,11 +39,17 @@ export async function POST(request: NextRequest) {
       character_photo,
     } = parsed.data;
 
+    // Face photo drives likeness. Studio set photos are not used as page art.
     const flatUrls =
       photo_urls ??
-      (photos_by_set
-        ? Object.values(photos_by_set).flat()
-        : []);
+      (photos_by_set ? Object.values(photos_by_set).flat() : []);
+
+    if (!character_photo) {
+      return NextResponse.json(
+        { error: "Child face / profile photo is required" },
+        { status: 400 }
+      );
+    }
 
     let storybookId: string | null = null;
 

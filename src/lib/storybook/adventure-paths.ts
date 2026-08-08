@@ -4,8 +4,8 @@ import type { KingdomSet, StoryGender, StoryPage } from "./types";
  * Choose-your-own-adventure paths for the kiosk / generator.
  * Kids pick one quest; scripts use placeholders filled at generate time.
  *
- * Placeholders: [Name] [Role] [she/he/they] [She/He/They]
- * [her/his/their] [Her/His/Their] [her/him/them] [is/are]
+ * Placeholders only: [Name] [Role]
+ * No pronouns — always repeat the child's name.
  */
 
 export const ADVENTURE_PATH_IDS = [
@@ -48,60 +48,21 @@ export type AdventurePath = {
 };
 
 export const TITLE_ROLE = {
-  girl: "Princess",
-  boy: "Prince",
-  other: "Royal Hero",
+  girl: "Queen",
+  boy: "King",
 } as const;
 
-export function getPronouns(gender: StoryGender) {
-  if (gender === "girl") {
-    return {
-      they: "she",
-      They: "She",
-      their: "her",
-      Their: "Her",
-      them: "her",
-      is: "is",
-    };
-  }
-  if (gender === "boy") {
-    return {
-      they: "he",
-      They: "He",
-      their: "his",
-      Their: "His",
-      them: "him",
-      is: "is",
-    };
-  }
-  return {
-    they: "they",
-    They: "They",
-    their: "their",
-    Their: "Their",
-    them: "them",
-    is: "are",
-  };
-}
-
-/** Fill script placeholders for a child. */
+/** Fill script placeholders for a child. Name only — no pronouns. */
 export function fillPlaceholders(
   text: string,
   childName: string,
   gender: StoryGender
 ): string {
   const role = TITLE_ROLE[gender];
-  const p = getPronouns(gender);
   return text
     .replace(/\[Child['']s Name\]/g, childName)
     .replace(/\[Name\]/g, childName)
-    .replace(/\[Role\]/g, role)
-    .replace(/\[she\/he\/they\]/g, p.they)
-    .replace(/\[She\/He\/They\]/g, p.They)
-    .replace(/\[her\/his\/their\]/g, p.their)
-    .replace(/\[Her\/His\/Their\]/g, p.Their)
-    .replace(/\[her\/him\/them\]/g, p.them)
-    .replace(/\[is\/are\]/g, p.is);
+    .replace(/\[Role\]/g, role);
 }
 
 export const ADVENTURE_PATHS_STORAGE_KEY = "sbp-adventure-paths-v3";
@@ -184,7 +145,7 @@ export function materializeAdventureStory(
       imagePrompt:
         fillPlaceholders(
           p.imagePromptHint ||
-            `Watercolor children's book illustration of [Role] [Name] in a kingdom adventure, soft golden light, magical atmosphere, no text`,
+            `Coloring book children's illustration of [Role] [Name] in a kingdom adventure, bold black outlines, cream paper, magical atmosphere, no text`,
           childName,
           gender
         ) + `, age ${childAge}`,
@@ -244,9 +205,9 @@ He turned and called out the name that made the whole kingdom hold its breath.
 
 "[Name]," the King said softly, "the dragon does not need to be defeated. It needs to be understood. Will you go? Will you bring peace back to our land?"
 
-[Role] [Name] looked out at the distant mountains, felt afraid — just a little — and then felt something stronger rising in [her/his/their] chest: a deep and steady courage, like a flame that cannot be blown out.
+[Role] [Name] looked out at the distant mountains, felt afraid — just a little — and then felt something stronger rising in [Name]'s chest: a deep and steady courage, like a flame that cannot be blown out.
 
-[She/He/They] stood tall and answered with one quiet word: "Yes."`,
+[Name] stood tall and answered with one quiet word: "Yes."`,
         photoCaption: `The quest begins`,
         useSessionPhoto: false,
         imagePromptHint: "call to adventure watercolor no text",
@@ -258,13 +219,13 @@ He turned and called out the name that made the whole kingdom hold its breath.
 
 In the center of the room, upon a platform of pure white marble, stood the throne — carved from the wood of an ancient oak, inlaid with gold, and draped in velvet the color of midnight sky.
 
-[Role] [Name] walked toward it slowly, footsteps echoing in the sacred silence of the hall. [She/He/They] sat down gently, as one sits on something holy.
+[Role] [Name] walked toward it slowly, footsteps echoing in the sacred silence of the hall. [Name] sat down gently, as one sits on something holy.
 
 Because it was.
 
-This was where every great leader of the kingdom had sat before [her/him/them]. This was where decisions were made that changed lives. This was where courage lived — not in swords or armies, but in the quiet, steady commitment to do what was right.
+This was where every great leader of the kingdom had sat before [Name]. This was where decisions were made that changed lives. This was where courage lived — not in swords or armies, but in the quiet, steady commitment to do what was right.
 
-[Role] [Name] straightened [her/his/their] back, lifted [her/his/their] chin, and whispered the words that every ruler must one day learn to believe: "I am ready."`,
+[Role] [Name] straightened [Name]'s back, lifted [Name]'s chin, and whispered the words that every ruler must one day learn to believe: "I am ready."`,
         photoCaption: `Portrait from the Throne Room`,
         photoSet: "Throne Room",
         useSessionPhoto: true,
@@ -278,7 +239,7 @@ This was where every great leader of the kingdom had sat before [her/him/them]. 
 
 A hush fell over the crowd.
 
-[Role] [Name] placed one hand over [her/his/their] heart and spoke in a voice clear and calm enough to carry to the very edges of the kingdom: "I will face the dragon. Not with anger — but with understanding. Not with a desire to win — but with a desire to make peace. I give you my word."
+[Role] [Name] placed one hand over [Name]'s heart and spoke in a voice clear and calm enough to carry to the very edges of the kingdom: "I will face the dragon. Not with anger — but with understanding. Not with a desire to win — but with a desire to make peace. I give you my word."
 
 For a long moment, there was silence. And then — the cheering began. It rolled across the courtyard like thunder, warm and full and generous, the sound of a people who believed in their [role] with every fiber of their being.
 
@@ -294,7 +255,7 @@ For a long moment, there was silence. And then — the cheering began. It rolled
 
 [Role] [Name] walked along the lantern-lit path, each step soft on the mossy ground. The light from the lanterns filtered through the leaves in golden patches, and somewhere high above, birds called to one another in the canopy.
 
-At the base of an enormous oak tree, a small woodland creature sat watching [her/him/them] with bright, kind eyes.
+At the base of an enormous oak tree, a small woodland creature sat watching [Name] with bright, kind eyes.
 
 "You have come far," it said. "And you have a good heart. But hearts alone do not win battles. You must learn one more thing before you face the dragon."
 
@@ -302,7 +263,7 @@ At the base of an enormous oak tree, a small woodland creature sat watching [her
 
 The creature was quiet for a moment, then said: "That the bravest thing you can do is to see someone — truly see them — even when they are frightening. Especially then."
 
-[Role] [Name] sat with those words until they settled deep inside [her/him/them], like seeds finding soil.`,
+[Role] [Name] sat with those words until they settled deep inside [Name], like seeds finding soil.`,
         photoCaption: `Portrait in the Royal Forest`,
         photoSet: "Royal Forest",
         useSessionPhoto: true,
@@ -316,17 +277,17 @@ The creature was quiet for a moment, then said: "That the bravest thing you can 
 
 For a long moment, neither of them moved.
 
-[Role] [Name] felt [her/his/their] heart beating fast. But [she/he/they] did not run. Instead, [she/he/they] took one slow step forward. Then another. Until [she/he/they] stood close enough to feel the warmth radiating from the dragon's great chest.
+[Role] [Name] felt [Name]'s heart beating fast. But [Name] did not run. Instead, [Name] took one slow step forward. Then another. Until [Name] stood close enough to feel the warmth radiating from the dragon's great chest.
 
-"I'm not here to fight you," [she/he/they] said, voice steady and clear. "I'm here because I believe you are more than what they say you are."
+"I'm not here to fight you," [Name] said, voice steady and clear. "I'm here because I believe you are more than what they say you are."
 
 The dragon lowered its head. Its breath came out in slow plumes of smoke. And then — very softly — it spoke.
 
 "I just want to belong somewhere. I just want a home."
 
-[Role] [Name] felt something break open inside [her/him/them] — not pain, but tenderness. The deep and aching tenderness of recognizing another soul who is lonely.
+[Role] [Name] felt something break open inside [Name] — not pain, but tenderness. The deep and aching tenderness of recognizing another soul who is lonely.
 
-"Then you have already found one," [she/he/they] said. "I promise."`,
+"Then you have already found one," [Name] said. "I promise."`,
         photoCaption: `The dragon encounter`,
         useSessionPhoto: false,
         imagePromptHint: "dragon encounter watercolor no text",
@@ -336,15 +297,15 @@ The dragon lowered its head. Its breath came out in slow plumes of smoke. And th
         title: `The Royal Garden`,
         text: `The Royal Garden was the most beautiful place in all the kingdom — a living tapestry of color and fragrance that seemed to exist outside of time.
 
-[Role] [Name] walked slowly through the garden paths, letting the peace of the place settle over [her/him/them] like a warm blanket. Roses climbed the stone walls. Butterflies drifted from flower to flower. The air smelled of honey and earth and something sweeter that had no name.
+[Role] [Name] walked slowly through the garden paths, letting the peace of the place settle over [Name] like a warm blanket. Roses climbed the stone walls. Butterflies drifted from flower to flower. The air smelled of honey and earth and something sweeter that had no name.
 
 In the very center of the garden grew a flower unlike any other — a single blossom that glowed softly, as if it had captured a piece of the sun inside itself.
 
 [Role] [Name] knew immediately what it was: the gift that would seal the promise. The thing that would turn a former enemy into a lifelong friend.
 
-[She/He/They] reached down gently, cupped the flower in both hands, and lifted it carefully. It pulsed once — warm and steady — like a heartbeat.
+[Name] reached down gently, cupped the flower in both hands, and lifted it carefully. It pulsed once — warm and steady — like a heartbeat.
 
-"Thank you," [she/he/they] whispered to the garden. And [she/he/they] could have sworn the flowers nodded back.`,
+"Thank you," [Name] whispered to the garden. And [Name] could have sworn the flowers nodded back.`,
         photoCaption: `Portrait in the Royal Garden`,
         photoSet: "Royal Garden",
         useSessionPhoto: true,
@@ -357,13 +318,13 @@ In the very center of the garden grew a flower unlike any other — a single blo
 
 [Role] [Name] arrived at the summit as the sun was beginning its slow descent toward the horizon. The light was golden and warm, painting everything it touched in shades of amber and rose.
 
-[She/He/They] stood still for a moment and breathed it all in: the smell of stone and sky, the distant sound of the kingdom below, the weight of the glowing blossom still cradled in [her/his/their] hands.
+[Name] stood still for a moment and breathed it all in: the smell of stone and sky, the distant sound of the kingdom below, the weight of the glowing blossom still cradled in [Name]'s hands.
 
 This was it. This was the moment.
 
-[Role] [Name] was not the same person who had answered the King's call that morning. [She/He/They] had walked through lantern-lit forests and sat upon ancient thrones. [She/He/They] had looked into the eyes of something frightening and chosen love over fear.
+[Role] [Name] was not the same person who had answered the King's call that morning. [Name] had walked through lantern-lit forests and sat upon ancient thrones. [Name] had looked into the eyes of something frightening and chosen love over fear.
 
-And now [she/he/they] was ready — not because [she/he/they] had no fear left, but because [she/he/they] had learned that courage was never the absence of fear. Courage was the decision that something — and someone — else mattered more.`,
+And now [Name] was ready — not because [Name] had no fear left, but because [Name] had learned that courage was never the absence of fear. Courage was the decision that something — and someone — else mattered more.`,
         photoCaption: `Portrait at the Courage Quest`,
         photoSet: "Chastle",
         useSessionPhoto: true,
@@ -381,9 +342,9 @@ The King stepped forward and placed his hands on [Role] [Name]'s shoulders.
 
 "You did not just save the kingdom," he said, his voice full and quiet at the same time. "You showed us what it means to be truly brave. You showed us that the greatest strength is not force — it is love."
 
-[Role] [Name] looked out at the faces of the people — all those faces alight with joy and wonder and relief — and felt something complete settle into place deep in [her/his/their] chest.
+[Role] [Name] looked out at the faces of the people — all those faces alight with joy and wonder and relief — and felt something complete settle into place deep in [Name]'s chest.
 
-This was what [she/he/they] had been made for. Not glory. Not power. But this: the quiet, impossible, perfect miracle of bringing people home to one another.`,
+This was what [Name] had been made for. Not glory. Not power. But this: the quiet, impossible, perfect miracle of bringing people home to one another.`,
         photoCaption: `The kingdom rejoices`,
         useSessionPhoto: false,
         imagePromptHint: "victory watercolor no text",
@@ -436,7 +397,7 @@ Always, they say yes.`,
         page: 2,
         staticScene: "rescue-mission/call",
         title: "The Call",
-        text: `A messenger raced into the Kingdom of Light with urgent news - friends from the valley were missing, and night was falling fast.\n\nThe King turned to [Role] [Name]:\n\n"[Name], will you lead the rescue? The kingdom trusts your brave and caring heart."\n\nWithout hesitation, [she/he/they] answered, "I will find them."`,
+        text: `A messenger raced into the Kingdom of Light with urgent news - friends from the valley were missing, and night was falling fast.\n\nThe King turned to [Role] [Name]:\n\n"[Name], will you lead the rescue? The kingdom trusts your brave and caring heart."\n\nWithout hesitation, [Name] answered, "I will find them."`,
         photoCaption: "Child looking determined",
         imagePromptHint:
           "Watercolor of [Role] [Name] receiving urgent news in a castle courtyard, children's book style, no text",
@@ -444,7 +405,7 @@ Always, they say yes.`,
       {
         page: 3,
         title: "Castle Throne Room",
-        text: `In the Castle Throne Room, [Role] [Name] received a royal map and a lantern of hope.\n\n[She/He/They] promised the people: "No one in our kingdom is left behind."\n\nThen [she/he/they] set out, heart steady and eyes bright.`,
+        text: `In the Castle Throne Room, [Role] [Name] received a royal map and a lantern of hope.\n\n[Name] promised the people: "No one in our kingdom is left behind."\n\nThen [Name] set out, heart steady and eyes bright.`,
         photoCaption: "Photo from Castle Throne Room",
         photoSet: "Throne Room",
         useSessionPhoto: true,
@@ -454,7 +415,7 @@ Always, they say yes.`,
       {
         page: 4,
         title: "Royal Forest",
-        text: `Through the Royal Forest, [Name] followed soft footprints and distant calls for help.\n\nLantern light guided [her/him/them] between the trees until [she/he/they] found the first friend - cold, scared, but safe.\n\n"You're not alone anymore," [Role] [Name] said gently.`,
+        text: `Through the Royal Forest, [Name] followed soft footprints and distant calls for help.\n\nLantern light guided [Name] between the trees until [Name] found the first friend - cold, scared, but safe.\n\n"You're not alone anymore," [Role] [Name] said gently.`,
         photoCaption: "Photo from Royal Forest",
         photoSet: "Royal Forest",
         useSessionPhoto: true,
@@ -495,7 +456,7 @@ Always, they say yes.`,
         title: "The End",
         staticScene: "rescue-mission/end",
         useSessionPhoto: false,
-        text: "And so, [Role] [Name] lived bravely ever after,\nknowing [she/he/they] [is/are] strong, kind, and deeply loved.\n\nThe End.",
+        text: "And so, [Role] [Name] lived bravely ever after,\nknowing [Name] is strong, kind, and deeply loved.\n\nThe End.",
         photoCaption: "Final portrait",
         imagePromptHint:
           "Watercolor closing scene of [Role] [Name] with soft golden light, children's book illustration, no text",
@@ -535,7 +496,7 @@ Always, they say yes.`,
       {
         page: 3,
         title: "Castle Throne Room",
-        text: `In the Castle Throne Room, [Role] [Name] searched carefully.\n\nBeneath a banner, [she/he/they] found the first clue: a golden thread leading toward the forest.\n\n"Every clue brings us closer," [she/he/they] said with a spark of hope.`,
+        text: `In the Castle Throne Room, [Role] [Name] searched carefully.\n\nBeneath a banner, [Name] found the first clue: a golden thread leading toward the forest.\n\n"Every clue brings us closer," [Name] said with a spark of hope.`,
         photoCaption: "Photo from Castle Throne Room",
         photoSet: "Throne Room",
         useSessionPhoto: true,
@@ -565,7 +526,7 @@ Always, they say yes.`,
       {
         page: 6,
         title: "Courage Quest",
-        text: `At the Courage Quest, [Role] [Name] found the crown resting on a stone of light.\n\nA soft voice asked, "Who seeks the crown - for glory, or for the people?"\n\n"For the people," [Name] answered.\n\nThe crown shone, and [she/he/they] lifted it with care.`,
+        text: `At the Courage Quest, [Role] [Name] found the crown resting on a stone of light.\n\nA soft voice asked, "Who seeks the crown - for glory, or for the people?"\n\n"For the people," [Name] answered.\n\nThe crown shone, and [Name] lifted it with care.`,
         photoCaption: "Photo from Courage Quest",
         photoSet: "Chastle",
         useSessionPhoto: true,
@@ -586,7 +547,7 @@ Always, they say yes.`,
         title: "The End",
         staticScene: "lost-crown/end",
         useSessionPhoto: false,
-        text: "And so, [Role] [Name] lived bravely ever after,\nknowing [she/he/they] [is/are] strong, kind, and deeply loved.\n\nThe End.",
+        text: "And so, [Role] [Name] lived bravely ever after,\nknowing [Name] is strong, kind, and deeply loved.\n\nThe End.",
         photoCaption: "Final portrait",
         imagePromptHint:
           "Watercolor closing scene of [Role] [Name] with soft golden light, children's book illustration, no text",
@@ -618,7 +579,7 @@ Always, they say yes.`,
         page: 2,
         staticScene: "forest-guardian/call",
         title: "The Call",
-        text: `The lanterns of the Royal Forest flickered weakly - the magic that protected the woodland creatures was fading.\n\nThe King asked [Role] [Name]:\n\n"Will you become the Forest Guardian and bring the light back to the trees?"\n\n[She/He/They] felt the call of the wild and whispered, "Yes."`,
+        text: `The lanterns of the Royal Forest flickered weakly - the magic that protected the woodland creatures was fading.\n\nThe King asked [Role] [Name]:\n\n"Will you become the Forest Guardian and bring the light back to the trees?"\n\n[Name] felt the call of the wild and whispered, "Yes."`,
         photoCaption: "Child looking wonder-struck",
         imagePromptHint:
           "Watercolor of [Role] [Name] called to protect a magical forest, children's book style, no text",
@@ -636,7 +597,7 @@ Always, they say yes.`,
       {
         page: 4,
         title: "Royal Forest",
-        text: "Deep in the Royal Forest, [Name] found frightened creatures hiding from the dark.\n\n[She/He/They] lit the lanterns one by one and sang a soft song of courage.\n\nThe trees seemed to lean closer, listening.",
+        text: "Deep in the Royal Forest, [Name] found frightened creatures hiding from the dark.\n\n[Name] lit the lanterns one by one and sang a soft song of courage.\n\nThe trees seemed to lean closer, listening.",
         photoCaption: "Photo from Royal Forest",
         photoSet: "Royal Forest",
         useSessionPhoto: true,
@@ -677,7 +638,7 @@ Always, they say yes.`,
         title: "The End",
         staticScene: "forest-guardian/end",
         useSessionPhoto: false,
-        text: "And so, [Role] [Name] lived bravely ever after,\nknowing [she/he/they] [is/are] strong, kind, and deeply loved.\n\nThe End.",
+        text: "And so, [Role] [Name] lived bravely ever after,\nknowing [Name] is strong, kind, and deeply loved.\n\nThe End.",
         photoCaption: "Final portrait",
         imagePromptHint:
           "Watercolor closing scene of [Role] [Name] with soft forest-gold light, children's book illustration, no text",
@@ -717,7 +678,7 @@ Always, they say yes.`,
       {
         page: 3,
         title: "Castle Throne Room",
-        text: `From the Castle Throne Room, [Role] [Name] gathered notes of encouragement written in gold ink.\n\n"Words can be as brave as armor," [she/he/they] said, and set out to share them.`,
+        text: `From the Castle Throne Room, [Role] [Name] gathered notes of encouragement written in gold ink.\n\n"Words can be as brave as armor," [Name] said, and set out to share them.`,
         photoCaption: "Photo from Castle Throne Room",
         photoSet: "Throne Room",
         useSessionPhoto: true,
@@ -727,7 +688,7 @@ Always, they say yes.`,
       {
         page: 4,
         title: "Royal Forest",
-        text: "In the Royal Forest, [Name] met a traveler who had lost hope.\n\n[She/He/They] sat beside them, listened, and left a note that read: You matter.\n\nThe forest felt warmer somehow.",
+        text: "In the Royal Forest, [Name] met a traveler who had lost hope.\n\n[Name] sat beside them, listened, and left a note that read: You matter.\n\nThe forest felt warmer somehow.",
         photoCaption: "Photo from Royal Forest",
         photoSet: "Royal Forest",
         useSessionPhoto: true,
@@ -737,17 +698,17 @@ Always, they say yes.`,
       {
         page: 5,
         title: "Royal Garden",
-        text: "In the Royal Garden, [Role] [Name] invited shy children to plant flowers together.\n\nLaughter returned like spring rain. Kindness, [she/he/they] learned, grows when it is shared.",
+        text: "In the Royal Garden, [Role] [Name] invited shy children to plant flowers together.\n\nLaughter returned like spring rain. Kindness, [Name] learned, grows when it is shared.",
         photoCaption: "Photo from Royal Garden",
         photoSet: "Royal Garden",
         useSessionPhoto: true,
         imagePromptHint:
-          "Watercolor of [Role] [Name] planting flowers with other children in a garden, children's book illustration, no text",
+          "Premium coloring book illustration of [Role] [Name] planting flowers with friends in a garden, bold ink outlines, cream paper, no text",
       },
       {
         page: 6,
         title: "Courage Quest",
-        text: "The Courage Quest asked [Name] to speak kindness even when it felt hard - to include someone who had been left out.\n\n[She/He/They] reached out a hand.\n\nThat single brave moment lit the whole kingdom.",
+        text: "The Courage Quest asked [Name] to speak kindness even when it felt hard - to include someone who had been left out.\n\n[Name] reached out a hand.\n\nThat single brave moment lit the whole kingdom.",
         photoCaption: "Photo from Courage Quest",
         photoSet: "Chastle",
         useSessionPhoto: true,
@@ -768,7 +729,7 @@ Always, they say yes.`,
         title: "The End",
         staticScene: "kindness-quest/end",
         useSessionPhoto: false,
-        text: "And so, [Role] [Name] lived bravely ever after,\nknowing [she/he/they] [is/are] strong, kind, and deeply loved.\n\nThe End.",
+        text: "And so, [Role] [Name] lived bravely ever after,\nknowing [Name] is strong, kind, and deeply loved.\n\nThe End.",
         photoCaption: "Final portrait",
         imagePromptHint:
           "Watercolor closing scene of [Role] [Name] with soft golden light, children's book illustration, no text",
@@ -808,7 +769,7 @@ Always, they say yes.`,
       {
         page: 3,
         title: "Castle Throne Room",
-        text: `In the Castle Throne Room, [Role] [Name] learned the treasure was not gold - it was a crystal of shared hope.\n\nWhoever held it must give light away, not keep it.\n\n"Then I will share it," [she/he/they] promised.`,
+        text: `In the Castle Throne Room, [Role] [Name] learned the treasure was not gold - it was a crystal of shared hope.\n\nWhoever held it must give light away, not keep it.\n\n"Then I will share it," [Name] promised.`,
         photoCaption: "Photo from Castle Throne Room",
         photoSet: "Throne Room",
         useSessionPhoto: true,
@@ -818,7 +779,7 @@ Always, they say yes.`,
       {
         page: 4,
         title: "Royal Forest",
-        text: "Through the Royal Forest, sparks of stolen light flickered between the trees.\n\n[Name] gathered them gently into [her/his/their] lantern until the path ahead glowed.",
+        text: "Through the Royal Forest, sparks of stolen light flickered between the trees.\n\n[Name] gathered them gently into [Name]'s lantern until the path ahead glowed.",
         photoCaption: "Photo from Royal Forest",
         photoSet: "Royal Forest",
         useSessionPhoto: true,
@@ -838,7 +799,7 @@ Always, they say yes.`,
       {
         page: 6,
         title: "Courage Quest",
-        text: "At the Courage Quest, a shadow tried to keep the Treasure of Light for itself.\n\n[Role] [Name] did not fight with anger. [She/He/They] opened the lantern and offered light freely.\n\nThe shadow melted. The crystal shone. The kingdom's treasure was restored.",
+        text: "At the Courage Quest, a shadow tried to keep the Treasure of Light for itself.\n\n[Role] [Name] did not fight with anger. [Name] opened the lantern and offered light freely.\n\nThe shadow melted. The crystal shone. The kingdom's treasure was restored.",
         photoCaption: "Photo from Courage Quest",
         photoSet: "Chastle",
         useSessionPhoto: true,
@@ -859,7 +820,7 @@ Always, they say yes.`,
         title: "The End",
         staticScene: "light-treasure/end",
         useSessionPhoto: false,
-        text: "And so, [Role] [Name] lived bravely ever after,\nknowing [she/he/they] [is/are] strong, kind, and deeply loved.\n\nThe End.",
+        text: "And so, [Role] [Name] lived bravely ever after,\nknowing [Name] is strong, kind, and deeply loved.\n\nThe End.",
         photoCaption: "Final portrait",
         imagePromptHint:
           "Watercolor closing scene of [Role] [Name] with soft golden light, children's book illustration, no text",

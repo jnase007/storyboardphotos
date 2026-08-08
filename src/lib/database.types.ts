@@ -101,6 +101,16 @@ export type Database = {
           pages: import("./storybook/types").StoryPage[];
           pdf_url: string | null;
           error_message: string | null;
+          video_status?: string;
+          video_url?: string | null;
+          video_requested_at?: string | null;
+          video_delivered_at?: string | null;
+          video_package?: string | null;
+          video_notes?: string | null;
+          video_contact_email?: string | null;
+          video_contact_name?: string | null;
+          narration_url?: string | null;
+          narration_script?: string | null;
         };
         Insert: {
           id?: string;
@@ -115,6 +125,16 @@ export type Database = {
           pages?: import("./storybook/types").StoryPage[];
           pdf_url?: string | null;
           error_message?: string | null;
+          video_status?: string;
+          video_url?: string | null;
+          video_requested_at?: string | null;
+          video_delivered_at?: string | null;
+          video_package?: string | null;
+          video_notes?: string | null;
+          video_contact_email?: string | null;
+          video_contact_name?: string | null;
+          narration_url?: string | null;
+          narration_script?: string | null;
         };
         Update: {
           id?: string;
@@ -129,6 +149,16 @@ export type Database = {
           pages?: import("./storybook/types").StoryPage[];
           pdf_url?: string | null;
           error_message?: string | null;
+          video_status?: string;
+          video_url?: string | null;
+          video_requested_at?: string | null;
+          video_delivered_at?: string | null;
+          video_package?: string | null;
+          video_notes?: string | null;
+          video_contact_email?: string | null;
+          video_contact_name?: string | null;
+          narration_url?: string | null;
+          narration_script?: string | null;
         };
         Relationships: [];
       };

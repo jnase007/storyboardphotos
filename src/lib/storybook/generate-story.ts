@@ -55,8 +55,9 @@ export function buildStoryPrompts(input: StoryInput) {
     .join("\n");
 
   const system = `You are a children's storybook author for Storybook Photos | Kings & Queens, a premium kingdom photo studio.
-Write warm, brave, inclusive adventure stories for ages 2–12.
-Use the child's name often. Keep language lyrical but readable aloud.
+Write warm, brave adventure stories for ages 2–12 that sound beautiful when read aloud as bedtime narration.
+ALWAYS call the child ${role} ${input.childName}. Never use he/she/they/him/her/his/hers pronouns — repeat the name instead.
+Boy = King, Girl = Queen only.
 The child chose this adventure path: "${path.title}" (${path.label}).
 Theme guidance: ${path.aiTheme}
 Follow the plot beats of the outline below — personalize wording, keep the same page count and photoSet assignments.
@@ -74,8 +75,8 @@ Rules:
 - Pages 1–2: title / call to adventure (photoSet null or portrait; useSessionPhoto true ok).
 - Include each of the four kingdom sets on distinct pages with useSessionPhoto true.
 - Final 1–2 pages: return + The End.
-- imagePrompt: short watercolor children's book illustration prompt describing the scene (no text in image), mentioning ${role} ${input.childName}, age ${input.childAge}.
-- Each page text: 2–5 short paragraphs, suitable for a printed spread.
+- imagePrompt: short COLORING BOOK illustration prompt (bold black outlines, cream paper, simple line art, light pastel only, no watercolor washes, no text), mentioning ${role} ${input.childName}, age ${input.childAge}.
+- Each page text: 2–5 short paragraphs, suitable for a printed spread and read-aloud narration.
 - Never graphic violence; keep dragon/conflict age-appropriate and hopeful.`;
 
   const user = `Write an ${pages}-page personalized story for ${role} ${input.childName}, age ${input.childAge}, gender ${input.gender}.

@@ -1,6 +1,7 @@
 /** Shared types for the internal storybook generator */
 
-export type StoryGender = "girl" | "boy" | "other";
+/** Boy = King, Girl = Queen. No other genders/pronouns. */
+export type StoryGender = "girl" | "boy";
 
 export type StorybookStatus =
   | "draft"
@@ -8,6 +9,35 @@ export type StorybookStatus =
   | "ready"
   | "approved"
   | "error";
+
+/** ListedFire-style animated movie production status */
+export type VideoStatus =
+  | "none"
+  | "requested"
+  | "paid"
+  | "in_production"
+  | "ready"
+  | "delivered"
+  | "cancelled";
+
+export type VideoPackage = "teaser" | "full";
+
+export const VIDEO_PACKAGES = {
+  teaser: {
+    id: "teaser" as const,
+    name: "Kingdom Teaser",
+    price: 149,
+    length: "15–30 sec",
+    description: "3–5 hero pages animated — perfect shareable preview",
+  },
+  full: {
+    id: "full" as const,
+    name: "Animated Kingdom Movie",
+    price: 299,
+    length: "60–90 sec",
+    description: "Full storybook mini-movie with music (Higgsfield + Seedance)",
+  },
+} as const;
 
 export type KingdomSet =
   | "Throne Room"
@@ -45,6 +75,18 @@ export type StorybookRecord = {
   pages: StoryPage[];
   pdf_url: string | null;
   error_message: string | null;
+  /** Animated movie upsell */
+  video_status?: VideoStatus;
+  video_url?: string | null;
+  video_requested_at?: string | null;
+  video_delivered_at?: string | null;
+  video_package?: VideoPackage | null;
+  video_notes?: string | null;
+  video_contact_email?: string | null;
+  video_contact_name?: string | null;
+  /** Bedtime-story narration (ElevenLabs) */
+  narration_url?: string | null;
+  narration_script?: string | null;
 };
 
 export const KINGDOM_SETS: Exclude<KingdomSet, null>[] = [

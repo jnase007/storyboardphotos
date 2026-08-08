@@ -210,7 +210,7 @@ export const PRICING_PACKAGES = [
     features: [
       "45-minute studio session",
       "All 4 enchanted kingdom sets",
-      "Personalized AI watercolor storybook",
+      "Personalized coloring-book style storybook",
       "Child named as the hero throughout",
       "6 unique adventure paths to choose from",
       "8×8 premium printed hardcover",
@@ -261,7 +261,8 @@ export const ADDITIONAL_INVESTMENTS = [
   // Physical add-ons
   { label: "Additional child book (4th+ child)", price: "$149 each" },
   { label: "Extra printed hardcover copy", price: "$45 each" },
-  { label: "Animated Kingdom video (coming soon)", price: "$299" },
+  { label: "Kingdom Teaser video (15–30 sec)", price: "$149" },
+  { label: "Animated Kingdom Movie (60–90 sec)", price: "$299" },
   { label: "Rush processing (48hr turnaround)", price: "$75" },
   // Portrait prints
   { label: "8×10 portrait print", price: "$200 each" },
@@ -269,7 +270,6 @@ export const ADDITIONAL_INVESTMENTS = [
   { label: "16×20 portrait print", price: "$975" },
   { label: "24×30 portrait print", price: "$1,650" },
   { label: "30×40 portrait print", price: "$2,650" },
-  { label: "MP4 digital slideshow (coming soon)", price: "$1,400" },
 ] as const;
 
 export const OUR_PROMISE = {

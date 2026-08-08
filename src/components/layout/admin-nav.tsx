@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import {
   BookOpen,
   ClipboardList,
+  Film,
   LayoutDashboard,
   Printer,
   Sparkles,
@@ -70,6 +71,13 @@ const ADMIN_LINKS = [
     shortLabel: "Books",
     icon: BookOpen,
     match: (path: string) => path.startsWith("/admin/books"),
+  },
+  {
+    href: "/admin/video-jobs",
+    label: "Movie Queue",
+    shortLabel: "Movies",
+    icon: Film,
+    match: (path: string) => path.startsWith("/admin/video-jobs"),
   },
   {
     href: "/admin/story-scripts",

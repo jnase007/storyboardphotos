@@ -43,8 +43,12 @@ type FluxResult = {
   provider: "fal" | "placeholder";
 };
 
+/**
+ * Disney-tier coloring book look for print + Seedance animation.
+ * Premium line art: clean ink, elegant shapes, magical but colorable.
+ */
 const STYLE_SUFFIX =
-  "Cozy watercolor children's book illustration, soft painterly style, warm gentle colors, storybook aesthetic, soft lighting, subtle texture, high detail, beautiful children's book art, no text, no watermark, no real people, no faces";
+  "premium Disney-quality children's coloring book illustration, ultra-clean bold black ink outlines, elegant refined line weight, charming royal character design, large open colorable regions, soft cream parchment paper, mostly uncolored line art with tiny champagne-gold and blush pastel accents only, magical sparkles as simple star outlines, fairytale composition, balanced negative space, masterpiece storybook page, consistent character model sheet look, no muddy shading, no gray fills, no photorealism, no real photographs, no 3D render, no watercolor washes, no text, no letters, no watermark, no logo, no signature";
 
 /**
  * Remove background from an image using fal-ai/bria background removal.
@@ -170,7 +174,7 @@ async function generateWithImagen4(prompt: string): Promise<FluxResult> {
   if (!googleKey) return fallbackPlaceholder(prompt);
 
   const STYLE =
-    "double-page spread children's storybook watercolor illustration, hand-drawn fine ink outlines, soft watercolor washes with gentle pastel colors, detailed enchanted kingdom scene with castle towers stone paths wildflowers fairies, decorative vine border frame around the edges, warm cream background, rich detailed scenery like a premium illustrated children's book, whimsical and magical atmosphere, style of a classic fairy tale picture book, lush green trees and rolling hills, cozy storybook feel, no text, no watermark";
+    "premium Disney-quality double-page children's coloring book illustration, ultra-clean bold black ink outlines, elegant royal storybook design, mostly uncolored line art with tiny champagne-gold accents only, cream parchment paper, decorative simple vine border, large open colorable areas, enchanted kingdom castle trees paths sparkles, masterpiece fairytale composition, no heavy shading, no watercolor washes, no photorealism, no text, no watermark";
 
   const fullPrompt = `${prompt}. ${STYLE}`;
 
@@ -270,9 +274,21 @@ async function generateWithCharacterPortrait(options: {
   const googleKey = process.env.GOOGLE_AI_API_KEY;
   if (!googleKey) return fallbackPlaceholder(options.prompt);
 
-  const STYLE = "Classic watercolor children's storybook illustration style, fine black ink outlines, soft pastel watercolor fills, warm cream paper background, decorative vine border frame, whimsical and magical, no text, no watermark";
+  const STYLE = "premium Disney-quality children's coloring book page, ultra-clean bold black ink outlines, elegant royal character design, mostly uncolored line art on cream parchment, tiny champagne-gold accents only, large colorable areas, magical but simple, no heavy shading, no watercolor, no photorealism, no text, no watermark";
 
-  const fullPrompt = `Take the child in this photo and place them as the hero in this scene: ${options.prompt}. Draw them in ${STYLE}. The character should look like the child in the photo but rendered as a storybook illustration. Keep their face and features recognizable but in watercolor art style.`;
+  const fullPrompt = `Create a premium Disney-level coloring book page.
+
+FACE LIKENESS (critical): Study the child's face in the reference photo. Draw the hero as a charming royal coloring-book character that clearly resembles this child — same age vibe, hair, face shape, expression — simplified into clean elegant line art (not a photo, not realistic skin).
+
+SCENE: ${options.prompt}
+
+STYLE: ${STYLE}
+
+RULES:
+- Hero is center stage, readable silhouette, proud kind pose
+- Same character design if this child appeared on other pages
+- Pure illustrated coloring book art only
+- No real photo collage, no half-photo face, no text`;
 
   try {
     const res = await fetch(
@@ -350,69 +366,46 @@ export async function illustrateStoryPages(options: {
   pages: StoryPage[];
   photoUrls?: string[];
   photosBySet?: PhotosBySet;
-  /** Optional character portrait (base64 data URL or public URL) */
+  /** Kid face / profile photo — used only as likeness reference, never printed as a real photo */
   characterPhoto?: string | null;
 }): Promise<StoryPage[]> {
-  const { pages, photosBySet, characterPhoto } = options;
-  const flat =
-    options.photoUrls ??
-    (photosBySet ? flattenPhotosBySet(photosBySet) : []);
-  const reference = flat.find((u) => !u.startsWith("data:")) ?? null;
-
-  // NOTE: Character portrait upload is saved for future face-compositing feature.
-  // For now, Mode A = real session photos, Mode B = pure AI watercolor (no faces).
-
-  // Round-robin cursor per set so multiple photos on one set rotate
-  const setCursors: Partial<Record<keyof PhotosBySet, number>> = {};
-  let flatCursor = 0;
+  const { pages, characterPhoto } = options;
+  // Product rule: book + movie are 100% coloring-book art.
+  // Real session photos are NEVER placed in pages. Face upload = likeness only.
   const result: StoryPage[] = [];
 
   for (const page of pages) {
-    // FIRST: Static scenes for title/call/victory/end pages
-    // BUT if a character photo is uploaded, action pages (dragon etc) get personalized
-    const isActionScene = page.staticScene && !["dragon-slayer/title","dragon-slayer/call","rescue-mission/title","rescue-mission/call","lost-crown/title","lost-crown/call","forest-guardian/title","forest-guardian/call","kindness-quest/title","kindness-quest/call","light-treasure/title","light-treasure/call"].includes(page.staticScene ?? "");
-    
-    if (page.staticScene && STATIC_SCENES[page.staticScene] && (!characterPhoto || !isActionScene)) {
-      result.push({ ...page, imageUrl: STATIC_SCENES[page.staticScene] });
-      continue;
-    }
-
-    // SECOND: Use session photos for set pages
-    if (page.photoSet && photosBySet) {
-      const setId = SET_NAME_TO_ID[page.photoSet];
-      const pool = photosBySet[setId] ?? [];
-      if (pool.length > 0) {
-        const idx = setCursors[setId] ?? 0;
-        setCursors[setId] = idx + 1;
-        result.push({ ...page, imageUrl: pool[idx % pool.length] });
-        continue;
-      }
-    }
-
-    // Only use flat fallback if useSessionPhoto is explicitly true AND this page
-    // doesn't have a specific photoSet (avoid cross-contaminating set photos)
-    const preferPhoto = page.useSessionPhoto && !page.photoSet;
-    if (preferPhoto && flat.length > 0) {
-      const photo = flat[flatCursor % flat.length];
-      flatCursor += 1;
-      result.push({ ...page, imageUrl: photo });
-      continue;
-    }
-
-    if (page.imageUrl) {
+    if (page.imageUrl && !looksLikeRealPhotoUrl(page.imageUrl)) {
       result.push(page);
       continue;
     }
 
-    // Generate AI scene — with character portrait if uploaded, otherwise scene only
+    const sceneHint = page.imagePrompt ?? page.title;
+    const prompt = `${sceneHint}. ${STYLE_SUFFIX}. Full-page children's coloring book illustration.`;
+
     const art = await generateStoryIllustration({
-      prompt: page.imagePrompt ?? page.title,
-      referenceImageUrl: reference,
+      prompt,
       characterPhotoUrl: characterPhoto ?? null,
     });
 
-    result.push({ ...page, imageUrl: art.imageUrl });
+    result.push({
+      ...page,
+      // Never keep session photo flags on output pages
+      useSessionPhoto: false,
+      imageUrl: art.imageUrl,
+    });
   }
 
   return result;
+}
+
+/** Heuristic: block obvious studio/session photo paths from being reused as page art */
+function looksLikeRealPhotoUrl(url: string): boolean {
+  const u = url.toLowerCase();
+  return (
+    u.includes("/session") ||
+    u.includes("session-photo") ||
+    u.includes("set-photo") ||
+    u.includes("raw-upload")
+  );
 }

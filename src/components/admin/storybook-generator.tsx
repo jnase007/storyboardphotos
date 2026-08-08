@@ -261,7 +261,7 @@ export function StorybookGenerator() {
           bookTitle: `${data.child_name || "Child"}'s Kingdom Chronicles`,
           child_name: data.child_name || "Child",
           child_age: data.child_age || 6,
-          gender: (data.gender as StoryGender) || "other",
+          gender: data.gender === "boy" || data.gender === "girl" ? data.gender : "girl",
           notes: data.notes ?? null,
           adventure_path: data.adventure_path,
           photo_urls: data.photo_urls || [],
@@ -385,21 +385,25 @@ export function StorybookGenerator() {
 
   async function handleGenerate(e: React.FormEvent) {
     e.preventDefault();
-    const missing = SET_UPLOAD_SLOTS.filter((s) => setFiles[s.id].length < 1);
-    if (missing.length > 0) {
-      toast.error(`Add at least one photo for: ${missing.map((m) => m.name).join(", ")}`);
-      return;
-    }
     if (!childName.trim()) {
       toast.error("Child's name is required.");
       return;
     }
+    if (!gender) {
+      toast.error("Select boy (King) or girl (Queen).");
+      return;
+    }
+    if (!characterPhoto) {
+      toast.error("Upload the child's face / profile photo.");
+      return;
+    }
 
     setStep("generating");
-    setGenStatus("Compressing photos…");
+    setGenStatus("Preparing coloring-book adventure…");
     window.scrollTo({ top: 0, behavior: "smooth" });
 
     try {
+      // Optional legacy set uploads — never used as page art (face likeness only)
       const photos_by_set = {
         "throne-room": [] as string[],
         "royal-forest": [] as string[],
@@ -408,42 +412,11 @@ export function StorybookGenerator() {
       };
       const photo_urls: string[] = [];
 
-      for (let i = 0; i < SET_UPLOAD_SLOTS.length; i++) {
-        const slot = SET_UPLOAD_SLOTS[i];
-        setGenStatus(
-          `Uploading ${slot.name} (${i + 1}/${SET_UPLOAD_SLOTS.length})…`
-        );
-        const form = new FormData();
-        for (const file of setFiles[slot.id]) {
-          const compressed = await compressImageFile(file);
-          form.append(slot.id, compressed);
-        }
-
-        const upRes = await fetch("/api/admin/storybooks/upload", {
-          method: "POST",
-          headers: adminHeaders,
-          body: form,
-        });
-        const upData = await readApiJson<{
-          error?: string;
-          photos_by_set?: Partial<typeof photos_by_set>;
-          photo_urls?: string[];
-        }>(upRes);
-        if (!upRes.ok) throw new Error(upData.error || "Upload failed");
-
-        const urls = upData.photos_by_set?.[slot.id];
-        if (!urls?.length) {
-          throw new Error(`Upload returned no photos for ${slot.name}`);
-        }
-        photos_by_set[slot.id] = urls;
-        photo_urls.push(...urls);
-      }
-
       const selectedPath =
         loadAdventurePathsClient().find((p) => p.id === adventurePath) ??
         ADVENTURE_PATHS.find((p) => p.id === adventurePath) ??
         ADVENTURE_PATHS[0];
-      setGenStatus(`Writing "${selectedPath.label}"…`);
+      setGenStatus(`Writing "${selectedPath.label}" for ${gender === "boy" ? "King" : "Queen"} ${childName.trim()}…`);
 
       const genRes = await fetch("/api/admin/storybooks/generate", {
         method: "POST",
@@ -461,11 +434,11 @@ export function StorybookGenerator() {
           story_mode: storyMode,
           photos_by_set,
           photo_urls,
-          character_photo: characterPhoto ?? undefined,
+          character_photo: characterPhoto,
         }),
       });
 
-      setGenStatus("Painting watercolor illustrations…");
+      setGenStatus("Drawing coloring-book pages with their face…");
       const genData = await readApiJson<{
         error?: string;
         storyProvider?: string;
@@ -635,13 +608,9 @@ export function StorybookGenerator() {
   const canGenerate = useMemo(
     () =>
       childName.trim().length > 0 &&
-      SET_UPLOAD_SLOTS.every((s) => setFiles[s.id].length >= 1),
-    [childName, setFiles]
-  );
-
-  const totalPhotos = useMemo(
-    () => SET_UPLOAD_SLOTS.reduce((n, s) => n + setFiles[s.id].length, 0),
-    [setFiles]
+      Boolean(gender) &&
+      Boolean(characterPhoto),
+    [childName, gender, characterPhoto]
   );
 
   if (loadingExisting) {
@@ -686,14 +655,14 @@ export function StorybookGenerator() {
             onSubmit={handleGenerate}
             className="rounded-2xl border-2 border-royal-gold/35 bg-white p-6 sm:p-8 shadow-lg shadow-royal-gold/10 space-y-6"
           >
-            {/* ── Character Portrait Upload (TOP) ─────────────────────────── */}
+            {/* ── Kid face / profile photo (required) ─────────────────────── */}
             <div>
               <div className="mb-3">
                 <p className="text-sm font-medium text-royal-blue">
-                  Upload Character Portrait (white background)
+                  Child face / profile photo <span className="text-royal-gold">*</span>
                 </p>
                 <p className="text-xs text-royal-blue/50 mt-0.5">
-                  Upload a studio portrait of the child on a white background — this becomes the hero of every scene
+                  Upload their face. We turn it into a King/Queen coloring-book hero for the book and animated video — no real photos in the pages.
                 </p>
               </div>
 
@@ -715,7 +684,7 @@ export function StorybookGenerator() {
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>
-                  <p className="mt-2 text-xs text-royal-blue/50 text-center">Character photo ✓</p>
+                  <p className="mt-2 text-xs text-royal-blue/50 text-center">Face photo ✓</p>
                 </div>
               ) : (
                 <div
@@ -738,10 +707,10 @@ export function StorybookGenerator() {
                         {characterDragging ? "Drop portrait here" : "Drag & drop or click to upload"}
                       </p>
                       <p className="text-xs text-royal-blue/45 mt-1">
-                        Single portrait · JPG, PNG, WebP · white background
+                        Face or profile photo · JPG, PNG, WebP
                       </p>
                       <p className="text-xs text-royal-blue/35 mt-0.5 italic">
-                        Optional — enables AI face compositing for all scenes
+                        Required — likeness only (coloring-book style, not real photos)
                       </p>
                     </div>
                     <input
@@ -853,10 +822,9 @@ export function StorybookGenerator() {
                   onChange={(e) => setGender(e.target.value as StoryGender)}
                   className="w-full h-11 rounded-md border border-royal-gold/30 bg-royal-cream/40 px-3 text-royal-blue outline-none focus:border-royal-gold focus:ring-2 focus:ring-royal-gold/20"
                 >
-                  <option value="" disabled>Select gender...</option>
-                  <option value="girl">Girl (Princess)</option>
-                  <option value="boy">Boy (Prince)</option>
-                  <option value="other">Other (Royal Hero)</option>
+                  <option value="" disabled>Select boy or girl...</option>
+                  <option value="girl">Girl (Queen)</option>
+                  <option value="boy">Boy (King)</option>
                 </select>
               </div>
             </div>
@@ -912,32 +880,14 @@ export function StorybookGenerator() {
               />
             </div>
 
-            <div>
-              <div className="flex flex-wrap items-end justify-between gap-2 mb-3">
-                <div>
-                  <p className="text-sm font-medium text-royal-blue">
-                    Session photos by kingdom set
-                  </p>
-                  <p className="text-xs text-royal-blue/50 mt-0.5">
-                    Drag &amp; drop 1–{MAX_PHOTOS_PER_SET} photos into each set
-                    · {totalPhotos} total
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                {SET_UPLOAD_SLOTS.map((slot) => (
-                  <SetDropZone
-                    key={slot.id}
-                    name={slot.name}
-                    hint={slot.hint}
-                    files={setFiles[slot.id]}
-                    previews={setPreviews[slot.id]}
-                    onAdd={(list) => addFilesToSet(slot.id, list)}
-                    onRemove={(i) => removeFileFromSet(slot.id, i)}
-                  />
-                ))}
-              </div>
+            <div className="rounded-xl border border-royal-gold/25 bg-royal-cream/40 px-4 py-3 text-sm text-royal-blue/75">
+              <p className="font-semibold text-royal-blue mb-1">Disney-level keepsake</p>
+              <ul className="list-disc pl-5 space-y-1 text-xs leading-relaxed">
+                <li>Premium coloring-book pages with King/Queen face likeness</li>
+                <li>Bedtime narration — like someone reading their story aloud</li>
+                <li>Optional animated movie from the same pages</li>
+                <li>No real photos in the book or movie — pure illustrated magic</li>
+              </ul>
             </div>
 
             <button
@@ -946,7 +896,7 @@ export function StorybookGenerator() {
               className="inline-flex h-12 w-full sm:w-auto items-center justify-center gap-2 rounded-md bg-royal-gold px-8 text-sm font-semibold text-royal-blue hover:bg-[#D4B480] disabled:opacity-40 transition-colors"
             >
               <Sparkles className="h-4 w-4" />
-              Generate Story &amp; Illustrations
+              Create Coloring Book Adventure
             </button>
           </form>
         )}

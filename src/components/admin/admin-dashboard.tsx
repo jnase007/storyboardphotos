@@ -6,6 +6,7 @@ import {
   BookOpen,
   ClipboardList,
   FileText,
+  Film,
   Printer,
   Sparkles,
   ArrowRight,
@@ -33,6 +34,14 @@ const TOOLS = [
     title: "Books Library",
     description: "View all generated storybooks — preview, share links, download PDFs, delete.",
     icon: BookOpen,
+    badge: "New",
+  },
+  {
+    href: "/admin/video-jobs",
+    title: "Animated Movie Queue",
+    description:
+      "ListedFire-style jobs: coloring-book pages + bedtime narration → deliver MP4.",
+    icon: Film,
     badge: "New",
   },
   {
