@@ -27,61 +27,66 @@ export const createStorybookSchema = z.object({
   adventure_script: z
     .object({
       id: z.enum(ADVENTURE_PATH_IDS),
-      option: z.union([
-        z.literal(1),
-        z.literal(2),
-        z.literal(3),
-        z.literal(4),
-        z.literal(5),
-        z.literal(6),
-      ]),
-      label: z.string().min(1).max(80),
-      title: z.string().min(1).max(120),
-      description: z.string().min(1).max(500),
-      aiTheme: z.string().min(1).max(1000),
-      bookTitleTemplate: z.string().min(1).max(160),
+      option: z.coerce.number().int().min(1).max(6).optional(),
+      label: z.string().min(1).max(120).optional(),
+      title: z.string().min(1).max(160).optional(),
+      description: z.string().max(1000).optional(),
+      aiTheme: z.string().max(2000).optional(),
+      bookTitleTemplate: z.string().max(200).optional(),
       pages: z
         .array(
-          z.object({
-            page: z.number().int().positive(),
-            title: z.string().min(1),
-            text: z.string().min(1),
-            photoCaption: z.string().optional().default(""),
-            photoSet: z
-              .enum([
-                "Throne Room",
-                "Royal Forest",
-                "Royal Garden",
-                "Chastle",
-              ])
-              .optional(),
-            useSessionPhoto: z.boolean().optional(),
-            imagePromptHint: z.string().optional(),
-          })
+          z
+            .object({
+              page: z.coerce.number().int().positive(),
+              title: z.string().min(1),
+              text: z.string().min(1),
+              photoCaption: z.string().optional().default(""),
+              photoSet: z
+                .enum([
+                  "Throne Room",
+                  "Royal Forest",
+                  "Royal Garden",
+                  "Chastle",
+                ])
+                .optional()
+                .nullable(),
+              useSessionPhoto: z.boolean().optional(),
+              imagePromptHint: z.string().optional(),
+              staticScene: z.string().optional(),
+            })
+            .passthrough()
         )
         .min(6)
         .max(24),
     })
+    .passthrough()
     .optional(),
-  /** Photos grouped by kingdom set (preferred) */
+  /** Optional set photos — empty arrays allowed (coloring book uses face only) */
   photos_by_set: z
     .object({
-      "throne-room": setPhotosSchema,
-      "royal-forest": setPhotosSchema,
-      "royal-garden": setPhotosSchema,
-      "chastle": setPhotosSchema,
+      "throne-room": z.array(photoUrlSchema).max(3).optional().default([]),
+      "royal-forest": z.array(photoUrlSchema).max(3).optional().default([]),
+      "royal-garden": z.array(photoUrlSchema).max(3).optional().default([]),
+      "chastle": z.array(photoUrlSchema).max(3).optional().default([]),
     })
     .optional(),
   /** Legacy studio set photos — ignored for page art (coloring book only) */
-  photo_urls: z.array(photoUrlSchema).max(12).optional(),
+  photo_urls: z.array(photoUrlSchema).max(12).optional().default([]),
   /** Kid face / profile photo — required for personalized coloring-book hero */
-  character_photo: z.string().min(1, "Child face photo is required"),
-}).refine(
-  (data) =>
-    Boolean(data.character_photo) ||
-    Boolean(data.photos_by_set) ||
-    Boolean(data.photo_urls?.length),
-  { message: "character_photo (kid face) is required" }
+  character_photo: z
+    .string()
+    .min(1, "Child face photo is required")
+    .refine(
+      (v) => v.startsWith("http") || v.startsWith("data:image/"),
+      "Invalid face photo"
+    ),
+  /** What to produce after generate */
+  package: z
+    .enum(["book", "movie", "both"])
+    .optional()
+    .default("book"),
+}).refine((data) => Boolean(data.character_photo),
+  { message: "character_photo (kid face) is required", path: ["character_photo"] }
 );
 
 export const updatePagesSchema = z.object({

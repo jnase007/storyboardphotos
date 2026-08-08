@@ -20,8 +20,16 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const parsed = createStorybookSchema.safeParse(body);
     if (!parsed.success) {
+      const flat = parsed.error.flatten();
+      const fieldMsg = Object.entries(flat.fieldErrors)
+        .map(([k, v]) => `${k}: ${(v as string[] | undefined)?.join(", ") || "invalid"}`)
+        .slice(0, 4)
+        .join(" · ");
       return NextResponse.json(
-        { error: "Invalid request", details: parsed.error.flatten() },
+        {
+          error: fieldMsg || flat.formErrors[0] || "Invalid request",
+          details: flat,
+        },
         { status: 400 }
       );
     }
@@ -37,6 +45,7 @@ export async function POST(request: NextRequest) {
       story_mode,
       adventure_script,
       character_photo,
+      package: outputPackage,
     } = parsed.data;
 
     // Face photo drives likeness. Studio set photos are not used as page art.
@@ -53,27 +62,52 @@ export async function POST(request: NextRequest) {
 
     let storybookId: string | null = null;
 
+    const wantsMovie =
+      outputPackage === "movie" || outputPackage === "both";
+
     if (hasRealSupabase()) {
       const supabase = createServiceClient();
+      const baseInsert = {
+        child_name,
+        child_age,
+        gender,
+        notes: notes
+          ? `[Adventure: ${adventure_path}] [Package: ${outputPackage}] ${notes}`
+          : `[Adventure: ${adventure_path}] [Package: ${outputPackage}]`,
+        photo_urls: flatUrls,
+        status: "generating" as const,
+        pages: [] as StoryPage[],
+      };
+
+      // Movie / Both → queue animated production immediately
+      const withMovie = wantsMovie
+        ? {
+            ...baseInsert,
+            video_status: "requested",
+            video_package: "full",
+            video_requested_at: new Date().toISOString(),
+            video_notes: `Requested with generate package=${outputPackage}`,
+          }
+        : baseInsert;
+
       const { data, error } = await supabase
         .from("storybooks")
-        .insert({
-          child_name,
-          child_age,
-          gender,
-          notes: notes
-            ? `[Adventure: ${adventure_path}] ${notes}`
-            : `[Adventure: ${adventure_path}]`,
-          photo_urls: flatUrls,
-          status: "generating",
-          pages: [],
-        })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .insert(withMovie as any)
         .select("id")
         .single();
 
       if (error) {
         console.error("storybooks insert:", error);
-        // Continue without DB if table missing — still return generated book
+        // Retry without video columns if schema cache lag / missing cols
+        const retry = await supabase
+          .from("storybooks")
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .insert(baseInsert as any)
+          .select("id")
+          .single();
+        if (!retry.error) storybookId = retry.data.id;
+        else console.error("storybooks insert retry:", retry.error);
       } else {
         storybookId = data.id;
       }
@@ -86,7 +120,8 @@ export async function POST(request: NextRequest) {
       notes: notes ?? undefined,
       pageCount: 11,
       adventurePath: adventure_path,
-      adventureScript: adventure_script,
+      // Server resolves full path if client script is partial / passthrough
+      adventureScript: adventure_script as never,
       storyMode: story_mode,
     });
 
@@ -118,6 +153,8 @@ export async function POST(request: NextRequest) {
       notes: notes ?? null,
       adventure_path: story.adventurePath,
       story_mode,
+      package: outputPackage,
+      video_status: wantsMovie ? "requested" : "none",
       photo_urls: flatUrls,
       photos_by_set: photos_by_set ?? null,
       pages,

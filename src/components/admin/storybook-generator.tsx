@@ -203,6 +203,8 @@ export function StorybookGenerator() {
   const [adventurePath, setAdventurePath] =
     useState<AdventurePathId>("dragon-slayer");
   const [storyMode, setStoryMode] = useState<"script" | "ai">("script");
+  /** book = coloring book only · movie = queue animation · both = book + movie */
+  const [outputPackage, setOutputPackage] = useState<"book" | "movie" | "both">("book");
   const [setFiles, setSetFiles] = useState<SetFiles>(emptySetFiles);
   const [setPreviews, setSetPreviews] = useState<SetPreviews>(emptySetPreviews);
   // Character portrait state
@@ -432,8 +434,8 @@ export function StorybookGenerator() {
           adventure_path: adventurePath,
           adventure_script: selectedPath,
           story_mode: storyMode,
-          photos_by_set,
-          photo_urls,
+          package: outputPackage,
+          // Don't send empty set arrays — coloring book is face-only
           character_photo: characterPhoto,
         }),
       });
@@ -449,10 +451,16 @@ export function StorybookGenerator() {
       setPageIndex(0);
       setEditMode(false);
       setStep("preview");
+      const pkgNote =
+        outputPackage === "both"
+          ? " Book + movie queued."
+          : outputPackage === "movie"
+            ? " Movie queued (book pages ready for animation)."
+            : "";
       toast.success(
-        genData.storyProvider === "template"
+        (genData.storyProvider === "template"
           ? "Adventure story ready from curated script"
-          : "Adventure story generated!"
+          : "Adventure story generated!") + pkgNote
       );
     } catch (err) {
       console.error(err);
@@ -831,6 +839,34 @@ export function StorybookGenerator() {
 
             <div>
               <label className="block text-sm font-medium text-royal-blue mb-1.5">
+                What are we making?
+              </label>
+              <div className="grid sm:grid-cols-3 gap-2">
+                {([
+                  ["book", "Book only", "Coloring-book adventure + bedtime narration"],
+                  ["movie", "Movie only", "Pages + queue Animated Kingdom Movie"],
+                  ["both", "Book + Movie", "Full package — book, narration, and movie queue"],
+                ] as const).map(([id, title, desc]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setOutputPackage(id)}
+                    className={cn(
+                      "rounded-lg border-2 px-3 py-3 text-left text-sm transition-colors",
+                      outputPackage === id
+                        ? "border-royal-gold bg-royal-gold/15 text-royal-blue"
+                        : "border-royal-gold/25 bg-royal-cream/30 text-royal-blue/70"
+                    )}
+                  >
+                    <span className="font-semibold block">{title}</span>
+                    <span className="text-xs opacity-70">{desc}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-royal-blue mb-1.5">
                 Story writing mode
               </label>
               <div className="grid sm:grid-cols-2 gap-2">
@@ -896,7 +932,11 @@ export function StorybookGenerator() {
               className="inline-flex h-12 w-full sm:w-auto items-center justify-center gap-2 rounded-md bg-royal-gold px-8 text-sm font-semibold text-royal-blue hover:bg-[#D4B480] disabled:opacity-40 transition-colors"
             >
               <Sparkles className="h-4 w-4" />
-              Create Coloring Book Adventure
+              {outputPackage === "both"
+                ? "Create Book + Movie"
+                : outputPackage === "movie"
+                  ? "Create Movie Adventure"
+                  : "Create Coloring Book Adventure"}
             </button>
           </form>
         )}
