@@ -187,7 +187,8 @@ export function IPBible() {
           
           <div className="grid grid-cols-2 gap-6 mb-6">
             <div className="rounded-xl overflow-hidden border" style={{ borderColor: "#C5A26F40" }}>
-              <img src="https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/hero-images/cover-chronicles-hq.jpg" alt="Kingdom Chronicles Cover" className="w-full" />
+              {/* Local public assets so admin IP page never depends on hotlink/CORS quirks */}
+              <img src="/ip/cover-chronicles.jpg" alt="Kingdom Chronicles Cover" className="w-full" />
               <div className="p-4" style={{ background: "#fafafa" }}>
                 <div className="font-bold text-lg mb-1" style={{ color: "#0A1628" }}>📖 Kingdom Chronicles</div>
                 <div className="text-sm mb-2" style={{ color: "#B98A19" }}>The Adventure Storybook — Dad's favorite</div>
@@ -202,7 +203,7 @@ export function IPBible() {
               </div>
             </div>
             <div className="rounded-xl overflow-hidden border" style={{ borderColor: "#C5A26F40" }}>
-              <img src="https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/hero-images/cover-portraits-hq.jpg" alt="Royal Portraits Cover" className="w-full" />
+              <img src="/ip/cover-portraits.jpg" alt="Royal Portraits Cover" className="w-full" />
               <div className="p-4" style={{ background: "#fafafa" }}>
                 <div className="font-bold text-lg mb-1" style={{ color: "#0A1628" }}>📸 Royal Portrait Album</div>
                 <div className="text-sm mb-2" style={{ color: "#B98A19" }}>The Photo Book — Mom's favorite</div>

@@ -171,17 +171,43 @@ export function VideoJobsPanel() {
             Loading jobs…
           </div>
         ) : error ? (
-          <div className="text-center py-16">
+          <div className="text-center py-16 max-w-2xl mx-auto">
             <p className="text-red-500 mb-2">{error}</p>
-            <p className="text-sm text-gray-500 mb-4">
-              If columns are missing, run{" "}
-              <code className="bg-white px-1 rounded">
-                supabase/animated-videos.sql
-              </code>{" "}
-              in Supabase.
+            <p className="text-sm text-gray-600 mb-3">
+              One-time Supabase setup needed. Open SQL Editor and run the migration
+              below (adds video + narration columns).
             </p>
-            <button onClick={load} className="text-amber-700 font-semibold">
-              Try again
+            <a
+              href="https://supabase.com/dashboard/project/cpnnztrqgbxledbikpqt/sql/new"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold text-white mb-3"
+              style={{ background: "#0A1628" }}
+            >
+              Open Supabase SQL Editor
+            </a>
+            <button
+              onClick={() => {
+                const sql = `ALTER TABLE public.storybooks ADD COLUMN IF NOT EXISTS video_status TEXT NOT NULL DEFAULT 'none';
+ALTER TABLE public.storybooks ADD COLUMN IF NOT EXISTS video_url TEXT;
+ALTER TABLE public.storybooks ADD COLUMN IF NOT EXISTS video_requested_at TIMESTAMPTZ;
+ALTER TABLE public.storybooks ADD COLUMN IF NOT EXISTS video_delivered_at TIMESTAMPTZ;
+ALTER TABLE public.storybooks ADD COLUMN IF NOT EXISTS video_package TEXT;
+ALTER TABLE public.storybooks ADD COLUMN IF NOT EXISTS video_notes TEXT;
+ALTER TABLE public.storybooks ADD COLUMN IF NOT EXISTS video_contact_email TEXT;
+ALTER TABLE public.storybooks ADD COLUMN IF NOT EXISTS video_contact_name TEXT;
+ALTER TABLE public.storybooks ADD COLUMN IF NOT EXISTS narration_url TEXT;
+ALTER TABLE public.storybooks ADD COLUMN IF NOT EXISTS narration_script TEXT;
+CREATE INDEX IF NOT EXISTS idx_storybooks_video_status ON public.storybooks(video_status);`;
+                navigator.clipboard.writeText(sql);
+                toast.success("SQL copied — paste in Supabase SQL Editor");
+              }}
+              className="block mx-auto text-amber-700 font-semibold mb-2"
+            >
+              Copy SQL migration
+            </button>
+            <button onClick={load} className="text-gray-500 text-sm hover:underline">
+              Try again after running SQL
             </button>
           </div>
         ) : jobs.length === 0 ? (
