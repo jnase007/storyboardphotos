@@ -1,29 +1,6 @@
-import type { Metadata } from "next";
-import { PageShell } from "@/components/layout/page-shell";
-import { PasswordGate } from "@/components/password-gate";
-import { ProformaSection } from "@/components/sections/proforma";
-import { buildMetadata } from "@/lib/seo";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = buildMetadata({
-  title: "Pre-Launch Proforma (Internal)",
-  description:
-    "Startup capital, monthly ramp, break-even, and Year 1–3 proforma P&L before launch.",
-  path: "/business-plan/proforma",
-  noIndex: true,
-});
-
+/** Old URL → unified Business Plan hub */
 export default function ProformaPage() {
-  return (
-    <PageShell>
-      <PasswordGate
-        code="3121"
-        storageKey="sbp-unlock-admin"
-        title="Pre-Launch Proforma"
-        description="Internal planning document — password protected."
-        buttonLabel="View Proforma"
-      >
-        <ProformaSection />
-      </PasswordGate>
-    </PageShell>
-  );
+  redirect("/business-plan?tab=proforma");
 }

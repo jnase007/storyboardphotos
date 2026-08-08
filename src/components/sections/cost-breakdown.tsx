@@ -215,7 +215,7 @@ function ScenarioCard({
   );
 }
 
-export function CostBreakdownSection() {
+export function CostBreakdownSection({ embedded = false }: { embedded?: boolean } = {}) {
   const small = BP_PNL_SCENARIOS.small;
   const large = BP_PNL_SCENARIOS.large;
   const smallPnl = computeBpPnl(small);
@@ -225,6 +225,7 @@ export function CostBreakdownSection() {
   return (
     <article className="py-12 sm:py-16 bg-enchanted-cream">
       <div className="container mx-auto px-4 lg:px-8 max-w-6xl">
+        {!embedded && (
         <div className="mb-6 flex flex-wrap gap-3">
           <Link
             href="/business-plan"
@@ -234,12 +235,13 @@ export function CostBreakdownSection() {
             Business Plan
           </Link>
           <Link
-            href="/business-plan/proforma"
+            href="/business-plan?tab=proforma"
             className="inline-flex items-center gap-2 text-sm font-semibold text-royal-blue/70 hover:text-royal-blue"
           >
             Pre-Launch Proforma
           </Link>
         </div>
+        )}
 
         <header className="text-center mb-10">
           <div className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-royal-gold/15 ring-1 ring-royal-gold/30 mb-3">

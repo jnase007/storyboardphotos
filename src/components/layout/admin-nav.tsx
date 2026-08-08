@@ -36,34 +36,10 @@ const ADMIN_LINKS = [
     label: "Business Plan",
     shortLabel: "Plan",
     icon: ClipboardList,
+    // One nav item — Phases / Costs / Proforma live inside the plan hub
     match: (path: string) =>
       path === "/business-plan" ||
-      (path.startsWith("/business-plan/") &&
-        !path.startsWith("/business-plan/print") &&
-        !path.startsWith("/business-plan/cost-breakdown") &&
-        !path.startsWith("/business-plan/proforma") &&
-        !path.startsWith("/business-plan/phases")),
-  },
-  {
-    href: "/business-plan/phases",
-    label: "Phases",
-    shortLabel: "Phases",
-    icon: ClipboardList,
-    match: (path: string) => path.startsWith("/business-plan/phases"),
-  },
-  {
-    href: "/business-plan/cost-breakdown",
-    label: "Cost Breakdown",
-    shortLabel: "P&L",
-    icon: ClipboardList,
-    match: (path: string) => path.startsWith("/business-plan/cost-breakdown"),
-  },
-  {
-    href: "/business-plan/proforma",
-    label: "Proforma",
-    shortLabel: "Proforma",
-    icon: ClipboardList,
-    match: (path: string) => path.startsWith("/business-plan/proforma"),
+      path.startsWith("/business-plan/"),
   },
   {
     href: "/admin/books",

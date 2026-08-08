@@ -64,7 +64,7 @@ function SectionHeading({
   );
 }
 
-export function BusinessPlanSection() {
+export function BusinessPlanSection({ embedded = false }: { embedded?: boolean } = {}) {
   const [tab, setTab] = useState<
     | "overview"
     | "operations"
@@ -104,23 +104,24 @@ export function BusinessPlanSection() {
           </p>
         </motion.div>
 
+        {!embedded && (
         <div className="mb-8 flex flex-col sm:flex-row sm:justify-end gap-2 print:hidden">
           <Link
-            href="/business-plan/phases"
+            href="/business-plan?tab=phases"
             className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-royal-gold/40 bg-white px-5 text-sm font-semibold text-royal-blue shadow-sm hover:border-royal-gold hover:bg-royal-gold/10 transition-colors"
           >
             <Target className="h-4 w-4 text-royal-gold" />
             Phase Decision
           </Link>
           <Link
-            href="/business-plan/proforma"
+            href="/business-plan?tab=proforma"
             className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-royal-gold/40 bg-white px-5 text-sm font-semibold text-royal-blue shadow-sm hover:border-royal-gold hover:bg-royal-gold/10 transition-colors"
           >
             <ClipboardList className="h-4 w-4 text-royal-gold" />
             Pre-Launch Proforma
           </Link>
           <Link
-            href="/business-plan/cost-breakdown"
+            href="/business-plan?tab=costs"
             className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-royal-gold/40 bg-white px-5 text-sm font-semibold text-royal-blue shadow-sm hover:border-royal-gold hover:bg-royal-gold/10 transition-colors"
           >
             <TrendingUp className="h-4 w-4 text-royal-gold" />
@@ -142,6 +143,7 @@ export function BusinessPlanSection() {
             Print
           </button>
         </div>
+        )}
 
         {/* Title */}
         <motion.header

@@ -1,29 +1,6 @@
-import type { Metadata } from "next";
-import { PageShell } from "@/components/layout/page-shell";
-import { PasswordGate } from "@/components/password-gate";
-import { PhaseDecisionSection } from "@/components/sections/phase-decision";
-import { buildMetadata } from "@/lib/seo";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = buildMetadata({
-  title: "Phase Decision (Internal)",
-  description:
-    "Office beta vs full retail + kitchen vs multi-set scale — economics and gate metrics before pulling the trigger.",
-  path: "/business-plan/phases",
-  noIndex: true,
-});
-
+/** Old URL → unified Business Plan hub */
 export default function PhaseDecisionPage() {
-  return (
-    <PageShell>
-      <PasswordGate
-        code="3121"
-        storageKey="sbp-unlock-admin"
-        title="Phase Decision"
-        description="Internal roadmap — password protected."
-        buttonLabel="View Phase Decision"
-      >
-        <PhaseDecisionSection />
-      </PasswordGate>
-    </PageShell>
-  );
+  redirect("/business-plan?tab=phases");
 }
