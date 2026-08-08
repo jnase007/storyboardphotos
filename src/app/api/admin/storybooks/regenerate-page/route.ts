@@ -3,6 +3,7 @@ import { assertAdminAccess } from "@/lib/storybook/admin-auth";
 import { generateStoryIllustration } from "@/lib/storybook/generate-illustrations";
 import { createServiceClient } from "@/lib/supabase/admin";
 import { hasRealSupabase } from "@/lib/storybook/supabase-helpers";
+import type { StoryPage } from "@/lib/storybook/types";
 
 export const maxDuration = 120;
 
@@ -50,13 +51,13 @@ export async function POST(request: NextRequest) {
           .select("pages")
           .eq("id", storybook_id)
           .single();
-        const pages = Array.isArray(row?.pages) ? [...(row.pages as Record<string, unknown>[])] : [];
-        if (pages[page_index]) {
-          pages[page_index] = {
-            ...pages[page_index],
-            imageUrl: result.imageUrl,
-            useSessionPhoto: false,
-          };
+        const existing = Array.isArray(row?.pages) ? (row.pages as StoryPage[]) : [];
+        if (existing[page_index]) {
+          const pages: StoryPage[] = existing.map((p, i) =>
+            i === page_index
+              ? { ...p, imageUrl: result.imageUrl, useSessionPhoto: false }
+              : p
+          );
           await supabase
             .from("storybooks")
             .update({ pages, updated_at: new Date().toISOString() })
