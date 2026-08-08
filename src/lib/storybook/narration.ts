@@ -136,4 +136,4 @@ export async function generateNarrationAudio(options: {
 
 /** Motion prompt for Seedance / Higgsfield — keep pages looking like coloring art while alive */
 export const SEEDANCE_PAGE_MOTION_PROMPT =
-  "Premium Disney-quality children's coloring book page gently coming to life, ultra-clean black ink outlines stay sharp and stable, cream parchment texture preserved, soft 2D parallax, hair and cape drift lightly, magical sparkle outlines twinkle, slow elegant camera push-in, warm golden fairy light, no morphing face, no photorealism, no text, no watermark";
+  "Whimsical watercolor children's storybook page gently coming to life, soft sepia ink outlines stay stable, pastel watercolor washes preserved, soft 2D parallax, hair and cape drift lightly, magical sparkles twinkle, slow elegant camera push-in, warm golden fairy light, no morphing face, no photorealism, no text, no watermark";

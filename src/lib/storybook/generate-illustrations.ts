@@ -44,11 +44,12 @@ type FluxResult = {
 };
 
 /**
- * Disney-tier coloring book look for print + Seedance animation.
- * Premium line art: clean ink, elegant shapes, magical but colorable.
+ * Target look (locked to Justin's style ref):
+ * whimsical watercolor + soft sepia/ink outlines on cream paper —
+ * classic fairytale children's book, NOT bare uncolored line art.
  */
 const STYLE_SUFFIX =
-  "premium Disney-quality children's coloring book illustration, ultra-clean bold black ink outlines, elegant refined line weight, charming royal character design, large open colorable regions, soft cream parchment paper, mostly uncolored line art with tiny champagne-gold and blush pastel accents only, magical sparkles as simple star outlines, fairytale composition, balanced negative space, masterpiece storybook page, consistent character model sheet look, no muddy shading, no gray fills, no photorealism, no real photographs, no 3D render, no watercolor washes, no text, no letters, no watermark, no logo, no signature";
+  "whimsical watercolor children's storybook illustration, soft sepia ink outlines with gentle hand-drawn line variation, soft pastel watercolor washes (sage green, dusty lavender, peach, powder blue, warm gold), cream textured watercolor paper, cute storybook character proportions with big expressive eyes, decorative floral vine border, atmospheric pale background washes, magical sparkles and warm fairy light, premium fairytale picture-book quality, consistent character across pages, FULL FIGURE visible with generous headroom and foot room, character completely inside the frame, never crop head face crown hands or feet, centered composition with safe margins on all sides, no photorealism, no real photographs, no 3D render, no harsh pure-black vector lines, no empty uncolored coloring-page look, no muddy gray, no text, no letters, no watermark, no logo, no signature";
 
 /**
  * Remove background from an image using fal-ai/bria background removal.
@@ -174,7 +175,7 @@ async function generateWithImagen4(prompt: string): Promise<FluxResult> {
   if (!googleKey) return fallbackPlaceholder(prompt);
 
   const STYLE =
-    "premium Disney-quality double-page children's coloring book illustration, ultra-clean bold black ink outlines, elegant royal storybook design, mostly uncolored line art with tiny champagne-gold accents only, cream parchment paper, decorative simple vine border, large open colorable areas, enchanted kingdom castle trees paths sparkles, masterpiece fairytale composition, no heavy shading, no watercolor washes, no photorealism, no text, no watermark";
+    "whimsical double-page watercolor children's storybook illustration, soft sepia ink outlines, gentle pastel watercolor washes on cream paper, decorative floral vine border, enchanted kingdom castle trees paths sparkles, atmospheric depth, fairytale picture-book quality, no photorealism, no empty line-art coloring page, no text, no watermark";
 
   const fullPrompt = `${prompt}. ${STYLE}`;
 
@@ -188,7 +189,7 @@ async function generateWithImagen4(prompt: string): Promise<FluxResult> {
           instances: [{ prompt: fullPrompt }],
           parameters: {
             sampleCount: 1,
-            aspectRatio: "3:4",
+            aspectRatio: "3:4", // portrait page — keep full figure with headroom
             safetyFilterLevel: "block_few",
             personGeneration: "allow_adult",
           },
@@ -274,11 +275,11 @@ async function generateWithCharacterPortrait(options: {
   const googleKey = process.env.GOOGLE_AI_API_KEY;
   if (!googleKey) return fallbackPlaceholder(options.prompt);
 
-  const STYLE = "premium Disney-quality children's coloring book page, ultra-clean bold black ink outlines, elegant royal character design, mostly uncolored line art on cream parchment, tiny champagne-gold accents only, large colorable areas, magical but simple, no heavy shading, no watercolor, no photorealism, no text, no watermark";
+  const STYLE = "whimsical watercolor children's storybook illustration, soft sepia ink outlines, soft pastel watercolor washes on cream textured paper, cute storybook proportions, big expressive eyes, decorative floral border, magical fairy light, fairytale picture-book quality, no photorealism, no empty uncolored coloring-page look, no text, no watermark";
 
-  const fullPrompt = `Create a premium Disney-level coloring book page.
+  const fullPrompt = `Create a premium watercolor children's storybook page (ink + soft color washes — NOT a blank coloring page).
 
-FACE LIKENESS (critical): Study the child's face in the reference photo. Draw the hero as a charming royal coloring-book character that clearly resembles this child — same age vibe, hair, face shape, expression — simplified into clean elegant line art (not a photo, not realistic skin).
+FACE LIKENESS (critical): Study the child's face in the reference photo. Paint/draw the hero as a charming royal storybook character that clearly resembles this child — same age vibe, hair, face shape, expression — stylized into soft watercolor + ink (not a photo, not realistic skin).
 
 SCENE: ${options.prompt}
 
@@ -286,8 +287,10 @@ STYLE: ${STYLE}
 
 RULES:
 - Hero is center stage, readable silhouette, proud kind pose
+- FULL BODY in frame: entire head, crown/hair, face, hands, feet — generous margins top and bottom
+- NEVER crop or cut off the head, face, crown, arms, or feet
 - Same character design if this child appeared on other pages
-- Pure illustrated coloring book art only
+- Soft watercolor color throughout (pastels), not empty line art
 - No real photo collage, no half-photo face, no text`;
 
   try {
@@ -370,7 +373,7 @@ export async function illustrateStoryPages(options: {
   characterPhoto?: string | null;
 }): Promise<StoryPage[]> {
   const { pages, characterPhoto } = options;
-  // Product rule: book + movie are 100% coloring-book art.
+  // Product rule: book + movie are 100% illustrated watercolor storybook art (no real session photos).
   // Real session photos are NEVER placed in pages. Face upload = likeness only.
   const result: StoryPage[] = [];
 
@@ -381,7 +384,7 @@ export async function illustrateStoryPages(options: {
     }
 
     const sceneHint = page.imagePrompt ?? page.title;
-    const prompt = `${sceneHint}. ${STYLE_SUFFIX}. Full-page children's coloring book illustration.`;
+    const prompt = `${sceneHint}. ${STYLE_SUFFIX}. Full-page children's watercolor storybook illustration. CRITICAL FRAMING: show the complete child hero from head to toe with empty margin above the crown/hair and below the feet — never cut off the head.`;
 
     const art = await generateStoryIllustration({
       prompt,

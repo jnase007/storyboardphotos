@@ -59,7 +59,7 @@ function BookPage({
           <img
             src={page.imageUrl}
             alt={page.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain bg-[#F8F1E3]"
           />
         ) : (
           <div

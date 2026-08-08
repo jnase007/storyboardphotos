@@ -145,7 +145,7 @@ export function materializeAdventureStory(
       imagePrompt:
         fillPlaceholders(
           p.imagePromptHint ||
-            `Coloring book children's illustration of [Role] [Name] in a kingdom adventure, bold black outlines, cream paper, magical atmosphere, no text`,
+            `Watercolor children's storybook illustration of [Role] [Name] in a kingdom adventure, soft sepia ink outlines, pastel watercolor washes, cream paper, magical atmosphere, no text`,
           childName,
           gender
         ) + `, age ${childAge}`,

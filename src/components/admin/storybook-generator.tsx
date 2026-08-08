@@ -59,6 +59,10 @@ type GeneratedBook = {
   pages: StoryPage[];
   status: string;
   storyProvider?: string;
+  package?: "book" | "movie" | "both";
+  video_status?: string | null;
+  narration_url?: string | null;
+  video_url?: string | null;
 };
 
 type SetFiles = Record<SetUploadId, File[]>;
@@ -219,6 +223,8 @@ export function StorybookGenerator() {
   const [pdfLoading, setPdfLoading] = useState(false);
   const [regeneratingPage, setRegeneratingPage] = useState(false);
   const [genStatus, setGenStatus] = useState("Preparing…");
+  const [narrating, setNarrating] = useState(false);
+  const [requestingMovie, setRequestingMovie] = useState(false);
 
   const page = book?.pages[pageIndex];
 
@@ -536,6 +542,58 @@ export function StorybookGenerator() {
       toast.error(err instanceof Error ? err.message : "PDF generation failed");
     } finally {
       setPdfLoading(false);
+    }
+  }
+
+  async function generateNarration() {
+    if (!book?.id || String(book.id).startsWith("local-")) {
+      toast.error("Save/generate with Supabase first (need a real book id).");
+      return;
+    }
+    setNarrating(true);
+    try {
+      const res = await fetch(`/api/storybooks/${book.id}/narrate`, {
+        method: "POST",
+        headers: { ...adminHeaders, "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      const data = await readApiJson<{ error?: string; narration_url?: string }>(res);
+      if (!res.ok) throw new Error(data.error || "Narration failed");
+      setBook((b) => (b ? { ...b, narration_url: data.narration_url ?? b.narration_url } : b));
+      toast.success("Bedtime narration ready");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Narration failed");
+    } finally {
+      setNarrating(false);
+    }
+  }
+
+  async function queueMovie() {
+    if (!book?.id || String(book.id).startsWith("local-")) {
+      toast.error("Need a saved book id to queue the movie.");
+      return;
+    }
+    setRequestingMovie(true);
+    try {
+      const res = await fetch(`/api/storybooks/${book.id}/video`, {
+        method: "POST",
+        headers: { ...adminHeaders, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          package: "full",
+          contact_name: childName.trim() || book.child_name,
+          notes: "Queued from admin generator",
+        }),
+      });
+      const data = await readApiJson<{ error?: string; video_status?: string }>(res);
+      if (!res.ok) throw new Error(data.error || "Movie request failed");
+      setBook((b) =>
+        b ? { ...b, video_status: data.video_status || "requested" } : b
+      );
+      toast.success("Movie queued — open Admin → Movie Queue");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Movie request failed");
+    } finally {
+      setRequestingMovie(false);
     }
   }
 
@@ -955,12 +1013,16 @@ export function StorybookGenerator() {
             saving={saving}
             approving={approving}
             pdfLoading={pdfLoading}
+            narrating={narrating}
+            requestingMovie={requestingMovie}
             updatePageField={updatePageField}
             saveEdits={saveEdits}
             downloadMpixPdf={downloadMpixPdf}
             approveAndDownload={approveAndDownload}
             regeneratePage={regeneratePage}
             regeneratingPage={regeneratingPage}
+            generateNarration={generateNarration}
+            queueMovie={queueMovie}
             onNewBook={() => {
               setStep("form");
               setBook(null);
@@ -987,12 +1049,16 @@ function BookFlipPreview({
   saving,
   approving,
   pdfLoading,
+  narrating,
+  requestingMovie,
   updatePageField,
   saveEdits,
   downloadMpixPdf,
   approveAndDownload,
   regeneratePage,
   regeneratingPage,
+  generateNarration,
+  queueMovie,
   onNewBook,
 }: {
   book: GeneratedBook;
@@ -1003,12 +1069,16 @@ function BookFlipPreview({
   saving: boolean;
   approving: boolean;
   pdfLoading: boolean;
+  narrating: boolean;
+  requestingMovie: boolean;
   updatePageField: (index: number, field: "title" | "text", value: string) => void;
   saveEdits: () => void;
   downloadMpixPdf: () => void;
   approveAndDownload: () => void;
   regeneratePage: (pageIdx: number) => void;
   regeneratingPage: boolean;
+  generateNarration: () => void;
+  queueMovie: () => void;
   onNewBook: () => void;
 }) {
   const page = book.pages[pageIndex];
@@ -1156,8 +1226,8 @@ function BookFlipPreview({
               transition={{ duration: 0.38, ease: [0.25, 0.46, 0.45, 0.94] }}
               className="w-full"
             >
-              {/* Illustration — top 70% */}
-              <div className="relative w-full" style={{ paddingBottom: "58%" }}>
+              {/* Illustration — full art visible (no head/body crop) */}
+              <div className="relative w-full bg-[#F8F1E3]" style={{ paddingBottom: "75%" }}>
                 {page.imageUrl ? (
                   page.imageUrl.startsWith("data:") ||
                   page.imageUrl.includes("placehold.co") ? (
@@ -1165,14 +1235,14 @@ function BookFlipPreview({
                     <img
                       src={page.imageUrl}
                       alt={["Title Page","The Dragon Quest","The Lost Crown","The Rescue Mission","The Forest Guardian","The Kindness Quest","The Light Treasure"].includes(page.title) ? "" : page.title}
-                      className="absolute inset-0 h-full w-full object-cover"
+                      className="absolute inset-0 h-full w-full object-contain"
                     />
                   ) : (
                     <Image
                       src={page.imageUrl}
                       alt={["Title Page","The Dragon Quest","The Lost Crown","The Rescue Mission","The Forest Guardian","The Kindness Quest","The Light Treasure"].includes(page.title) ? "" : page.title}
                       fill
-                      className="object-cover"
+                      className="object-contain"
                       sizes="(max-width: 640px) 100vw, 900px"
                       unoptimized
                     />
@@ -1275,6 +1345,56 @@ function BookFlipPreview({
         </div>
       </div>
 
+      {/* Make the video path */}
+      <div className="rounded-xl border border-royal-gold/30 bg-white/80 p-4 space-y-3">
+        <p className="text-sm font-semibold text-royal-blue">Make the video</p>
+        <ol className="text-xs text-royal-blue/70 list-decimal pl-5 space-y-1">
+          <li>Generate bedtime narration (ElevenLabs read-aloud)</li>
+          <li>Queue Animated Kingdom Movie → Admin → Movie Queue</li>
+          <li>Ops renders page clips + stitches MP4, pastes video URL</li>
+          <li>Parent watches on /book/[id]</li>
+        </ol>
+        <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-2 pt-1">
+          <button
+            type="button"
+            onClick={generateNarration}
+            disabled={narrating || !book.id || String(book.id).startsWith("local-")}
+            className="inline-flex h-11 items-center gap-2 rounded-md border-2 border-royal-gold bg-royal-cream px-5 text-sm font-semibold text-royal-blue hover:bg-royal-gold/20 disabled:opacity-50"
+          >
+            {narrating ? <Loader2 className="h-4 w-4 animate-spin" /> : <span>🎧</span>}
+            {book.narration_url ? "Regenerate Narration" : "Generate Narration"}
+          </button>
+          <button
+            type="button"
+            onClick={queueMovie}
+            disabled={
+              requestingMovie ||
+              !book.id ||
+              String(book.id).startsWith("local-") ||
+              book.video_status === "requested" ||
+              book.video_status === "in_production" ||
+              book.video_status === "ready"
+            }
+            className="inline-flex h-11 items-center gap-2 rounded-md border-2 border-royal-blue bg-royal-blue px-5 text-sm font-semibold text-royal-gold hover:bg-royal-blue/90 disabled:opacity-50"
+          >
+            {requestingMovie ? <Loader2 className="h-4 w-4 animate-spin" /> : <span>🎬</span>}
+            {book.video_status && book.video_status !== "none"
+              ? `Movie: ${book.video_status}`
+              : "Queue Animated Movie"}
+          </button>
+          <a
+            href="/admin/video-jobs"
+            className="inline-flex h-11 items-center gap-2 rounded-md border border-royal-gold/40 px-5 text-sm font-semibold text-royal-blue hover:bg-royal-gold/10"
+          >
+            Open Movie Queue
+          </a>
+        </div>
+        {book.narration_url ? (
+          // eslint-disable-next-line jsx-a11y/media-has-caption
+          <audio controls src={book.narration_url} className="w-full mt-1" />
+        ) : null}
+      </div>
+
       {/* Approve & Download PDF — bottom CTA */}
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
         <button
@@ -1288,13 +1408,12 @@ function BookFlipPreview({
           ) : (
             <Download className="h-4 w-4" />
           )}
-          Approve &amp; Download PDF
+          Approve & Download PDF
         </button>
       </div>
 
       <p className="text-center text-sm text-royal-blue/50">
-        Each kingdom-set page uses the photos you dropped for that set.
-        AI watercolor fills the remaining pages when fal.ai is configured.
+        Watercolor storybook art with full figure in frame (no head crop). Face photo is likeness only.
       </p>
     </div>
   );

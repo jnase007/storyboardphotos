@@ -220,20 +220,23 @@ async function drawInteriorPage(
           const areaRatio = PAGE_W / imageAreaH;
 
           let drawW, drawH, drawX, drawY;
-          // Cover mode: fill the entire area, crop edges if needed (no white bars)
+          // Contain mode: never crop heads/feet — letterbox on cream if needed
           if (imgRatio > areaRatio) {
-            // Image wider than area — fit by height, crop left/right
-            drawH = imageAreaH;
-            drawW = imageAreaH * imgRatio;
-            drawX = (PAGE_W - drawW) / 2;
-            drawY = 0;
-          } else {
-            // Image taller than area — fit by width, crop top/bottom
+            // Image wider than area — fit by width, pad top/bottom
             drawW = PAGE_W;
             drawH = PAGE_W / imgRatio;
             drawX = 0;
             drawY = (imageAreaH - drawH) / 2;
+          } else {
+            // Image taller than area — fit by height, pad left/right
+            drawH = imageAreaH;
+            drawW = imageAreaH * imgRatio;
+            drawX = (PAGE_W - drawW) / 2;
+            drawY = 0;
           }
+          // Cream letterbox so uncropped art sits on storybook paper
+          doc.setFillColor(...CREAM);
+          doc.rect(0, 0, PAGE_W, imageAreaH, "F");
           doc.addImage(img.dataUrl, img.format, drawX, drawY, drawW, drawH, undefined, "FAST");
         } catch {
           // Fallback: stretch to fill
@@ -512,13 +515,13 @@ async function centerCropImage(dataUrl: string, targetRatio: number): Promise<st
     let cropX = 0, cropY = 0, cropW = srcW, cropH = srcH;
 
     if (srcRatio > targetRatio) {
-      // Wider than target — crop width
+      // Wider than target — crop sides only (keep full height / heads)
       cropW = Math.round(srcH * targetRatio);
       cropX = Math.round((srcW - cropW) / 2);
     } else if (srcRatio < targetRatio) {
-      // Taller than target — crop height
+      // Taller than target — center crop vertically (never chop from top only)
       cropH = Math.round(srcW / targetRatio);
-      cropY = 0; // Crop from top
+      cropY = Math.round((srcH - cropH) / 2);
     }
 
     const canvas = document.createElement("canvas");
