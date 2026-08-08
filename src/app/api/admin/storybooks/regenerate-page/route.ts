@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { assertAdminAccess } from "@/lib/storybook/admin-auth";
 import { generateStoryIllustration } from "@/lib/storybook/generate-illustrations";
+import { createServiceClient } from "@/lib/supabase/admin";
+import { hasRealSupabase } from "@/lib/storybook/supabase-helpers";
 
 export const maxDuration = 120;
 
@@ -10,14 +12,60 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { imagePrompt, pageTitle } = body;
+    const {
+      imagePrompt,
+      pageTitle,
+      character_photo,
+      storybook_id,
+      page_index,
+    } = body as {
+      imagePrompt?: string;
+      pageTitle?: string;
+      character_photo?: string | null;
+      storybook_id?: string;
+      page_index?: number;
+    };
 
-    const prompt = imagePrompt || pageTitle || "An enchanted kingdom watercolor scene";
+    const scene = imagePrompt || pageTitle || "An enchanted kingdom watercolor scene";
+    const prompt = `${scene}. ONE single-page watercolor children's storybook illustration only — not a diptych, not two panels, not a double-page spread. Soft sepia ink outlines, pastel watercolor washes, cream paper, full figure with headroom, never crop the head, no text, no watermark.`;
 
     const result = await generateStoryIllustration({
       prompt,
       referenceImageUrl: null,
+      characterPhotoUrl: character_photo ?? null,
     });
+
+    // Persist into storybook pages when we have an id + index
+    if (
+      hasRealSupabase() &&
+      storybook_id &&
+      typeof page_index === "number" &&
+      page_index >= 0 &&
+      !String(storybook_id).startsWith("local-")
+    ) {
+      try {
+        const supabase = createServiceClient();
+        const { data: row } = await supabase
+          .from("storybooks")
+          .select("pages")
+          .eq("id", storybook_id)
+          .single();
+        const pages = Array.isArray(row?.pages) ? [...(row.pages as Record<string, unknown>[])] : [];
+        if (pages[page_index]) {
+          pages[page_index] = {
+            ...pages[page_index],
+            imageUrl: result.imageUrl,
+            useSessionPhoto: false,
+          };
+          await supabase
+            .from("storybooks")
+            .update({ pages, updated_at: new Date().toISOString() })
+            .eq("id", storybook_id);
+        }
+      } catch (persistErr) {
+        console.error("regenerate-page persist:", persistErr);
+      }
+    }
 
     return NextResponse.json({
       imageUrl: result.imageUrl,

@@ -612,15 +612,22 @@ export function StorybookGenerator() {
         body: JSON.stringify({
           imagePrompt: page.imagePrompt,
           pageTitle: page.title,
+          character_photo: characterPhoto,
+          storybook_id: book.id,
+          page_index: pageIdx,
         }),
       });
       if (!res.ok) throw new Error("Regeneration failed");
       const data = await res.json();
       if (data.imageUrl) {
+        // Replace only this page's single imageUrl (never append a second image)
         setBook((prev) => {
           if (!prev) return prev;
-          const pages = [...prev.pages];
-          pages[pageIdx] = { ...pages[pageIdx], imageUrl: data.imageUrl };
+          const pages = prev.pages.map((p, i) =>
+            i === pageIdx
+              ? { ...p, imageUrl: data.imageUrl as string, useSessionPhoto: false }
+              : p
+          );
           return { ...prev, pages };
         });
         toast.success("Page regenerated! ✨");

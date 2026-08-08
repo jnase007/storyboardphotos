@@ -49,7 +49,7 @@ type FluxResult = {
  * classic fairytale children's book, NOT bare uncolored line art.
  */
 const STYLE_SUFFIX =
-  "whimsical watercolor children's storybook illustration, soft sepia ink outlines with gentle hand-drawn line variation, soft pastel watercolor washes (sage green, dusty lavender, peach, powder blue, warm gold), cream textured watercolor paper, cute storybook character proportions with big expressive eyes, decorative floral vine border, atmospheric pale background washes, magical sparkles and warm fairy light, premium fairytale picture-book quality, consistent character across pages, FULL FIGURE visible with generous headroom and foot room, character completely inside the frame, never crop head face crown hands or feet, centered composition with safe margins on all sides, no photorealism, no real photographs, no 3D render, no harsh pure-black vector lines, no empty uncolored coloring-page look, no muddy gray, no text, no letters, no watermark, no logo, no signature";
+  "ONE single watercolor children's storybook illustration only — not a diptych, not two panels, not a double-page spread, not split screen, not collage of multiple scenes. Whimsical watercolor, soft sepia ink outlines with gentle hand-drawn line variation, soft pastel watercolor washes (sage green, dusty lavender, peach, powder blue, warm gold), cream textured watercolor paper, cute storybook character proportions with big expressive eyes, decorative floral vine border, atmospheric pale background washes, magical sparkles and warm fairy light, premium fairytale picture-book quality, consistent character across pages, FULL FIGURE visible with generous headroom and foot room, character completely inside the frame, never crop head face crown hands or feet, centered composition with safe margins on all sides, no photorealism, no real photographs, no 3D render, no harsh pure-black vector lines, no empty uncolored coloring-page look, no muddy gray, no text, no letters, no watermark, no logo, no signature";
 
 /**
  * Remove background from an image using fal-ai/bria background removal.
@@ -175,7 +175,7 @@ async function generateWithImagen4(prompt: string): Promise<FluxResult> {
   if (!googleKey) return fallbackPlaceholder(prompt);
 
   const STYLE =
-    "whimsical double-page watercolor children's storybook illustration, soft sepia ink outlines, gentle pastel watercolor washes on cream paper, decorative floral vine border, enchanted kingdom castle trees paths sparkles, atmospheric depth, fairytale picture-book quality, no photorealism, no empty line-art coloring page, no text, no watermark";
+    "ONE single-page whimsical watercolor children's storybook illustration only (not diptych, not two panels, not double-page spread), soft sepia ink outlines, gentle pastel watercolor washes on cream paper, decorative floral vine border, enchanted kingdom, atmospheric depth, fairytale picture-book quality, full figure with headroom, no photorealism, no empty line-art coloring page, no text, no watermark";
 
   const fullPrompt = `${prompt}. ${STYLE}`;
 
@@ -275,9 +275,9 @@ async function generateWithCharacterPortrait(options: {
   const googleKey = process.env.GOOGLE_AI_API_KEY;
   if (!googleKey) return fallbackPlaceholder(options.prompt);
 
-  const STYLE = "whimsical watercolor children's storybook illustration, soft sepia ink outlines, soft pastel watercolor washes on cream textured paper, cute storybook proportions, big expressive eyes, decorative floral border, magical fairy light, fairytale picture-book quality, no photorealism, no empty uncolored coloring-page look, no text, no watermark";
+  const STYLE = "ONE single-page whimsical watercolor children's storybook illustration only (not diptych, not two panels, not double-page, not collage), soft sepia ink outlines, soft pastel watercolor washes on cream textured paper, cute storybook proportions, big expressive eyes, decorative floral border, magical fairy light, fairytale picture-book quality, no photorealism, no empty uncolored coloring-page look, no text, no watermark";
 
-  const fullPrompt = `Create a premium watercolor children's storybook page (ink + soft color washes — NOT a blank coloring page).
+  const fullPrompt = `Create ONE premium watercolor children's storybook page (ink + soft color washes — NOT a blank coloring page). Single scene only.
 
 FACE LIKENESS (critical): Study the child's face in the reference photo. Paint/draw the hero as a charming royal storybook character that clearly resembles this child — same age vibe, hair, face shape, expression — stylized into soft watercolor + ink (not a photo, not realistic skin).
 
@@ -286,6 +286,8 @@ SCENE: ${options.prompt}
 STYLE: ${STYLE}
 
 RULES:
+- Exactly ONE illustration / one scene in the whole image
+- Do NOT draw two side-by-side pages, panels, or mirrored scenes
 - Hero is center stage, readable silhouette, proud kind pose
 - FULL BODY in frame: entire head, crown/hair, face, hands, feet — generous margins top and bottom
 - NEVER crop or cut off the head, face, crown, arms, or feet
