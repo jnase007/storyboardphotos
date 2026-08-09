@@ -40,6 +40,10 @@ export type AdventurePath = {
   title: string;
   /** One-line kid-friendly pitch */
   description: string;
+  /** Scripture anchor for the quest (reference) */
+  bibleVerse: string;
+  /** Short kid-friendly verse wording */
+  bibleVerseText: string;
   /** Extra guidance for AI rewriting */
   aiTheme: string;
   /** Book title with [Role] and [Name] */
@@ -65,7 +69,16 @@ export function fillPlaceholders(
     .replace(/\[Role\]/g, role);
 }
 
-export const ADVENTURE_PATHS_STORAGE_KEY = "sbp-adventure-paths-v3";
+/** v4 = biblical virtue themes + no spells/wands/occult magic */
+export const ADVENTURE_PATHS_STORAGE_KEY = "sbp-adventure-paths-v4";
+
+/** Shared AI guardrails for every quest (faith-friendly kingdom stories). */
+export const BIBLICAL_STORY_GUARDRAILS =
+  "Faith-friendly Kingdom of Light story. Themes from Scripture: courage, kindness, stewardship, light, rescue, integrity. " +
+  "NO magic spells, NO wands, NO casting, NO witchcraft, NO sorcery, NO wizards, NO potions, NO incantations, NO fairy-godmother magic. " +
+  "Wonder comes from beauty of creation, courage, prayerful heart, love, and light — never occult power. " +
+  "Talking animals or dragons only as gentle fable creatures (Narnia-adjacent), not as spirits or gods. " +
+  "No pronouns — always use the child name. Boy=King, Girl=Queen only.";
 
 export function getAdventurePath(id: AdventurePathId): AdventurePath {
   const path = ADVENTURE_PATHS.find((p) => p.id === id);
@@ -83,6 +96,8 @@ export function isAdventurePath(value: unknown): value is AdventurePath {
     typeof p.label === "string" &&
     typeof p.title === "string" &&
     typeof p.bookTitleTemplate === "string" &&
+    typeof (p as AdventurePath).bibleVerse === "string" &&
+    typeof (p as AdventurePath).bibleVerseText === "string" &&
     Array.isArray(p.pages) &&
     p.pages.length >= 6
   );
@@ -129,8 +144,9 @@ export function materializeAdventureStory(
   const role = TITLE_ROLE[gender];
   const bookTitle = fillPlaceholders(path.bookTitleTemplate, childName, gender);
 
-  // Cover already shows name + hero art — drop redundant interior title/portrait page
-  const rawPages = path.pages.filter((p) => !isRedundantTitleScriptPage(p));
+  // Keep title/cover script pages so they get UNIQUE art for the hardcover.
+  // Interior reading/PDF still strips them via stripRedundantTitlePages (cover already shows name + hero).
+  const rawPages = path.pages;
 
   const pages: StoryPage[] = rawPages.map((p, idx) => {
     const photoSet = p.photoSet ?? null;
@@ -148,7 +164,7 @@ export function materializeAdventureStory(
       imagePrompt:
         fillPlaceholders(
           p.imagePromptHint ||
-            `Watercolor children's storybook illustration of [Role] [Name] in a kingdom adventure, soft sepia ink outlines, pastel watercolor washes, cream paper, magical atmosphere, no text`,
+            `Watercolor children's storybook illustration of [Role] [Name] in a kingdom adventure, soft sepia ink outlines, pastel watercolor washes, cream paper, warm golden light and wonder of creation, no magic spells no wands, no text`,
           childName,
           gender
         ) + `, age ${childAge}`,
@@ -225,9 +241,12 @@ export const ADVENTURE_PATHS: AdventurePath[] = [
     label: "Slay the Dragon",
     title: "The Dragon Quest",
     description:
-      "Face the great dragon with courage - and discover that bravery can turn a foe into a friend.",
+      "Face the great dragon with courage — and discover that bravery and kindness can turn a foe into a friend.",
+    bibleVerse: "Joshua 1:9",
+    bibleVerseText:
+      "Be strong and courageous. Do not be afraid… for the Lord your God is with you wherever you go.",
     aiTheme:
-      "Child faces a fearsome-but-not-gory dragon threatening the kingdom. Climax is courage and kindness that calms or befriends the dragon - never graphic violence. Theme: true strength protects others.",
+      `${BIBLICAL_STORY_GUARDRAILS} Child faces a fearsome-but-not-gory dragon. Climax is courage and kindness that calms or befriends the dragon — never graphic violence, never spells. Theme: true strength protects others (Joshua 1:9).`,
     bookTitleTemplate: "[Role] [Name] and the Dragon Quest",
     pages: [
       {
@@ -235,19 +254,21 @@ export const ADVENTURE_PATHS: AdventurePath[] = [
         title: `The Dragon Quest`,
         staticScene: "dragon-slayer/title",
         text: `[Role] [Name] and the Dragon Quest`,
-        photoCaption: `A magical kingdom awaits`,
+        photoCaption: `A kingdom of light awaits`,
         useSessionPhoto: false,
-        imagePromptHint: "title page watercolor no text",
+        imagePromptHint: "title page watercolor no text, no wands no spells",
       },
       {
         page: 2,
         title: `The Kingdom of Light`,
         staticScene: "kingdom-map",
-        text: `Welcome to the Kingdom of Light — a magical realm of enchanted forests, royal gardens, and ancient castles.
+        text: `Welcome to the Kingdom of Light — a bright realm of living forests, royal gardens, and ancient castles.
 
 Every path leads to adventure. Every adventure begins with a brave heart.
 
-Your kingdom awaits, [Role] [Name].`,
+Your kingdom awaits, [Role] [Name].
+
+Be strong and courageous… for the Lord your God is with you. — Joshua 1:9`,
         photoCaption: `Map of the Kingdom`,
         useSessionPhoto: false,
         imagePromptHint: "kingdom map watercolor no text",
@@ -438,8 +459,11 @@ Always, they say yes.`,
     title: "The Rescue Mission",
     description:
       "Someone needs help! Race through the kingdom to rescue friends and bring them safely home.",
+    bibleVerse: "Luke 15:4",
+    bibleVerseText:
+      "What man of you, having a hundred sheep, if he has lost one of them, does not leave the ninety-nine… and go after the one that is lost?",
     aiTheme:
-      "Child leads a rescue mission to save villagers or friends in trouble (lost, trapped, or scared - never dark). Theme: helping others, teamwork, compassion.",
+      `${BIBLICAL_STORY_GUARDRAILS} Child leads a rescue to find friends who are lost or scared (never dark/horror). Theme: the Good Shepherd heart — leave none behind (Luke 15:4). No spells or wands.`,
     bookTitleTemplate: "[Role] [Name] and the Rescue Mission",
     pages: [
       {
@@ -456,7 +480,7 @@ Always, they say yes.`,
         page: 2,
         staticScene: "rescue-mission/call",
         title: "The Call",
-        text: `A messenger raced into the Kingdom of Light with urgent news - friends from the valley were missing, and night was falling fast.\n\nThe King turned to [Role] [Name]:\n\n"[Name], will you lead the rescue? The kingdom trusts your brave and caring heart."\n\nWithout hesitation, [Name] answered, "I will find them."`,
+        text: `A messenger raced into the Kingdom of Light with urgent news - friends from the valley were missing, and night was falling fast.\n\nThe King turned to [Role] [Name]:\n\n"[Name], will you lead the rescue? The kingdom trusts your brave and caring heart."\n\nWithout hesitation, [Name] answered, "I will find them."\n\nWhat man… does not go after the one that is lost? — Luke 15:4`,
         photoCaption: "Child looking determined",
         imagePromptHint:
           "Watercolor of [Role] [Name] receiving urgent news in a castle courtyard, children's book style, no text",
@@ -528,9 +552,12 @@ Always, they say yes.`,
     label: "Find the Crown",
     title: "The Lost Crown",
     description:
-      "The royal crown is missing! Follow clues across the kingdom to bring it home.",
+      "The royal crown is missing! Follow clues across the kingdom and return it with a true heart.",
+    bibleVerse: "Proverbs 4:23",
+    bibleVerseText:
+      "Keep your heart with all vigilance, for from it flow the springs of life.",
     aiTheme:
-      "Mystery adventure: the royal crown is lost. Child follows clues through the four sets and recovers it. Theme: responsibility, observation, honesty.",
+      `${BIBLICAL_STORY_GUARDRAILS} Mystery: the royal crown is lost. Child follows clues and recovers it with honesty, not greed. Theme: guard your heart; true royalty serves (Proverbs 4:23). No magical artifacts that cast spells — crown is a symbol of responsibility.`,
     bookTitleTemplate: "[Role] [Name] and the Lost Crown",
     pages: [
       {
@@ -547,7 +574,7 @@ Always, they say yes.`,
         page: 2,
         staticScene: "lost-crown/call",
         title: "The Call",
-        text: `Morning bells rang strangely in the Kingdom of Light - the royal crown was gone from its velvet pillow!\n\nThe King looked to [Role] [Name]:\n\n"You notice what others miss. Will you find our crown and restore the kingdom's light?"\n\n[Name] nodded. A mystery awaited.`,
+        text: `Morning bells rang strangely in the Kingdom of Light - the royal crown was gone from its velvet pillow!\n\nThe King looked to [Role] [Name]:\n\n"You notice what others miss. Will you find our crown and restore the kingdom's light?"\n\n[Name] nodded. A mystery awaited.\n\nKeep your heart with all vigilance… — Proverbs 4:23`,
         photoCaption: "Child looking curious",
         imagePromptHint:
           "Watercolor of [Role] [Name] beside an empty crown pillow, mystery mood, children's book style, no text",
@@ -565,7 +592,7 @@ Always, they say yes.`,
       {
         page: 4,
         title: "Royal Forest",
-        text: "The golden thread wound through the Royal Forest.\n\nAmong the lanterns, [Name] discovered a second clue - a sparkling jewel that belonged to the crown.\n\nThe path was becoming clear.",
+        text: "The golden thread wound through the Royal Forest.\n\nAmong the lanterns, [Name] discovered a second clue - a jewel that belonged to the crown.\n\nThe path was becoming clear.",
         photoCaption: "Photo from Royal Forest",
         photoSet: "Royal Forest",
         useSessionPhoto: true,
@@ -585,7 +612,7 @@ Always, they say yes.`,
       {
         page: 6,
         title: "Courage Quest",
-        text: `At the Courage Quest, [Role] [Name] found the crown resting on a stone of light.\n\nA soft voice asked, "Who seeks the crown - for glory, or for the people?"\n\n"For the people," [Name] answered.\n\nThe crown shone, and [Name] lifted it with care.`,
+        text: `At the Courage Quest, [Role] [Name] found the crown resting on a stone of light.\n\nA soft voice asked, "Who seeks the crown - for glory, or for the people?"\n\n"For the people," [Name] answered.\n\nThe crown gleamed in the sun, and [Name] lifted it with care.`,
         photoCaption: "Photo from Courage Quest",
         photoSet: "Chastle",
         useSessionPhoto: true,
@@ -619,9 +646,12 @@ Always, they say yes.`,
     label: "Forest Guardian",
     title: "The Forest Guardian",
     description:
-      "The enchanted forest needs a protector. Defend the creatures and restore the magic.",
+      "God's green world needs a protector. Care for the creatures and restore the light to the trees.",
+    bibleVerse: "Genesis 2:15",
+    bibleVerseText:
+      "The Lord God took the man and put him in the garden of Eden to work it and keep it.",
     aiTheme:
-      "Child becomes guardian of the enchanted forest, helping animals and restoring magic. Theme: stewardship, gentleness with nature, quiet courage.",
+      `${BIBLICAL_STORY_GUARDRAILS} Child becomes guardian of the living forest, helping animals and restoring light to the trees. Theme: stewardship of creation (Genesis 2:15). No magic spells — light is care, courage, and God's good design.`,
     bookTitleTemplate: "[Role] [Name] and the Forest Guardian",
     pages: [
       {
@@ -632,16 +662,16 @@ Always, they say yes.`,
         staticScene: "forest-guardian/title",
         useSessionPhoto: false,
         imagePromptHint:
-          "Watercolor portrait of [Role] [Name] with soft forest light, children's book style, no text",
+          "COVER PORTRAIT only: [Role] [Name] facing viewer in a soft garden arch or simple throne backdrop, calm smile, holding flowers or a small unlit lantern — NOT deep forest action, NO staff, NO wand, NO fairies casting spells, children's book style, no text",
       },
       {
         page: 2,
         staticScene: "forest-guardian/call",
         title: "The Call",
-        text: `The lanterns of the Royal Forest flickered weakly - the magic that protected the woodland creatures was fading.\n\nThe King asked [Role] [Name]:\n\n"Will you become the Forest Guardian and bring the light back to the trees?"\n\n[Name] felt the call of the wild and whispered, "Yes."`,
+        text: `The lanterns of the Royal Forest flickered weakly - the light that kept the woodland creatures safe was fading.\n\nThe King asked [Role] [Name]:\n\n"Will you become the Forest Guardian and bring the light back to the trees?"\n\n[Name] felt the call to care for creation and whispered, "Yes."\n\nThe Lord God… put him in the garden… to work it and keep it. — Genesis 2:15`,
         photoCaption: "Child looking wonder-struck",
         imagePromptHint:
-          "Watercolor of [Role] [Name] called to protect a magical forest, children's book style, no text",
+          "THE CALL scene — DIFFERENT from cover: castle courtyard steps at golden hour, King or messenger with [Role] [Name], kingdom walls behind, beginning of journey pose, NO deep lantern forest clone of the cover, NO staff, NO wand, warm natural light, children's book style, no text",
       },
       {
         page: 3,
@@ -661,22 +691,22 @@ Always, they say yes.`,
         photoSet: "Royal Forest",
         useSessionPhoto: true,
         imagePromptHint:
-          "Watercolor of [Role] [Name] lighting lanterns for forest creatures, magical trees, children's book style, no text",
+          "Watercolor of [Role] [Name] lighting lanterns for forest creatures, living trees warm light, no spells no wands, children's book style, no text",
       },
       {
         page: 5,
         title: "Royal Garden",
-        text: "The Royal Garden offered seeds of starlight - tiny sparks that could heal tired roots.\n\n[Role] [Name] carried them carefully, knowing every living thing deserved care.",
+        text: "The Royal Garden offered seeds of hope - tiny gifts that could strengthen tired roots.\n\n[Role] [Name] carried them carefully, knowing every living thing deserved care.",
         photoCaption: "Photo from Royal Garden",
         photoSet: "Royal Garden",
         useSessionPhoto: true,
         imagePromptHint:
-          "Watercolor of [Role] [Name] gathering glowing seeds in a garden, children's book illustration, no text",
+          "Watercolor of [Role] [Name] gathering hopeful seeds in a garden, warm daylight, no spells no wands, children's book illustration, no text",
       },
       {
         page: 6,
         title: "Courage Quest",
-        text: "At the Courage Quest, a shadow tried to snuff out the last forest light.\n\n[Role] [Name] planted the starlight seeds and stood firm.\n\nLight bloomed. The shadow fled. The forest breathed again - and named [Name] its guardian.",
+        text: "At the Courage Quest, a shadow tried to snuff out the last forest light.\n\n[Role] [Name] planted the seeds of hope and stood firm.\n\nLight returned. The shadow fled. The forest breathed again - and [Name] kept it with a faithful heart.",
         photoCaption: "Photo from Courage Quest",
         photoSet: "Chastle",
         useSessionPhoto: true,
@@ -711,8 +741,11 @@ Always, they say yes.`,
     title: "The Kindness Quest",
     description:
       "A lonely corner of the kingdom needs warmth. Heal hearts with courage and kindness.",
+    bibleVerse: "Ephesians 4:32",
+    bibleVerseText:
+      "Be kind to one another, tenderhearted, forgiving one another, as God in Christ forgave you.",
     aiTheme:
-      "Emotional adventure: child spreads kindness to heal loneliness or sadness in the kingdom. Theme: empathy, inclusion, gentle bravery.",
+      `${BIBLICAL_STORY_GUARDRAILS} Child spreads kindness to heal loneliness in the kingdom. Theme: be kind and tenderhearted (Ephesians 4:32). No "royal magic" — kindness is love in action, not a spell.`,
     bookTitleTemplate: "[Role] [Name] and the Kindness Quest",
     pages: [
       {
@@ -729,7 +762,7 @@ Always, they say yes.`,
         page: 2,
         staticScene: "kindness-quest/call",
         title: "The Call",
-        text: `Not every quest needs a sword. In the Kingdom of Light, a quiet sadness had settled over one village - people felt unseen and alone.\n\nThe King asked [Role] [Name]:\n\n"Will you carry kindness like a lantern and remind everyone they belong?"\n\n[Name]'s answer was soft and sure: "I will."`,
+        text: `Not every quest needs a sword. In the Kingdom of Light, a quiet sadness had settled over one village - people felt unseen and alone.\n\nThe King asked [Role] [Name]:\n\n"Will you carry kindness like a lantern and remind everyone they belong?"\n\n[Name]'s answer was soft and sure: "I will."\n\nBe kind to one another, tenderhearted… — Ephesians 4:32`,
         photoCaption: "Child looking compassionate",
         imagePromptHint:
           "Watercolor of [Role] [Name] holding a lantern of kindness, children's book style, no text",
@@ -778,7 +811,7 @@ Always, they say yes.`,
         page: 7,
         staticScene: "kindness-quest/gift",
         title: "The Return",
-        text: `When [Role] [Name] returned, the village glowed with new friendships.\n\nThe King said, "You healed what swords cannot. That is royal magic."`,
+        text: `When [Role] [Name] returned, the village glowed with new friendships.\n\nThe King said, "You healed what swords cannot. That is true royalty — love in action."`,
         photoCaption: "Child looking proud",
         imagePromptHint:
           "Watercolor celebration of kindness with [Role] [Name] at the castle, children's book style, no text",
@@ -801,9 +834,11 @@ Always, they say yes.`,
     label: "Treasure of Light",
     title: "The Treasure of Light",
     description:
-      "The kingdom's light has been stolen! Recover the treasure and bring the glow home.",
+      "The kingdom's light has dimmed! Recover the treasure of hope and share the glow with everyone.",
+    bibleVerse: "Matthew 5:14",
+    bibleVerseText: "You are the light of the world. A city set on a hill cannot be hidden.",
     aiTheme:
-      "Quest to recover a stolen magical light/treasure that keeps the kingdom bright. Theme: perseverance, hope, sharing light with others.",
+      `${BIBLICAL_STORY_GUARDRAILS} Quest to recover a stolen treasure of light/hope that keeps the kingdom bright. Theme: you are the light of the world — share light, do not hide it (Matthew 5:14). Crystal/lantern is a symbol of hope, not a magic spell object.`,
     bookTitleTemplate: "[Role] [Name] and the Treasure of Light",
     pages: [
       {
@@ -820,7 +855,7 @@ Always, they say yes.`,
         page: 2,
         staticScene: "light-treasure/call",
         title: "The Call",
-        text: `One night, the stars above the Kingdom of Light dimmed - the Treasure of Light had been taken from the tower.\n\nThe King called [Role] [Name]:\n\n"Bring back our light, and remind everyone that hope can be found again."\n\n[Name] lifted a small empty lantern. "I will fill it."`,
+        text: `One night, the stars above the Kingdom of Light dimmed - the Treasure of Light had been taken from the tower.\n\nThe King called [Role] [Name]:\n\n"Bring back our light, and remind everyone that hope can be found again."\n\n[Name] lifted a small empty lantern. "I will fill it."\n\nYou are the light of the world. — Matthew 5:14`,
         photoCaption: "Child holding a lantern",
         imagePromptHint:
           "Watercolor of [Role] [Name] with an empty lantern under dim stars, children's book style, no text",

@@ -75,7 +75,7 @@ Rules:
 - Pages 1–2: title / call to adventure (photoSet null or portrait; useSessionPhoto true ok).
 - Include each of the four kingdom sets on distinct pages with useSessionPhoto true.
 - Final 1–2 pages: return + The End.
-- imagePrompt: short WATERCOLOR STORYBOOK illustration prompt (full-bleed 4:3 landscape, soft sepia ink outlines, soft pastel watercolor washes, whimsical fairytale look, edge-to-edge scene with NO vine border and NO white side margins, full body in frame with headroom above crown, no cropped heads, no empty line-art coloring page, no text), mentioning ${role} ${input.childName}, age ${input.childAge}.
+- imagePrompt: short WATERCOLOR STORYBOOK illustration prompt (full-bleed 4:3 landscape, soft sepia ink outlines, soft pastel watercolor washes, faith-friendly fairytale look, warm golden light, edge-to-edge scene with NO vine border and NO white side margins, full body in frame with headroom above crown, no cropped heads, no empty line-art coloring page, NO wands, NO glowing staffs, NO spell casting, no text). Each page MUST describe a DIFFERENT location/pose than other pages. Mention ${role} ${input.childName}, age ${input.childAge}.
 - Each page text: 2–5 short paragraphs, suitable for a printed spread and read-aloud narration.
 - Never graphic violence; keep dragon/conflict age-appropriate and hopeful.`;
 

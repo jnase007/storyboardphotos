@@ -2,6 +2,17 @@ import { jsPDF } from "jspdf";
 import type { StoryPage } from "./types";
 import { stripRedundantTitlePages } from "./adventure-paths";
 
+function isLikelyTitlePage(p: StoryPage): boolean {
+  const title = (p.title || "").trim().toLowerCase();
+  if (title === "title page") return true;
+  const text = (p.text || "").replace(/\s+/g, " ").trim();
+  return (
+    text.length <= 90 &&
+    /and the /i.test(text) &&
+    !text.includes("\n")
+  );
+}
+
 // ─── Brand Colors ────────────────────────────────────────────────────────────
 const ROYAL_BLUE   = [10,  22,  40]  as [number, number, number]; // #0A1628
 const GOLD         = [212, 176, 122] as [number, number, number]; // #D4B07A
@@ -46,11 +57,18 @@ export async function buildStorybookPdf(options: {
 
   let pageCount = 0;
 
+  // Prefer dedicated title/cover art (page 1) so interior "The Call" is never duplicated on the cover
+  const titleOrFirstArt =
+    pages.find((p) => isLikelyTitlePage(p))?.imageUrl ||
+    pages[0]?.imageUrl ||
+    undefined;
+  const resolvedCoverUrl = coverImageUrl || titleOrFirstArt;
+
   // ── Cover page ────────────────────────────────────────────────────────────
   if (includeCover) {
     if (pageCount > 0) doc.addPage();
     pageCount++;
-    await drawCoverPageAsync(doc, childName, coverImageUrl, bookType);
+    await drawCoverPageAsync(doc, childName, resolvedCoverUrl, bookType);
   }
 
   // ── Interior pages ────────────────────────────────────────────────────────

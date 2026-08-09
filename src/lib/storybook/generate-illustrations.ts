@@ -56,7 +56,7 @@ export const STORYBOOK_IMAGE_ASPECT = "4:3" as const;
  * classic fairytale children's book, NOT bare uncolored line art.
  */
 const STYLE_SUFFIX =
-  "ONE single full-bleed 4:3 landscape watercolor children's storybook illustration only — not a diptych, not two panels, not a double-page spread, not split screen, not collage. FILL THE ENTIRE CANVAS edge-to-edge with the scene (background, sky, forest, castle continue to all four edges). NO decorative vine border, NO floral frame, NO oval matte, NO white or cream margins inside the image, NO picture-frame border. Whimsical watercolor, soft sepia ink outlines with gentle hand-drawn line variation, soft pastel watercolor washes (sage green, dusty lavender, peach, powder blue, warm gold), cream textured watercolor paper only as the painted ground not as empty side bars, cute storybook character proportions with big expressive eyes, atmospheric depth, magical sparkles and warm fairy light, premium fairytale picture-book quality, consistent character across pages, FULL FIGURE hero visible with headroom above crown and feet still in frame, never crop head face crown hands or feet, no photorealism, no real photographs, no 3D render, no harsh pure-black vector lines, no empty uncolored coloring-page look, no muddy gray, no text, no letters, no watermark, no logo, no signature";
+  "ONE single full-bleed 4:3 landscape watercolor children's storybook illustration only — not a diptych, not two panels, not a double-page spread, not split screen, not collage. FILL THE ENTIRE CANVAS edge-to-edge with the scene (background, sky, forest, castle continue to all four edges). NO decorative vine border, NO floral frame, NO oval matte, NO white or cream margins inside the image, NO picture-frame border. Whimsical watercolor, soft sepia ink outlines with gentle hand-drawn line variation, soft pastel watercolor washes (sage green, dusty lavender, peach, powder blue, warm gold), cream textured watercolor paper only as the painted ground not as empty side bars, cute storybook character proportions with big expressive eyes, atmospheric depth, warm golden sunlight and gentle wonder of creation, soft dust motes in sunbeams, premium faith-friendly fairytale picture-book quality (Narnia warmth not occult), NO magic wands, NO glowing staffs, NO scepters with energy beams, NO spell casting, NO witches, NO wizards, NO fairies casting spells, NO glowing runes, NO sorcery props, child may hold a simple lantern or flowers only, consistent character across pages, FULL FIGURE hero visible with headroom above crown and feet still in frame, never crop head face crown hands or feet, no photorealism, no real photographs, no 3D render, no harsh pure-black vector lines, no empty uncolored coloring-page look, no muddy gray, no text, no letters, no watermark, no logo, no signature";
 
 /**
  * Remove background from an image using fal-ai/bria background removal.
@@ -283,7 +283,7 @@ async function generateWithCharacterPortrait(options: {
   const googleKey = process.env.GOOGLE_AI_API_KEY;
   if (!googleKey) return fallbackPlaceholder(options.prompt);
 
-  const STYLE = "ONE full-bleed 4:3 landscape whimsical watercolor children's storybook illustration only (not diptych, not two panels, not double-page, not collage), soft sepia ink outlines, soft pastel watercolor washes, cute storybook proportions, big expressive eyes, magical fairy light, fairytale picture-book quality, scene fills entire canvas edge-to-edge, no photorealism, no empty uncolored coloring-page look, no text, no watermark";
+  const STYLE = "ONE full-bleed 4:3 landscape whimsical watercolor children's storybook illustration only (not diptych, not two panels, not double-page, not collage), soft sepia ink outlines, soft pastel watercolor washes, cute storybook proportions, big expressive eyes, warm golden sunlight, faith-friendly fairytale picture-book quality, NO wands NO spells NO sorcery, scene fills entire canvas edge-to-edge, no photorealism, no empty uncolored coloring-page look, no text, no watermark";
 
   const fullPrompt = `Create ONE premium watercolor children's storybook illustration (ink + soft color washes — NOT a blank coloring page). Single scene only. Canvas is 4:3 landscape and must be FULL BLEED.
 
@@ -388,30 +388,99 @@ export async function illustrateStoryPages(options: {
   // Product rule: book + movie are 100% illustrated watercolor storybook art (no real session photos).
   // Real session photos are NEVER placed in pages. Face upload = likeness only.
   const result: StoryPage[] = [];
+  const usedSceneKeys: string[] = [];
 
-  for (const page of pages) {
+  for (let index = 0; index < pages.length; index++) {
+    const page = pages[index];
     if (page.imageUrl && !looksLikeRealPhotoUrl(page.imageUrl)) {
       result.push(page);
+      usedSceneKeys.push(sceneKey(page));
       continue;
     }
 
+    const uniqueness = uniqueSceneDirective(page, index, pages, usedSceneKeys);
     const sceneHint = page.imagePrompt ?? page.title;
-    const prompt = `${sceneHint}. ${STYLE_SUFFIX}. Full-bleed 4:3 children's watercolor storybook illustration for an 8.25 inch square printed book image band. CRITICAL: edge-to-edge scene, no vine frame, no side white space. Show the complete child hero from head to toe with headroom above the crown — never cut off the head.`;
+    const prompt = `${sceneHint}. ${uniqueness}. ${STYLE_SUFFIX}. Full-bleed 4:3 children's watercolor storybook illustration for an 8.25 inch square printed book image band. CRITICAL: edge-to-edge scene, no vine frame, no side white space. Show the complete child hero from head to toe with headroom above the crown — never cut off the head. NO glowing staff, NO wand, NO scepter beam, NO spell props.`;
 
     const art = await generateStoryIllustration({
       prompt,
       characterPhotoUrl: characterPhoto ?? null,
     });
 
-    result.push({
+    const next = {
       ...page,
       // Never keep session photo flags on output pages
       useSessionPhoto: false,
       imageUrl: art.imageUrl,
-    });
+    };
+    result.push(next);
+    usedSceneKeys.push(sceneKey(next));
   }
 
   return result;
+}
+
+function sceneKey(page: Pick<StoryPage, "title" | "text" | "imagePrompt" | "staticScene">): string {
+  return [page.staticScene, page.title, (page.imagePrompt || "").slice(0, 80), (page.text || "").slice(0, 60)]
+    .filter(Boolean)
+    .join("|")
+    .toLowerCase();
+}
+
+/** Force each page into a distinct composition so cover/call/etc never clone each other. */
+function uniqueSceneDirective(
+  page: StoryPage,
+  index: number,
+  all: StoryPage[],
+  used: string[]
+): string {
+  const title = (page.title || "").toLowerCase();
+  const prevTitles = all
+    .slice(0, index)
+    .map((p) => p.title)
+    .filter(Boolean)
+    .join(", ");
+
+  const angleBank = [
+    "COMPOSITION A: wide establishing landscape, hero small-to-medium in lower third, deep forest path leading away",
+    "COMPOSITION B: medium full-body hero center stage, different background architecture or garden than any prior page",
+    "COMPOSITION C: three-quarter view hero walking toward a NEW landmark (bridge, gate, throne steps, garden arch) — not a copy of prior page",
+    "COMPOSITION D: intimate garden or courtyard beat with different props (flowers, map, lantern on a post — never a wand)",
+    "COMPOSITION E: elevated overlook / castle balcony / hill crest with kingdom vista behind hero",
+    "COMPOSITION F: nighttime-soft or golden-hour return scene with warm windows and celebration energy",
+    "COMPOSITION G: quiet ending vignette at a window or tower with calm sky — unique from action pages",
+  ];
+  const angle = angleBank[index % angleBank.length];
+
+  let beat = "unique story beat";
+  if (index === 0 || title.includes("title")) {
+    beat =
+      "COVER/OPENING PORTRAIT ONLY: hero facing viewer in a simple royal portrait setting (soft throne or garden arch). Do NOT reuse the deep lantern-forest action composition from later pages.";
+  } else if (title.includes("call")) {
+    beat =
+      "THE CALL beat: courtyard or throne-adjacent outdoor steps receiving news — NOT the same deep forest portrait as the cover. Different location, different pose, different background.";
+  } else if (title.includes("throne")) {
+    beat = "THRONE ROOM interior: marble, banners, throne — clearly indoor castle architecture";
+  } else if (title.includes("forest")) {
+    beat = "ROYAL FOREST path scene with lanterns and trees — only if this page is the forest chapter";
+  } else if (title.includes("garden")) {
+    beat = "ROYAL GARDEN with roses and open sky — not forest canopy";
+  } else if (title.includes("courage") || title.includes("chastle") || title.includes("quest")) {
+    beat = "COURAGE QUEST stone overlook / bridge landmark — not forest and not garden";
+  } else if (title.includes("return") || title.includes("rejoice") || title.includes("end")) {
+    beat = "RETURN/ENDING castle gates or quiet night window — distinct from opening portrait";
+  }
+
+  return [
+    `PAGE ${index + 1} MUST be a COMPLETELY DIFFERENT scene/composition from every earlier page.`,
+    prevTitles ? `Do NOT repeat compositions used for: ${prevTitles}.` : "",
+    used.length ? `Already used scene keys: ${used.slice(-4).join(" || ")}.` : "",
+    beat,
+    angle,
+    "Same child likeness and royal wardrobe family, but NEW pose, NEW camera angle, NEW background landmark.",
+  ]
+    .filter(Boolean)
+    .join(" ");
 }
 
 /** Heuristic: block obvious studio/session photo paths from being reused as page art */

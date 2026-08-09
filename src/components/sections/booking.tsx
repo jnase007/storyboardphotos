@@ -7,12 +7,12 @@ import { BookingForm } from "@/components/booking-form";
 
 
 const QUESTS = [
-  { id: "dragon-slayer", num: 1, title: "Slay the Dragon", desc: "Face the great dragon with courage — and discover that bravery can turn a foe into a friend.", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/dragon-slayer.jpg" },
-  { id: "rescue-mission", num: 2, title: "Rescue Mission", desc: "Someone needs help! Race through the kingdom to rescue friends and bring them safely home.", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/rescue-mission.jpg" },
-  { id: "lost-crown", num: 3, title: "Find the Crown", desc: "The royal crown is missing! Follow clues across the kingdom to bring it home.", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/lost-crown.jpg" },
-  { id: "forest-guardian", num: 4, title: "Forest Guardian", desc: "The enchanted forest needs a protector. Defend the creatures and restore the magic.", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/forest-guardian.jpg" },
-  { id: "kindness-quest", num: 5, title: "Kindness Quest", desc: "A lonely corner of the kingdom needs warmth. Heal hearts with courage and kindness.", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/kindness-quest.jpg" },
-  { id: "light-treasure", num: 6, title: "Treasure of Light", desc: "The kingdom\'s light has been stolen! Recover the treasure and bring the glow home.", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/light-treasure.jpg" },
+  { id: "dragon-slayer", num: 1, title: "Slay the Dragon", desc: "Face the great dragon with courage — and discover that bravery and kindness can turn a foe into a friend. (Joshua 1:9)", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/dragon-slayer.jpg" },
+  { id: "rescue-mission", num: 2, title: "Rescue Mission", desc: "Someone needs help! Race through the kingdom to rescue friends and bring them safely home. (Luke 15:4)", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/rescue-mission.jpg" },
+  { id: "lost-crown", num: 3, title: "Find the Crown", desc: "The royal crown is missing! Follow clues across the kingdom and return it with a true heart. (Proverbs 4:23)", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/lost-crown.jpg" },
+  { id: "forest-guardian", num: 4, title: "Forest Guardian", desc: "God's green world needs a protector. Care for the creatures and restore light to the trees. (Genesis 2:15)", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/forest-guardian.jpg" },
+  { id: "kindness-quest", num: 5, title: "Kindness Quest", desc: "A lonely corner of the kingdom needs warmth. Heal hearts with courage and kindness. (Ephesians 4:32)", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/kindness-quest.jpg" },
+  { id: "light-treasure", num: 6, title: "Treasure of Light", desc: "The kingdom's light has dimmed! Recover the treasure of hope and share the glow. (Matthew 5:14)", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/light-treasure.jpg" },
 ];
 
 export function BookingSection() {
@@ -72,7 +72,7 @@ export function BookingSection() {
           </h2>
           <p className="text-royal-blue/60 text-lg">
             Tell us about your child and we&apos;ll handle everything. We curate the day around them —
-            their adventure, their story, their Kingdom Quest book. You simply show up and experience the magic.
+            their adventure, their story, their Kingdom Quest book. You simply show up and experience the wonder.
           </p>
         </motion.div>
 
