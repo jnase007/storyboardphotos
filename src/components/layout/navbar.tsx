@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Crown } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NAV_LINKS, SITE } from "@/lib/constants";
 import { cn } from "@/lib/utils";
@@ -40,16 +41,15 @@ export function Navbar() {
     >
       <nav className="container mx-auto px-4 lg:px-8">
         <div className="flex h-16 lg:h-20 items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 group">
-            <Crown className="h-6 w-6 text-royal-gold group-hover:scale-110 transition-transform" />
-            <div className="flex flex-col leading-tight">
-              <span className="font-serif text-lg font-bold text-royal-cream">
-                {SITE.name}
-              </span>
-              <span className="text-xs text-royal-gold tracking-widest uppercase">
-                {SITE.subtitle}
-              </span>
-            </div>
+          <Link href="/" className="flex items-center gap-2 group" aria-label={SITE.name}>
+            <Image
+              src="/brand/storybook-photos-logo.png"
+              alt={SITE.name}
+              width={220}
+              height={145}
+              priority
+              className="h-10 w-auto lg:h-12 object-contain transition-transform group-hover:scale-[1.03]"
+            />
           </Link>
 
           <div className="hidden lg:flex items-center gap-6 xl:gap-8">

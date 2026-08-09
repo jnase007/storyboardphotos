@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Crown, Mail, Phone, MapPin } from "lucide-react";
+import Image from "next/image";
+import { Mail, Phone, MapPin } from "lucide-react";
 import { LOCAL_PAGES, NAV_LINKS, SITE } from "@/lib/constants";
 
 export function Footer() {
@@ -13,16 +14,14 @@ export function Footer() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Brand */}
           <div className="sm:col-span-2 lg:col-span-1">
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <Crown className="h-6 w-6 text-royal-gold" />
-              <div className="flex flex-col leading-tight">
-                <span className="font-serif text-lg font-bold text-royal-cream">
-                  {SITE.name}
-                </span>
-                <span className="text-xs text-royal-gold tracking-widest uppercase">
-                  {SITE.subtitle}
-                </span>
-              </div>
+            <Link href="/" className="inline-flex items-center mb-4" aria-label={SITE.name}>
+              <Image
+                src="/brand/storybook-photos-logo.png"
+                alt={SITE.name}
+                width={200}
+                height={132}
+                className="h-12 w-auto object-contain"
+              />
             </Link>
             <p className="text-royal-cream/50 text-sm leading-relaxed mb-4">
               {SITE.tagline}
