@@ -317,9 +317,9 @@ export function VideoJobsPanel() {
               Movies
             </h1>
             <p className="text-gray-600 mt-1 text-sm max-w-md">
-              Every video gets <strong>bedtime narration + sound</strong>. Standard
-              motion = soft storybook adventure film (same animation language every
-              quest). Draft = stills + voice for cheap tests.
+              Main button = <strong>real animated movie</strong> (soft storybook
+              motion + narration + logo bump, ~$10–15). Cheap stills draft is
+              secondary only.
             </p>
           </div>
           <button
@@ -347,17 +347,19 @@ export function VideoJobsPanel() {
           </div>
         ) : null}
 
-        <div className="mb-6 rounded-xl border border-emerald-100 bg-white px-4 py-3 text-sm text-gray-700">
-          <p className="font-semibold text-gray-900 mb-1">How to test without burning cash</p>
+        <div className="mb-6 rounded-xl border border-amber-100 bg-amber-50/60 px-4 py-3 text-sm text-gray-700">
+          <p className="font-semibold text-gray-900 mb-1">What you want</p>
           <ol className="list-decimal ml-5 space-y-1">
             <li>
-              Improve the <strong>book</strong> first (art + story).
+              Lock the <strong>book</strong> (art + story + same outfit).
             </li>
             <li>
-              <strong>Test draft</strong> = pages + story narration/sound (pennies). Do your 30 passes here.
+              Tap <strong>Make animated movie</strong> — real motion, narration,
+              logo bump (~$10–15, max $50).
             </li>
             <li>
-              When locked, run <strong>one Standard</strong> with light motion + narration (~$10-15, max $50).
+              Only use <strong>Cheap stills draft</strong> if you just need a
+              silent/slideshow check (not the real product).
             </li>
           </ol>
         </div>
@@ -441,7 +443,7 @@ export function VideoJobsPanel() {
                       {state.kind === "stuck" ? (
                         <div className="mt-3 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
                           This one died on the server. Unstick it, then run{" "}
-                          <strong>Test draft</strong> (not customer/premium).
+                          <strong>Make animated movie</strong> again.
                         </div>
                       ) : null}
 
@@ -489,7 +491,7 @@ export function VideoJobsPanel() {
                               onClick={() =>
                                 makeMovie(
                                   job.id,
-                                  "draft",
+                                  "standard",
                                   Boolean(job.video_url) || state.kind === "stuck"
                                 )
                               }
@@ -497,28 +499,36 @@ export function VideoJobsPanel() {
                               className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-white disabled:opacity-60"
                               style={{
                                 background:
-                                  "linear-gradient(135deg, #0A1628, #2D1B4E)",
+                                  "linear-gradient(135deg, #B98A19, #d4a843)",
                               }}
                             >
                               {busy ? (
                                 <Loader2 className="w-4 h-4 animate-spin" />
                               ) : (
-                                <Sparkles className="w-4 h-4" />
+                                <Film className="w-4 h-4" />
                               )}
                               {job.video_url
-                                ? "Remake test draft"
-                                : "Make test draft"}
+                                ? "Remake animated movie (~$15)"
+                                : "Make animated movie (~$15)"}
                             </button>
+                            <p className="text-[11px] text-gray-500 -mt-1">
+                              Real motion + bedtime narration + logo bump. This is
+                              the product.
+                            </p>
 
                             <div className="grid grid-cols-2 gap-2">
                               <button
                                 onClick={() =>
-                                  makeMovie(job.id, "standard", Boolean(job.video_url))
+                                  makeMovie(
+                                    job.id,
+                                    "draft",
+                                    Boolean(job.video_url) || state.kind === "stuck"
+                                  )
                                 }
                                 disabled={busy}
-                                className="inline-flex items-center justify-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs font-bold text-amber-900 disabled:opacity-60"
+                                className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-xs font-semibold text-gray-600 disabled:opacity-60"
                               >
-                                Customer video (~$15)
+                                Cheap stills draft
                               </button>
                               <button
                                 onClick={() =>

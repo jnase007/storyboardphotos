@@ -27,11 +27,11 @@ type Params = { params: Promise<{ id: string }> };
 const bodySchema = z.object({
   package: z.enum(["teaser", "full"]).default("teaser"),
   /**
-   * draft = QA/testing (DEFAULT, pennies)
-   * standard|fast = $150 coloring-book delivery (~$15 target / $50 max)
+   * standard|fast = real animated movie (DEFAULT) — $150 delivery (~$15 target / $50 max)
+   * draft = cheap stills slideshow only
    * premium = blocked unless ALLOW_PREMIUM_MOVIE=1
    */
-  quality: z.enum(["draft", "fast", "standard", "premium"]).default("draft"),
+  quality: z.enum(["draft", "fast", "standard", "premium"]).default("standard"),
   force: z.boolean().optional(),
   /** default true — movies should have bedtime story sound */
   generateNarrationIfMissing: z.boolean().optional().default(true),
@@ -139,33 +139,32 @@ async function runRenderJob(options: {
       narrationUrl = null;
     }
 
-    const wantsSound =
-      generateNarrationIfMissing ||
-      quality === "standard" ||
-      quality === "premium" ||
-      quality === "draft";
+    // Product requirement: animated movies MUST have bedtime narration sound.
+    const requireSound = quality === "standard" || quality === "premium";
+    const wantsSound = generateNarrationIfMissing || requireSound || quality === "draft";
 
-    if (!narrationUrl && wantsSound) {
+    if ((!narrationUrl || !/^https?:\/\//i.test(narrationUrl)) && wantsSound) {
       const gender = (book.gender === "girl" ? "girl" : "boy") as "boy" | "girl";
       const role = TITLE_ROLE[gender];
       const script =
         (book.narration_script as string) ||
         buildNarrationScript(book.child_name, role, pages);
+      await bump("prep", "Calling ElevenLabs for bedtime narration…");
       const audio = await generateNarrationAudio({
         text: script,
         filename: `${book.child_name}-narration.mp3`,
       });
       if (!audio.audioUrl) {
         const msg = audio.error || "ElevenLabs narration failed";
-        // Standard/customer videos must have sound
-        if (quality === "standard" || quality === "premium") {
-          await bump("failed", msg, { error: msg });
+        if (requireSound) {
+          await bump("failed", `SOUND BLOCKED: ${msg}`, { error: msg });
           return;
         }
-        // Draft can continue silent but mark it
         await bump("prep", `Narration failed (draft continues silent): ${msg}`);
+        narrationUrl = null;
       } else {
-        narrationUrl = audio.audioUrl;
+        // Always persist to public HTTPS — fal merge cannot use data: URLs
+        let publicUrl: string | null = null;
         if (audio.audioUrl.startsWith("data:audio")) {
           const base64 = audio.audioUrl.split(",")[1] ?? "";
           const bytes = Buffer.from(base64, "base64");
@@ -175,8 +174,8 @@ async function runRenderJob(options: {
             .upload(path, bytes, { contentType: "audio/mpeg", upsert: true });
           if (upErr) {
             const msg = `Narration storage upload failed: ${upErr.message}`;
-            if (quality === "standard" || quality === "premium") {
-              await bump("failed", msg, { error: msg });
+            if (requireSound) {
+              await bump("failed", `SOUND BLOCKED: ${msg}`, { error: msg });
               return;
             }
             narrationUrl = null;
@@ -184,10 +183,21 @@ async function runRenderJob(options: {
             const { data: pub } = supabase.storage
               .from("storybook-assets")
               .getPublicUrl(path);
-            narrationUrl = pub.publicUrl;
+            publicUrl = pub.publicUrl;
           }
+        } else if (/^https?:\/\//i.test(audio.audioUrl)) {
+          publicUrl = audio.audioUrl;
         }
-        if (narrationUrl && !narrationUrl.startsWith("data:")) {
+
+        if (!publicUrl || !/^https?:\/\//i.test(publicUrl)) {
+          const msg = "Narration did not produce a public HTTPS URL";
+          if (requireSound) {
+            await bump("failed", `SOUND BLOCKED: ${msg}`, { error: msg });
+            return;
+          }
+          narrationUrl = null;
+        } else {
+          narrationUrl = publicUrl;
           await supabase
             .from("storybooks")
             .update({
@@ -196,9 +206,18 @@ async function runRenderJob(options: {
               updated_at: new Date().toISOString(),
             })
             .eq("id", id);
-          await bump("prep", "Narration ready — building picture track…");
+          await bump(
+            "prep",
+            `Narration ready (${audio.bytes || "?"} bytes) — building picture…`
+          );
         }
       }
+    }
+
+    if (requireSound && (!narrationUrl || !/^https?:\/\//i.test(narrationUrl))) {
+      const msg = "Refusing animated movie without public narration URL";
+      await bump("failed", `SOUND BLOCKED: ${msg}`, { error: msg });
+      return;
     }
 
     await bump("oven", "Pages going into the oven…", {
