@@ -16,11 +16,11 @@ export function Footer() {
           <div className="sm:col-span-2 lg:col-span-1">
             <Link href="/" className="inline-flex items-center mb-4" aria-label={SITE.name}>
               <Image
-                src="/brand/storybook-photos-logo.png"
+                src="/brand/storybook-photos-logo-white.png"
                 alt={SITE.name}
-                width={200}
-                height={132}
-                className="h-12 w-auto object-contain"
+                width={280}
+                height={184}
+                className="h-16 w-auto object-contain drop-shadow-[0_1px_8px_rgba(0,0,0,0.35)]"
               />
             </Link>
             <p className="text-royal-cream/50 text-sm leading-relaxed mb-4">
