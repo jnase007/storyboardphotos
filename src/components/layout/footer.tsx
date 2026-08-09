@@ -20,7 +20,7 @@ export function Footer() {
                 alt={SITE.name}
                 width={280}
                 height={184}
-                className="h-16 w-auto object-contain drop-shadow-[0_1px_8px_rgba(0,0,0,0.35)]"
+                className="h-20 w-auto object-contain drop-shadow-[0_1px_8px_rgba(0,0,0,0.35)]"
               />
             </Link>
             <p className="text-royal-cream/50 text-sm leading-relaxed mb-4">

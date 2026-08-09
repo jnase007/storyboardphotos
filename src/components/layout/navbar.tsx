@@ -40,15 +40,15 @@ export function Navbar() {
       )}
     >
       <nav className="container mx-auto px-4 lg:px-8">
-        <div className="flex h-20 lg:h-24 items-center justify-between">
+        <div className="flex h-24 lg:h-28 items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group" aria-label={SITE.name}>
             <Image
               src="/brand/storybook-photos-logo-white.png"
               alt={SITE.name}
-              width={360}
-              height={237}
+              width={460}
+              height={302}
               priority
-              className="h-14 w-auto sm:h-16 lg:h-[4.5rem] object-contain drop-shadow-[0_1px_8px_rgba(0,0,0,0.45)] transition-transform group-hover:scale-[1.03]"
+              className="h-[4.5rem] w-auto sm:h-20 lg:h-[5.25rem] object-contain drop-shadow-[0_1px_8px_rgba(0,0,0,0.45)] transition-transform group-hover:scale-[1.03]"
             />
           </Link>
 
