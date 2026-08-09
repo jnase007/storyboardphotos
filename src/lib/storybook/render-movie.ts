@@ -29,10 +29,19 @@ const COMPOSE_MODEL = "fal-ai/ffmpeg-api/compose";
 const MERGE_AV_MODEL = "fal-ai/ffmpeg-api/merge-audio-video";
 const STILL_MODEL = "fal-ai/ffmpeg-api/images-to-video";
 
-/** Public end slate with Storybook Photos branding (logo lockup). */
+/**
+ * Closing logo bump (animated MP4) — Justin brand bumper at end of every movie.
+ * Falls back to still end-card PNG if bump URL fails.
+ */
+const MOVIE_END_BUMP_URL =
+  process.env.MOVIE_END_BUMP_URL ||
+  "https://www.storybookphotos.com/brand/movie-end-bump.mp4";
+/** Fallback still if video bump cannot be fetched by compose. */
 const MOVIE_END_CARD_URL =
   process.env.MOVIE_END_CARD_URL ||
   "https://www.storybookphotos.com/brand/movie-end-card-v3.png";
+/** Known length of brand logo bump (seconds). */
+const END_BUMP_DURATION_SEC = Number(process.env.MOVIE_END_BUMP_SEC || 10);
 const END_CARD_DURATION_SEC = 4;
 
 export type MovieQuality = "draft" | "fast" | "standard" | "premium";
@@ -544,22 +553,47 @@ export async function renderPremiumStoryMovie(options: {
     throw new Error("All page animations failed — cannot build movie");
   }
 
-  // Closing slate: Storybook Photos logo end card
+  // Closing slate: animated Storybook Photos logo bump (preferred), still card fallback
   try {
     onProgress({
       stage: "stitching",
-      detail: "Adding Storybook Photos end logo…",
+      detail: "Adding Storybook Photos logo bump…",
       clipsDone: clipUrls.length,
       clipsTotal: pages.length + 1,
     });
-    const endUrl = await stillHoldClip(MOVIE_END_CARD_URL, END_CARD_DURATION_SEC);
-    clipUrls.push(endUrl);
-    clipDurationsMs.push(END_CARD_DURATION_SEC * 1000);
-    notes.push(`end card: Storybook Photos logo (${END_CARD_DURATION_SEC}s)`);
+    // Use the real MP4 bumper directly in the compose timeline (no re-encode needed)
+    if (isHttpUrl(MOVIE_END_BUMP_URL)) {
+      clipUrls.push(MOVIE_END_BUMP_URL);
+      clipDurationsMs.push(Math.max(3, END_BUMP_DURATION_SEC) * 1000);
+      notes.push(
+        `end bump: logo video ${MOVIE_END_BUMP_URL} (~${END_BUMP_DURATION_SEC}s)`
+      );
+    } else {
+      const endUrl = await stillHoldClip(
+        MOVIE_END_CARD_URL,
+        END_CARD_DURATION_SEC
+      );
+      clipUrls.push(endUrl);
+      clipDurationsMs.push(END_CARD_DURATION_SEC * 1000);
+      notes.push(`end card: still logo fallback (${END_CARD_DURATION_SEC}s)`);
+    }
   } catch (err) {
     notes.push(
-      `end card skipped: ${err instanceof Error ? err.message : String(err)}`
+      `end bump failed, trying still: ${err instanceof Error ? err.message : String(err)}`
     );
+    try {
+      const endUrl = await stillHoldClip(
+        MOVIE_END_CARD_URL,
+        END_CARD_DURATION_SEC
+      );
+      clipUrls.push(endUrl);
+      clipDurationsMs.push(END_CARD_DURATION_SEC * 1000);
+      notes.push(`end card: still logo fallback (${END_CARD_DURATION_SEC}s)`);
+    } catch (e2) {
+      notes.push(
+        `end card skipped: ${e2 instanceof Error ? e2.message : String(e2)}`
+      );
+    }
   }
 
   onProgress({ stage: "stitching", detail: `Composing ${clipUrls.length} clips` });
