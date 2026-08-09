@@ -1,14 +1,6 @@
-import type { Metadata } from "next";
-import { IPBible } from "@/components/admin/ip-bible";
-import { buildMetadata } from "@/lib/seo";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = buildMetadata({
-  title: "IP Bible (Internal)",
-  description: "Internal IP bible for Storybook Photos.",
-  path: "/admin/ip",
-  noIndex: true,
-});
-
+/** IP Bible lives inside Business Plan hub now. */
 export default function IPPage() {
-  return <IPBible />;
+  redirect("/business-plan?tab=ip");
 }

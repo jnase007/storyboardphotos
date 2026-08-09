@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
+  BookOpen,
   ClipboardList,
   FileDown,
   Target,
@@ -15,8 +16,9 @@ import { BusinessPlanSection } from "@/components/sections/business-plan";
 import { PhaseDecisionSection } from "@/components/sections/phase-decision";
 import { CostBreakdownSection } from "@/components/sections/cost-breakdown";
 import { ProformaSection } from "@/components/sections/proforma";
+import { IPBible } from "@/components/admin/ip-bible";
 
-export type BizPlanTab = "plan" | "phases" | "costs" | "proforma";
+export type BizPlanTab = "plan" | "phases" | "costs" | "proforma" | "ip";
 
 const TABS: {
   id: BizPlanTab;
@@ -53,15 +55,31 @@ const TABS: {
     icon: Target,
     path: "/business-plan/proforma",
   },
+  {
+    id: "ip",
+    label: "IP Bible",
+    short: "IP",
+    icon: BookOpen,
+    path: "/business-plan?tab=ip",
+  },
 ];
 
 function tabFromPath(pathname: string, queryTab: string | null): BizPlanTab {
-  if (queryTab === "phases" || queryTab === "costs" || queryTab === "proforma" || queryTab === "plan") {
+  if (
+    queryTab === "phases" ||
+    queryTab === "costs" ||
+    queryTab === "proforma" ||
+    queryTab === "plan" ||
+    queryTab === "ip"
+  ) {
     return queryTab;
   }
   if (pathname.startsWith("/business-plan/phases")) return "phases";
   if (pathname.startsWith("/business-plan/cost-breakdown")) return "costs";
   if (pathname.startsWith("/business-plan/proforma")) return "proforma";
+  if (pathname.startsWith("/business-plan/ip") || pathname.startsWith("/admin/ip")) {
+    return "ip";
+  }
   return "plan";
 }
 
@@ -152,6 +170,9 @@ export function BusinessPlanHub({ initialTab }: { initialTab?: BizPlanTab }) {
       </div>
       <div className={tab === "proforma" ? "block" : "hidden"}>
         <ProformaSection embedded />
+      </div>
+      <div className={tab === "ip" ? "block" : "hidden"}>
+        <IPBible />
       </div>
     </div>
   );

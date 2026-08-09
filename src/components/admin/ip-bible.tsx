@@ -167,7 +167,7 @@ export function IPBible() {
               ["Storybook Generator", "https://storybookphotos.com/admin/storybook-generator"],
               ["Books Library", "https://storybookphotos.com/admin/books"],
               ["Story Scripts", "https://storybookphotos.com/admin/story-scripts"],
-              ["IP Bible", "https://storybookphotos.com/admin/ip"],
+              ["IP Bible", "https://storybookphotos.com/business-plan?tab=ip"],
               ["Client Book View", "https://storybookphotos.com/book/[id]"],
               ["GitHub", "https://github.com/jnase007/storyboardphotos"],
               ["Supabase Project", "cpnnztrqgbxledbikpqt.supabase.co"],

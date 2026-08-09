@@ -36,10 +36,11 @@ const ADMIN_LINKS = [
     label: "Business Plan",
     shortLabel: "Plan",
     icon: ClipboardList,
-    // One nav item — Phases / Costs / Proforma live inside the plan hub
+    // One nav item — Phases / Costs / Proforma / IP live inside the plan hub
     match: (path: string) =>
       path === "/business-plan" ||
-      path.startsWith("/business-plan/"),
+      path.startsWith("/business-plan/") ||
+      path.startsWith("/admin/ip"),
   },
   {
     href: "/admin/books",
@@ -61,20 +62,6 @@ const ADMIN_LINKS = [
     shortLabel: "Scripts",
     icon: BookOpen,
     match: (path: string) => path.startsWith("/admin/story-scripts"),
-  },
-  {
-    href: "/admin/ip",
-    label: "IP Bible",
-    shortLabel: "IP",
-    icon: BookOpen,
-    match: (path: string) => path.startsWith("/admin/ip"),
-  },
-  {
-    href: "https://docs.google.com/spreadsheets/d/1EtvANzzcqwofpUO6zriYN76OVjx8dgo7pk406eS9Vdk/edit#gid=0",
-    label: "Set Pricing",
-    shortLabel: "Pricing",
-    icon: BookOpen,
-    match: () => false,
   },
 ] as const;
 
