@@ -37,8 +37,10 @@ const MOVIE_END_BUMP_URL =
 const MOVIE_END_CARD_URL =
   process.env.MOVIE_END_CARD_URL ||
   "https://www.storybookphotos.com/brand/movie-end-card-16x9.png";
-const FORCE_END_BUMP = process.env.FORCE_END_BUMP === "1";
+/** Always try Justin's logo bump video; scale into 16:9 via merge-videos. */
+const USE_END_BUMP = process.env.DISABLE_END_BUMP !== "1";
 const END_CARD_DURATION_SEC = Number(process.env.MOVIE_END_CARD_SEC || 5);
+const END_BUMP_DURATION_SEC = Number(process.env.MOVIE_END_BUMP_SEC || 10);
 const MOVIE_WIDTH = 1280;
 const MOVIE_HEIGHT = 720;
 
@@ -51,11 +53,11 @@ export const VIDEO_COGS_MAX_USD = 50;
 const SEEDANCE_FAST_USD_PER_SEC = 0.242;
 const SEEDANCE_PREMIUM_USD_PER_SEC = 0.68;
 
-/** More beats so story + narration can finish. */
-export const STANDARD_MAX_CLIPS = 10;
+/** Beats kept modest so Seedance can finish before serverless timeout. */
+export const STANDARD_MAX_CLIPS = 8;
 export const STANDARD_SEC_PER_CLIP = 6;
 export const STANDARD_MIN_SEC_PER_CLIP = 5;
-export const STANDARD_MAX_SEC_PER_CLIP = 10;
+export const STANDARD_MAX_SEC_PER_CLIP = 8;
 
 export function estimateMotionCostUsd(opts: {
   quality: MovieQuality;
@@ -430,10 +432,12 @@ async function animatePage(options: {
   index: number;
 }): Promise<string | null> {
   const { page, childName, role, duration, quality, notes, index } = options;
+  const imageUrl = page.imageUrl!;
 
+  // Draft = still only (cheap QA)
   if (quality === "draft") {
     try {
-      const url = await stillHoldClip(page.imageUrl!, duration);
+      const url = await stillHoldClip(imageUrl, duration);
       notes.push(`clip ${index + 1}: draft still-hold (${duration}s)`);
       return url;
     } catch (err) {
@@ -447,120 +451,147 @@ async function animatePage(options: {
   const usePremium = quality === "premium";
   const model = usePremium ? SEEDANCE_PREMIUM : SEEDANCE_FAST;
   const prompt = buildMotionPrompt(page, childName, role);
-  // Seedance Fast supports short clips; aim 5–8s then loop if narration longer
-  const seedanceSec = Math.min(
-    usePremium ? 8 : 8,
-    Math.max(5, Math.min(STANDARD_MAX_SEC_PER_CLIP, Math.round(duration)))
-  );
+  // Keep Seedance clips short (faster + cheaper); loop if narration longer
+  const seedanceSec = 5;
 
+  const trySeedance = async (label: string, input: Record<string, unknown>) => {
+    const result = await falQueueResult(model, input, {
+      timeoutMs: 12 * 60_000,
+      pollMs: 4000,
+    });
+    const url = extractVideoUrl(result);
+    if (!url) throw new Error(`${label}: no video url`);
+    notes.push(`clip ${index + 1}: ${label} animated (${seedanceSec}s)`);
+    return url;
+  };
+
+  let url: string | null = null;
   try {
-    const input: Record<string, unknown> = {
+    // Minimal known-good Seedance payload (proven via live API test)
+    url = await trySeedance(usePremium ? "Seedance premium" : "Seedance Fast", {
       prompt,
-      image_url: page.imageUrl,
+      image_url: imageUrl,
       resolution: "720p",
       duration: String(seedanceSec),
       aspect_ratio: "16:9",
       generate_audio: false,
-      camera_fixed: false,
-      bitrate_mode: "standard",
-    };
-
-    const result = await falQueueResult(model, input, {
-      timeoutMs: 10 * 60_000,
-      pollMs: 3000,
     });
-    let url = extractVideoUrl(result);
-    if (!url) throw new Error(`No video url for page ${index + 1}`);
-    notes.push(
-      `clip ${index + 1}: ${usePremium ? "Seedance premium" : "Seedance Fast"} animated (${seedanceSec}s 720p)`
-    );
-
-    if (duration > seedanceSec + 0.5) {
-      url = await extendClipToDuration(url, duration, notes, index);
-    }
-    return url;
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    // Standard customer movies must animate — retry once with simpler prompt
-    if (quality === "standard" || quality === "premium") {
-      try {
-        notes.push(
-          `clip ${index + 1} animate retry after: ${msg.slice(0, 100)}`
-        );
-        const retry = await falQueueResult(
-          SEEDANCE_FAST,
-          {
-            prompt: `${STORYBOOK_MOVIE_MOTION_BIBLE} Gentle storybook motion on this page. Hero ${role} ${childName}.`,
-            image_url: page.imageUrl,
-            resolution: "720p",
-            duration: "5",
-            aspect_ratio: "16:9",
-            generate_audio: false,
-          },
-          { timeoutMs: 10 * 60_000, pollMs: 3000 }
-        );
-        let url = extractVideoUrl(retry);
-        if (!url) throw new Error("retry missing url");
-        if (duration > 5.5) {
-          url = await extendClipToDuration(url, duration, notes, index);
-        }
-        notes.push(`clip ${index + 1}: Seedance Fast retry ok`);
-        return url;
-      } catch (e2) {
-        notes.push(
-          `clip ${index + 1} ANIMATION FAILED (no still fallback on standard): ${
-            e2 instanceof Error ? e2.message : String(e2)
-          }`.slice(0, 180)
-        );
-        return null;
-      }
-    }
-
-    // Draft-only still fallback
+    notes.push(`clip ${index + 1} seedance fail: ${msg.slice(0, 120)}`);
     try {
-      const url = await stillHoldClip(page.imageUrl!, duration);
-      notes.push(`clip ${index + 1}: still-hold fallback (${duration}s)`);
-      return url;
+      url = await trySeedance("Seedance Fast retry", {
+        prompt: `Gentle storybook motion. Slow push-in. Soft breeze on hair and cape. Sparkles. Hero ${role} ${childName}. Watercolor page comes alive. No text.`,
+        image_url: imageUrl,
+        duration: "5",
+      });
     } catch (e2) {
       notes.push(
-        `clip ${index + 1} dropped: ${e2 instanceof Error ? e2.message : String(e2)}`
+        `clip ${index + 1} seedance retry fail: ${e2 instanceof Error ? e2.message : String(e2)}`.slice(
+          0,
+          140
+        )
+      );
+    }
+  }
+
+  // ALWAYS keep a picture on screen — still-hold if Seedance fails (never skip / blank)
+  if (!url) {
+    try {
+      url = await stillHoldClip(imageUrl, Math.max(duration, seedanceSec));
+      notes.push(
+        `clip ${index + 1}: STILL fallback (${Math.max(duration, seedanceSec)}s) — Seedance unavailable`
+      );
+    } catch (e3) {
+      notes.push(
+        `clip ${index + 1} dropped: ${e3 instanceof Error ? e3.message : String(e3)}`
       );
       return null;
     }
+  } else if (duration > seedanceSec + 0.5) {
+    url = await extendClipToDuration(url, duration, notes, index);
   }
+  return url;
 }
 
 async function makeFullBleedEndCard(notes: string[]): Promise<{
   url: string;
   durationMs: number;
 }> {
-  // Product rule: end card must be full-width 16:9 (no black pillars).
-  // Square logo spin MP4 letterboxes inside 16:9 compose — skip unless forced AND proven 16:9.
-  if (FORCE_END_BUMP && isHttpUrl(MOVIE_END_BUMP_URL)) {
-    const meta = await probeMedia(MOVIE_END_BUMP_URL);
-    const w = meta.width || 0;
-    const h = meta.height || 0;
-    const ar = w && h ? w / h : 0;
-    if (ar >= 1.6 && ar <= 1.9) {
-      notes.push(
-        `end bump: 16:9 logo video accepted (${w}x${h}, ~${(meta.durationSec || 10).toFixed(1)}s)`
+  // Prefer Justin's logo bump video, forced into 16:9 canvas via merge-videos scale.
+  if (USE_END_BUMP && isHttpUrl(MOVIE_END_BUMP_URL)) {
+    try {
+      const scaled = await falQueueResult(
+        MERGE_VIDEOS_MODEL,
+        {
+          video_urls: [MOVIE_END_BUMP_URL],
+          target_fps: 24,
+          resolution: { width: MOVIE_WIDTH, height: MOVIE_HEIGHT },
+        },
+        { timeoutMs: 6 * 60_000 }
       );
-      return {
-        url: MOVIE_END_BUMP_URL,
-        durationMs: Math.max(3, meta.durationSec || 10) * 1000,
-      };
+      const url = extractVideoUrl(scaled);
+      if (url) {
+        const meta = await probeMedia(url);
+        const dur = meta.durationSec || END_BUMP_DURATION_SEC;
+        notes.push(
+          `end bump: logo video scaled to ${MOVIE_WIDTH}x${MOVIE_HEIGHT} (~${dur.toFixed(1)}s)`
+        );
+        return { url, durationMs: Math.max(3, dur) * 1000 };
+      }
+    } catch (err) {
+      notes.push(
+        `end bump scale failed: ${err instanceof Error ? err.message : String(err)}`.slice(
+          0,
+          140
+        )
+      );
     }
-    notes.push(
-      `end bump skipped (not 16:9 — would pillarbox). Using full-bleed still card.`
-    );
-  } else {
-    notes.push(
-      "end card: full-bleed 16:9 logo still (no black side bars)"
-    );
   }
 
+  notes.push("end card: full-bleed 16:9 logo still");
   const endUrl = await stillHoldClip(MOVIE_END_CARD_URL, END_CARD_DURATION_SEC);
   return { url: endUrl, durationMs: END_CARD_DURATION_SEC * 1000 };
+}
+
+/** If audio is longer than picture, pad with end-card holds so screen never goes blank. */
+async function padVideoToAudio(
+  videoUrl: string,
+  audioUrl: string,
+  notes: string[]
+): Promise<string> {
+  const [vMeta, aMeta] = await Promise.all([
+    probeMedia(videoUrl),
+    probeMedia(audioUrl),
+  ]);
+  const v = vMeta.durationSec || 0;
+  const a = aMeta.durationSec || 0;
+  notes.push(`pad_check video=${v.toFixed(1)}s audio=${a.toFixed(1)}s`);
+  if (!a || a <= v + 0.75) return videoUrl;
+
+  const need = a - v + 1.0;
+  const padSec = Math.min(30, Math.max(END_CARD_DURATION_SEC, need));
+  notes.push(`padding picture +${padSec.toFixed(1)}s so narration never outruns video`);
+  try {
+    const padClip = await stillHoldClip(MOVIE_END_CARD_URL, padSec);
+    const merged = await falQueueResult(
+      MERGE_VIDEOS_MODEL,
+      {
+        video_urls: [videoUrl, padClip],
+        target_fps: 24,
+        resolution: { width: MOVIE_WIDTH, height: MOVIE_HEIGHT },
+      },
+      { timeoutMs: 8 * 60_000 }
+    );
+    const url = extractVideoUrl(merged);
+    if (!url) throw new Error("pad merge missing url");
+    return url;
+  } catch (err) {
+    notes.push(
+      `pad failed: ${err instanceof Error ? err.message : String(err)}`.slice(0, 140)
+    );
+    return videoUrl;
+  }
 }
 
 /**
@@ -762,15 +793,15 @@ export async function renderPremiumStoryMovie(options: {
     });
 
     if (!url) {
-      if (requireSound) {
-        // skip failed page rather than inserting still on standard
-        notes.push(`clip ${i + 1}: skipped after animation failure`);
-        continue;
-      }
+      notes.push(`clip ${i + 1}: hard-failed (no still either) — skipped`);
       continue;
     }
 
-    const durMs = Math.round(duration * 1000);
+    // Hold picture for AT LEAST the narration length (prevents blank screen)
+    const meta = await probeMedia(url);
+    const actualClipSec = meta.durationSec || duration;
+    const holdSec = Math.max(duration, actualClipSec);
+    const durMs = Math.round(holdSec * 1000);
     clipUrls.push(url);
     clipDurationsMs.push(durMs);
 
@@ -888,32 +919,59 @@ export async function renderPremiumStoryMovie(options: {
 
   let finalUrl = composedUrl;
 
-  // If timed audio didn't land in compose, merge whole-book narration (legacy path)
-  const needWholeMerge =
-    Boolean(finalUrl) &&
-    audioKeyframes.length === 0 &&
-    isHttpUrl(options.narrationUrl);
-
-  if (needWholeMerge) {
+  // Build one continuous whole-book narration if per-page timed audio is thin
+  let wholeNarration = isHttpUrl(options.narrationUrl)
+    ? options.narrationUrl
+    : null;
+  if (
+    !wholeNarration &&
+    options.narrationScript &&
+    options.narrationScript.length > 40 &&
+    (audioKeyframes.length < Math.ceil(beats.length * 0.5) || !audioKeyframes.length)
+  ) {
     try {
-      onProgress({
-        stage: "audio",
-        detail: "Merging full bedtime narration…",
+      onProgress({ stage: "audio", detail: "Building full-book narration fallback…" });
+      const audio = await generateNarrationAudio({
+        text: options.narrationScript.slice(0, 4500),
+        filename: `${options.childName}-full.mp3`,
       });
+      if (audio.audioUrl && isHttpUrl(audio.audioUrl)) {
+        wholeNarration = audio.audioUrl;
+      } else if (audio.audioUrl?.startsWith("data:audio") && options.uploadAudio) {
+        const base64 = audio.audioUrl.split(",")[1] ?? "";
+        wholeNarration = await options.uploadAudio(
+          Buffer.from(base64, "base64"),
+          `${options.childName.replace(/\s+/g, "-").toLowerCase()}-full-${Date.now()}.mp3`
+        );
+      }
+      if (wholeNarration) notes.push("whole-book narration ready (fallback)");
+    } catch (err) {
+      notes.push(
+        `whole narration fallback failed: ${err instanceof Error ? err.message : String(err)}`.slice(
+          0,
+          140
+        )
+      );
+    }
+  }
+
+  // If compose did not embed timed audio (or too few pages), merge whole narration
+  // BUT first pad picture so audio never outruns video (blank screen bug).
+  const composeHasAudio = audioKeyframes.length >= Math.max(1, Math.ceil(beats.length * 0.6));
+  if (finalUrl && wholeNarration && !composeHasAudio) {
+    try {
+      onProgress({ stage: "audio", detail: "Padding picture to full narration length…" });
+      finalUrl = await padVideoToAudio(finalUrl, wholeNarration, notes);
+      onProgress({ stage: "audio", detail: "Merging full bedtime narration…" });
       const merged = await falQueueResult(
         MERGE_AV_MODEL,
-        {
-          video_url: finalUrl,
-          audio_url: options.narrationUrl,
-        },
+        { video_url: finalUrl, audio_url: wholeNarration },
         { timeoutMs: 8 * 60_000 }
       );
       const murl = extractVideoUrl(merged);
       if (!murl) throw new Error("merge-audio-video returned no url");
       finalUrl = murl;
-      notes.push(
-        "SOUND: whole-book narration merged (prefer per-page next run)"
-      );
+      notes.push("SOUND: whole-book narration merged after pad");
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       notes.push(`SOUND FAILED: ${msg.slice(0, 180)}`);
@@ -923,20 +981,20 @@ export async function renderPremiumStoryMovie(options: {
         );
       }
     }
-  } else if (audioKeyframes.length === 0 && !options.narrationUrl) {
+  } else if (composeHasAudio) {
+    notes.push("SOUND: timed per-page narration in compose");
+    // Still pad if final probe shows audio longer than video
+    if (finalUrl && wholeNarration) {
+      finalUrl = await padVideoToAudio(finalUrl, wholeNarration, notes);
+    }
+  } else if (!wholeNarration && audioKeyframes.length === 0) {
     notes.push("SOUND: no narration provided");
   }
 
-  // Safety: if composed video is shorter than ~sum of beats and we have whole narration, extend note
   if (finalUrl) {
     const meta = await probeMedia(finalUrl);
     if (meta.durationSec) {
       notes.push(`final_duration_sec=${meta.durationSec.toFixed(1)}`);
-      if (meta.durationSec < 40 && requireSound) {
-        notes.push(
-          "WARN: final under 40s — check page count / narration length"
-        );
-      }
     }
   }
 
