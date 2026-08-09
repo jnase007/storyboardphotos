@@ -21,7 +21,7 @@ const STILL_MODEL = "fal-ai/ffmpeg-api/images-to-video";
 /** Public end slate with Storybook Photos branding (logo lockup). */
 const MOVIE_END_CARD_URL =
   process.env.MOVIE_END_CARD_URL ||
-  "https://www.storybookphotos.com/brand/movie-end-card-v2.png";
+  "https://www.storybookphotos.com/brand/movie-end-card-v3.png";
 const END_CARD_DURATION_SEC = 4;
 
 function falKey(): string | null {

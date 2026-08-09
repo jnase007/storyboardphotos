@@ -32,7 +32,7 @@ SEEDANCE = "bytedance/seedance-2.0/image-to-video"
 COMPOSE = "fal-ai/ffmpeg-api/compose"
 MERGE = "fal-ai/ffmpeg-api/merge-audio-video"
 STILL = "fal-ai/ffmpeg-api/images-to-video"
-END_CARD = "https://www.storybookphotos.com/brand/movie-end-card-v2.png"
+END_CARD = "https://www.storybookphotos.com/brand/movie-end-card-v3.png"
 END_CARD_SEC = 4
 
 
