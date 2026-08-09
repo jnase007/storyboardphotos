@@ -44,12 +44,19 @@ type FluxResult = {
 };
 
 /**
+ * Book geometry (Mpix 8.25" square page):
+ * illustration band is the TOP of the page (~4:3 landscape), full bleed edge-to-edge.
+ * Art must FILL the canvas — no vine frames, no side letterbox, no matte borders.
+ */
+export const STORYBOOK_IMAGE_ASPECT = "4:3" as const;
+
+/**
  * Target look (locked to Justin's style ref):
  * whimsical watercolor + soft sepia/ink outlines on cream paper —
  * classic fairytale children's book, NOT bare uncolored line art.
  */
 const STYLE_SUFFIX =
-  "ONE single watercolor children's storybook illustration only — not a diptych, not two panels, not a double-page spread, not split screen, not collage of multiple scenes. Whimsical watercolor, soft sepia ink outlines with gentle hand-drawn line variation, soft pastel watercolor washes (sage green, dusty lavender, peach, powder blue, warm gold), cream textured watercolor paper, cute storybook character proportions with big expressive eyes, decorative floral vine border, atmospheric pale background washes, magical sparkles and warm fairy light, premium fairytale picture-book quality, consistent character across pages, FULL FIGURE visible with generous headroom and foot room, character completely inside the frame, never crop head face crown hands or feet, centered composition with safe margins on all sides, no photorealism, no real photographs, no 3D render, no harsh pure-black vector lines, no empty uncolored coloring-page look, no muddy gray, no text, no letters, no watermark, no logo, no signature";
+  "ONE single full-bleed 4:3 landscape watercolor children's storybook illustration only — not a diptych, not two panels, not a double-page spread, not split screen, not collage. FILL THE ENTIRE CANVAS edge-to-edge with the scene (background, sky, forest, castle continue to all four edges). NO decorative vine border, NO floral frame, NO oval matte, NO white or cream margins inside the image, NO picture-frame border. Whimsical watercolor, soft sepia ink outlines with gentle hand-drawn line variation, soft pastel watercolor washes (sage green, dusty lavender, peach, powder blue, warm gold), cream textured watercolor paper only as the painted ground not as empty side bars, cute storybook character proportions with big expressive eyes, atmospheric depth, magical sparkles and warm fairy light, premium fairytale picture-book quality, consistent character across pages, FULL FIGURE hero visible with headroom above crown and feet still in frame, never crop head face crown hands or feet, no photorealism, no real photographs, no 3D render, no harsh pure-black vector lines, no empty uncolored coloring-page look, no muddy gray, no text, no letters, no watermark, no logo, no signature";
 
 /**
  * Remove background from an image using fal-ai/bria background removal.
@@ -142,7 +149,7 @@ async function generateWithPulid(options: {
         ],
         num_inference_steps: 30,
         guidance_scale: 4.5,
-        image_size: "portrait_4_3",
+        image_size: "landscape_4_3",
         enable_safety_checker: true,
       }),
     });
@@ -175,7 +182,7 @@ async function generateWithImagen4(prompt: string): Promise<FluxResult> {
   if (!googleKey) return fallbackPlaceholder(prompt);
 
   const STYLE =
-    "ONE single-page whimsical watercolor children's storybook illustration only (not diptych, not two panels, not double-page spread), soft sepia ink outlines, gentle pastel watercolor washes on cream paper, decorative floral vine border, enchanted kingdom, atmospheric depth, fairytale picture-book quality, full figure with headroom, no photorealism, no empty line-art coloring page, no text, no watermark";
+    "ONE full-bleed 4:3 landscape whimsical watercolor children's storybook illustration only (not diptych, not two panels, not double-page spread), soft sepia ink outlines, gentle pastel watercolor washes, scene painted edge-to-edge with NO vine border NO floral frame NO white side margins, enchanted kingdom, atmospheric depth, fairytale picture-book quality, full figure hero with headroom, no photorealism, no empty line-art coloring page, no text, no watermark";
 
   const fullPrompt = `${prompt}. ${STYLE}`;
 
@@ -189,7 +196,8 @@ async function generateWithImagen4(prompt: string): Promise<FluxResult> {
           instances: [{ prompt: fullPrompt }],
           parameters: {
             sampleCount: 1,
-            aspectRatio: "3:4", // portrait page — keep full figure with headroom
+            // Match storybook image band (top of 8.25" square page)
+            aspectRatio: STORYBOOK_IMAGE_ASPECT,
             safetyFilterLevel: "block_few",
             personGeneration: "allow_adult",
           },
@@ -275,9 +283,9 @@ async function generateWithCharacterPortrait(options: {
   const googleKey = process.env.GOOGLE_AI_API_KEY;
   if (!googleKey) return fallbackPlaceholder(options.prompt);
 
-  const STYLE = "ONE single-page whimsical watercolor children's storybook illustration only (not diptych, not two panels, not double-page, not collage), soft sepia ink outlines, soft pastel watercolor washes on cream textured paper, cute storybook proportions, big expressive eyes, decorative floral border, magical fairy light, fairytale picture-book quality, no photorealism, no empty uncolored coloring-page look, no text, no watermark";
+  const STYLE = "ONE full-bleed 4:3 landscape whimsical watercolor children's storybook illustration only (not diptych, not two panels, not double-page, not collage), soft sepia ink outlines, soft pastel watercolor washes, cute storybook proportions, big expressive eyes, magical fairy light, fairytale picture-book quality, scene fills entire canvas edge-to-edge, no photorealism, no empty uncolored coloring-page look, no text, no watermark";
 
-  const fullPrompt = `Create ONE premium watercolor children's storybook page (ink + soft color washes — NOT a blank coloring page). Single scene only.
+  const fullPrompt = `Create ONE premium watercolor children's storybook illustration (ink + soft color washes — NOT a blank coloring page). Single scene only. Canvas is 4:3 landscape and must be FULL BLEED.
 
 FACE LIKENESS (critical): Study the child's face in the reference photo. Paint/draw the hero as a charming royal storybook character that clearly resembles this child — same age vibe, hair, face shape, expression — stylized into soft watercolor + ink (not a photo, not realistic skin).
 
@@ -288,8 +296,10 @@ STYLE: ${STYLE}
 RULES:
 - Exactly ONE illustration / one scene in the whole image
 - Do NOT draw two side-by-side pages, panels, or mirrored scenes
+- FILL the entire image edge-to-edge — background continues to all four edges
+- NO decorative vine border, NO floral frame, NO oval vignette, NO white/cream side bars, NO picture mat
 - Hero is center stage, readable silhouette, proud kind pose
-- FULL BODY in frame: entire head, crown/hair, face, hands, feet — generous margins top and bottom
+- FULL BODY in frame: entire head, crown/hair, face, hands, feet — headroom above crown, feet still visible
 - NEVER crop or cut off the head, face, crown, arms, or feet
 - Same character design if this child appeared on other pages
 - Soft watercolor color throughout (pastels), not empty line art
@@ -386,7 +396,7 @@ export async function illustrateStoryPages(options: {
     }
 
     const sceneHint = page.imagePrompt ?? page.title;
-    const prompt = `${sceneHint}. ${STYLE_SUFFIX}. Full-page children's watercolor storybook illustration. CRITICAL FRAMING: show the complete child hero from head to toe with empty margin above the crown/hair and below the feet — never cut off the head.`;
+    const prompt = `${sceneHint}. ${STYLE_SUFFIX}. Full-bleed 4:3 children's watercolor storybook illustration for an 8.25 inch square printed book image band. CRITICAL: edge-to-edge scene, no vine frame, no side white space. Show the complete child hero from head to toe with headroom above the crown — never cut off the head.`;
 
     const art = await generateStoryIllustration({
       prompt,

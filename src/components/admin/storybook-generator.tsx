@@ -1233,7 +1233,7 @@ function BookFlipPreview({
               transition={{ duration: 0.38, ease: [0.25, 0.46, 0.45, 0.94] }}
               className="w-full"
             >
-              {/* Illustration — full art visible (no head/body crop) */}
+              {/* Illustration — full-bleed 4:3 band matching printed book */}
               <div className="relative w-full bg-[#F8F1E3]" style={{ paddingBottom: "75%" }}>
                 {page.imageUrl ? (
                   page.imageUrl.startsWith("data:") ||
@@ -1242,14 +1242,14 @@ function BookFlipPreview({
                     <img
                       src={page.imageUrl}
                       alt={["Title Page","The Dragon Quest","The Lost Crown","The Rescue Mission","The Forest Guardian","The Kindness Quest","The Light Treasure"].includes(page.title) ? "" : page.title}
-                      className="absolute inset-0 h-full w-full object-contain"
+                      className="absolute inset-0 h-full w-full object-cover"
                     />
                   ) : (
                     <Image
                       src={page.imageUrl}
                       alt={["Title Page","The Dragon Quest","The Lost Crown","The Rescue Mission","The Forest Guardian","The Kindness Quest","The Light Treasure"].includes(page.title) ? "" : page.title}
                       fill
-                      className="object-contain"
+                      className="object-cover"
                       sizes="(max-width: 640px) 100vw, 900px"
                       unoptimized
                     />

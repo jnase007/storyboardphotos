@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -35,9 +35,11 @@ type Book = {
 function BookPage({
   page,
   pageNum,
+  fullBleed = false,
 }: {
   page: StoryPage;
   pageNum: number;
+  fullBleed?: boolean;
 }) {
   const skipTitles = [
     "Title Page",
@@ -51,6 +53,50 @@ function BookPage({
   ];
   const showTitle = page.title && !skipTitles.includes(page.title);
 
+  if (fullBleed) {
+    return (
+      <div className="relative h-full w-full" style={{ background: "#0A1628" }}>
+        {page.imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={page.imageUrl}
+            alt={page.title || ""}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center text-6xl">
+            👑
+          </div>
+        )}
+        <div
+          className="absolute inset-x-0 bottom-0 p-4 sm:p-6 pt-16"
+          style={{
+            background:
+              "linear-gradient(to top, rgba(10,22,40,0.92) 0%, rgba(10,22,40,0.55) 55%, transparent 100%)",
+          }}
+        >
+          {showTitle ? (
+            <h3
+              className="font-bold text-sm sm:text-base mb-1"
+              style={{ color: "#C5A26F", fontFamily: "Georgia, serif" }}
+            >
+              {page.title}
+            </h3>
+          ) : null}
+          <p
+            className="text-xs sm:text-sm leading-relaxed text-white/90 max-h-[28vh] overflow-hidden"
+            style={{ fontFamily: "Georgia, serif" }}
+          >
+            {page.text}
+          </p>
+          <p className="text-[10px] mt-2 italic" style={{ color: "#C5A26F" }}>
+            {pageNum}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-full" style={{ background: "#F8F4EC" }}>
       <div className="flex-shrink-0" style={{ height: "60%" }}>
@@ -59,7 +105,7 @@ function BookPage({
           <img
             src={page.imageUrl}
             alt={page.title}
-            className="w-full h-full object-contain bg-[#F8F1E3]"
+            className="w-full h-full object-cover bg-[#F8F1E3]"
           />
         ) : (
           <div
@@ -105,8 +151,10 @@ function BookPage({
 
 export function ClientBookViewer({ book }: { book: Book }) {
   const [spreadIndex, setSpreadIndex] = useState(0);
+  const [pageIndex, setPageIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
-  const [playing, setPlaying] = useState(false);
+  const [playingAudio, setPlayingAudio] = useState(false);
+  const [slideshow, setSlideshow] = useState(false);
   const [showMovieForm, setShowMovieForm] = useState(false);
   const [videoStatus, setVideoStatus] = useState(book.video_status ?? "none");
   const [videoUrl, setVideoUrl] = useState(book.video_url ?? null);
@@ -118,6 +166,11 @@ export function ClientBookViewer({ book }: { book: Book }) {
   const totalPages = book.pages.length;
   const role = book.gender === "boy" ? "King" : "Queen";
 
+  const autoPlayRequested = useMemo(() => {
+    if (typeof window === "undefined") return false;
+    return new URLSearchParams(window.location.search).get("play") === "1";
+  }, []);
+
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
     check();
@@ -128,33 +181,99 @@ export function ClientBookViewer({ book }: { book: Book }) {
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
-    const onEnded = () => setPlaying(false);
+    const onEnded = () => {
+      setPlayingAudio(false);
+      setSlideshow(false);
+    };
     audio.addEventListener("ended", onEnded);
     return () => audio.removeEventListener("ended", onEnded);
   }, [book.narration_url]);
 
+  // Auto-start slideshow from ?play=1 (admin movie queue shortcut)
+  useEffect(() => {
+    if (!autoPlayRequested) return;
+    void startSlideshow();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoPlayRequested]);
+
+  // Advance pages while slideshow + narration play
+  useEffect(() => {
+    if (!slideshow || totalPages <= 1) return;
+    const secondsPerPage = Math.max(
+      4,
+      Math.min(10, (audioRef.current?.duration || totalPages * 6) / totalPages)
+    );
+    const id = window.setInterval(() => {
+      setPageIndex((i) => {
+        if (i >= totalPages - 1) return i;
+        return i + 1;
+      });
+      setSpreadIndex((i) => {
+        const pps = isMobile ? 1 : 2;
+        const max = Math.max(0, Math.ceil(totalPages / pps) - 1);
+        const nextPage = Math.min(totalPages - 1, pageIndex + 1);
+        return Math.min(max, Math.floor(nextPage / pps));
+      });
+    }, secondsPerPage * 1000);
+    return () => window.clearInterval(id);
+  }, [slideshow, totalPages, isMobile, pageIndex]);
+
   const pagesPerSpread = isMobile ? 1 : 2;
-  const totalSpreads = Math.ceil(totalPages / pagesPerSpread);
+  const totalSpreads = Math.ceil(totalPages / pagesPerSpread) || 1;
   const leftPageIdx = spreadIndex * pagesPerSpread;
   const rightPageIdx = leftPageIdx + 1;
   const leftPage = book.pages[leftPageIdx];
   const rightPage = book.pages[rightPageIdx];
+  const currentPage = book.pages[pageIndex] ?? book.pages[0];
 
-  async function toggleNarration() {
+  async function startSlideshow() {
+    setPageIndex(0);
+    setSpreadIndex(0);
+    setSlideshow(true);
     if (!book.narration_url) {
-      toast.message("Narration coming soon for this book");
+      toast.message("Playing page slideshow — add narration for full read-aloud");
       return;
     }
     const audio = audioRef.current;
     if (!audio) return;
-    if (playing) {
+    try {
+      audio.currentTime = 0;
+      await audio.play();
+      setPlayingAudio(true);
+    } catch {
+      toast.error("Could not start audio — tap Play again");
+    }
+  }
+
+  function stopSlideshow() {
+    setSlideshow(false);
+    const audio = audioRef.current;
+    if (audio) {
       audio.pause();
-      setPlaying(false);
+    }
+    setPlayingAudio(false);
+  }
+
+  async function toggleNarration() {
+    if (slideshow) {
+      stopSlideshow();
+      return;
+    }
+    if (!book.narration_url) {
+      // Still allow silent page flip slideshow
+      await startSlideshow();
+      return;
+    }
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (playingAudio) {
+      audio.pause();
+      setPlayingAudio(false);
       return;
     }
     try {
       await audio.play();
-      setPlaying(true);
+      setPlayingAudio(true);
     } catch {
       toast.error("Could not play narration");
     }
@@ -176,7 +295,7 @@ export function ClientBookViewer({ book }: { book: Book }) {
       if (!res.ok) throw new Error(data.error || "Request failed");
       setVideoStatus(data.video_status || "requested");
       setShowMovieForm(false);
-      toast.success("Movie requested! We'll create your storybook reading.");
+      toast.success("Movie requested! Production will deliver an MP4.");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Request failed");
     } finally {
@@ -202,7 +321,7 @@ export function ClientBookViewer({ book }: { book: Book }) {
       }}
     >
       {book.narration_url ? (
-        <audio ref={audioRef} src={book.narration_url} preload="none" />
+        <audio ref={audioRef} src={book.narration_url} preload="metadata" />
       ) : null}
 
       <div className="text-center mb-2 sm:mb-3 shrink-0">
@@ -213,32 +332,49 @@ export function ClientBookViewer({ book }: { book: Book }) {
           {role} {book.child_name}'s Kingdom Chronicles
         </h1>
         <p className="text-white/40 text-xs mt-1">
-          A Storybook Photos Adventure · Premium Coloring Book Edition
+          A Storybook Photos Adventure
         </p>
       </div>
 
       {/* Controls */}
       <div className="flex flex-wrap items-center justify-center gap-2 mb-2 sm:mb-3 shrink-0">
         <button
-          onClick={toggleNarration}
+          onClick={() => void toggleNarration()}
           className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-opacity hover:opacity-90"
           style={{
-            background: book.narration_url ? "#C5A26F" : "rgba(197,162,111,0.25)",
-            color: book.narration_url ? "#0A1628" : "rgba(255,255,255,0.55)",
+            background:
+              book.narration_url || slideshow
+                ? "#C5A26F"
+                : "rgba(197,162,111,0.25)",
+            color:
+              book.narration_url || slideshow
+                ? "#0A1628"
+                : "rgba(255,255,255,0.55)",
           }}
         >
-          {playing ? (
+          {playingAudio || slideshow ? (
             <Pause className="w-3.5 h-3.5" />
           ) : book.narration_url ? (
             <Play className="w-3.5 h-3.5" />
           ) : (
             <Volume2 className="w-3.5 h-3.5" />
           )}
-          {playing
-            ? "Pause story"
+          {playingAudio || slideshow
+            ? "Pause"
             : book.narration_url
               ? "Read my story"
-              : "Narration soon"}
+              : "Flip pages"}
+        </button>
+
+        <button
+          onClick={() => {
+            if (slideshow) stopSlideshow();
+            else void startSlideshow();
+          }}
+          className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold border border-[#C5A26F]/50 text-[#C5A26F] hover:bg-white/5"
+        >
+          <Play className="w-3.5 h-3.5" />
+          {slideshow ? "Stop slideshow" : "Play story slideshow"}
         </button>
 
         {movieReady ? (
@@ -259,6 +395,7 @@ export function ClientBookViewer({ book }: { book: Book }) {
               background: "rgba(197,162,111,0.2)",
               color: "#C5A26F",
             }}
+            title="MP4 not uploaded yet — use Play story slideshow now"
           >
             <Film className="w-3.5 h-3.5" />
             Movie in production
@@ -283,9 +420,9 @@ export function ClientBookViewer({ book }: { book: Book }) {
           }}
         >
           <p className="text-white/70 text-xs mb-2 leading-relaxed">
-            Disney-style keepsake: {role} {book.child_name}'s coloring-book
-            pages come alive with gentle motion and a bedtime storyteller reading
-            the book aloud.
+            Premium keepsake: pages come alive as a finished MP4 with motion +
+            bedtime narration. Until production delivers, use{" "}
+            <strong>Play story slideshow</strong> above.
           </p>
           <div className="grid gap-2 sm:grid-cols-2">
             <input
@@ -331,83 +468,103 @@ export function ClientBookViewer({ book }: { book: Book }) {
         </div>
       )}
 
-      <div
-        className="flex items-stretch w-full max-w-4xl min-h-0"
-        style={{
-          height: isMobile ? "calc(100dvh - 190px)" : "calc(100dvh - 200px)",
-          maxHeight: "calc(100dvh - 180px)",
-        }}
-      >
-        <button
-          onClick={() => setSpreadIndex((i) => Math.max(0, i - 1))}
-          disabled={spreadIndex === 0}
-          className="flex-shrink-0 w-10 flex items-center justify-center disabled:opacity-20 transition-opacity"
-          style={{ color: "#C5A26F" }}
-        >
-          <ChevronLeft className="w-7 h-7" />
-        </button>
-
+      {/* Slideshow cinema mode */}
+      {slideshow && currentPage ? (
         <div
-          className="flex-1 flex rounded-xl overflow-hidden shadow-2xl relative"
+          className="w-full max-w-4xl min-h-0 rounded-xl overflow-hidden shadow-2xl relative"
           style={{
-            boxShadow:
-              "0 25px 60px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(197,162,111,0.2)",
+            height: isMobile ? "calc(100dvh - 170px)" : "calc(100dvh - 180px)",
+            maxHeight: "calc(100dvh - 160px)",
+            boxShadow: "0 25px 60px rgba(0,0,0,0.5)",
           }}
         >
-          {leftPage && (
-            <div
-              className="flex-1 relative"
-              style={{
-                borderRight: isMobile ? "none" : "2px solid #C5A26F40",
-              }}
-            >
-              <BookPage page={leftPage} pageNum={leftPageIdx + 1} />
-            </div>
-          )}
+          <BookPage page={currentPage} pageNum={pageIndex + 1} fullBleed />
+          <div className="absolute top-3 right-3 rounded-full bg-black/50 px-3 py-1 text-[10px] text-white/80">
+            {pageIndex + 1} / {totalPages}
+            {playingAudio ? " · reading aloud" : ""}
+          </div>
+        </div>
+      ) : (
+        <div
+          className="flex items-stretch w-full max-w-4xl min-h-0"
+          style={{
+            height: isMobile ? "calc(100dvh - 190px)" : "calc(100dvh - 200px)",
+            maxHeight: "calc(100dvh - 180px)",
+          }}
+        >
+          <button
+            onClick={() => setSpreadIndex((i) => Math.max(0, i - 1))}
+            disabled={spreadIndex === 0}
+            className="flex-shrink-0 w-10 flex items-center justify-center disabled:opacity-20 transition-opacity"
+            style={{ color: "#C5A26F" }}
+          >
+            <ChevronLeft className="w-7 h-7" />
+          </button>
 
-          {!isMobile && rightPage && (
-            <div className="flex-1 relative">
-              <BookPage page={rightPage} pageNum={rightPageIdx + 1} />
-            </div>
-          )}
+          <div
+            className="flex-1 flex rounded-xl overflow-hidden shadow-2xl relative"
+            style={{
+              boxShadow:
+                "0 25px 60px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(197,162,111,0.2)",
+            }}
+          >
+            {leftPage && (
+              <div
+                className="flex-1 relative"
+                style={{
+                  borderRight: isMobile ? "none" : "2px solid #C5A26F40",
+                }}
+              >
+                <BookPage page={leftPage} pageNum={leftPageIdx + 1} />
+              </div>
+            )}
 
-          {!isMobile && rightPage && (
-            <div
-              className="absolute left-1/2 top-0 bottom-0 w-4 -translate-x-1/2 pointer-events-none"
+            {!isMobile && rightPage && (
+              <div className="flex-1 relative">
+                <BookPage page={rightPage} pageNum={rightPageIdx + 1} />
+              </div>
+            )}
+
+            {!isMobile && rightPage && (
+              <div
+                className="absolute left-1/2 top-0 bottom-0 w-4 -translate-x-1/2 pointer-events-none"
+                style={{
+                  background:
+                    "linear-gradient(90deg, rgba(0,0,0,0.15), rgba(0,0,0,0.05), rgba(0,0,0,0.15))",
+                  zIndex: 10,
+                }}
+              />
+            )}
+          </div>
+
+          <button
+            onClick={() =>
+              setSpreadIndex((i) => Math.min(totalSpreads - 1, i + 1))
+            }
+            disabled={spreadIndex === totalSpreads - 1}
+            className="flex-shrink-0 w-10 flex items-center justify-center disabled:opacity-20 transition-opacity"
+            style={{ color: "#C5A26F" }}
+          >
+            <ChevronRight className="w-7 h-7" />
+          </button>
+        </div>
+      )}
+
+      {!slideshow && (
+        <div className="flex gap-2 mt-2 sm:mt-3 shrink-0">
+          {Array.from({ length: totalSpreads }).map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setSpreadIndex(i)}
+              className="w-2 h-2 rounded-full transition-all"
               style={{
                 background:
-                  "linear-gradient(90deg, rgba(0,0,0,0.15), rgba(0,0,0,0.05), rgba(0,0,0,0.15))",
-                zIndex: 10,
+                  i === spreadIndex ? "#C5A26F" : "rgba(197,162,111,0.3)",
               }}
             />
-          )}
+          ))}
         </div>
-
-        <button
-          onClick={() =>
-            setSpreadIndex((i) => Math.min(totalSpreads - 1, i + 1))
-          }
-          disabled={spreadIndex === totalSpreads - 1}
-          className="flex-shrink-0 w-10 flex items-center justify-center disabled:opacity-20 transition-opacity"
-          style={{ color: "#C5A26F" }}
-        >
-          <ChevronRight className="w-7 h-7" />
-        </button>
-      </div>
-
-      <div className="flex gap-2 mt-2 sm:mt-3 shrink-0">
-        {Array.from({ length: totalSpreads }).map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setSpreadIndex(i)}
-            className="w-2 h-2 rounded-full transition-all"
-            style={{
-              background:
-                i === spreadIndex ? "#C5A26F" : "rgba(197,162,111,0.3)",
-            }}
-          />
-        ))}
-      </div>
+      )}
 
       <p className="text-white/20 text-xs mt-2 shrink-0">storybookphotos.com</p>
     </div>

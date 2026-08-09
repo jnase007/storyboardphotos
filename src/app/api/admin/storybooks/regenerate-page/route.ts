@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     };
 
     const scene = imagePrompt || pageTitle || "An enchanted kingdom watercolor scene";
-    const prompt = `${scene}. ONE single-page watercolor children's storybook illustration only — not a diptych, not two panels, not a double-page spread. Soft sepia ink outlines, pastel watercolor washes, cream paper, full figure with headroom, never crop the head, no text, no watermark.`;
+    const prompt = `${scene}. ONE full-bleed 4:3 landscape watercolor children's storybook illustration only — not a diptych, not two panels, not a double-page spread. Soft sepia ink outlines, pastel watercolor washes. FILL entire canvas edge-to-edge. NO vine border, NO floral frame, NO white side margins. Full figure with headroom, never crop the head, no text, no watermark.`;
 
     const result = await generateStoryIllustration({
       prompt,

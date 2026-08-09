@@ -74,16 +74,38 @@ export async function buildStorybookPdf(options: {
 // Cover Page
 // ─────────────────────────────────────────────────────────────────────────────
 async function drawCoverPageAsync(doc: jsPDF, childName: string, coverImageUrl?: string, bookType: "chronicles" | "portraits" = "chronicles"): Promise<void> {
-  // Use AI-generated cover with child's face if available, otherwise use castle scene
+  // Prefer first story page art as cover so it matches the book look
   const CHRONICLES_COVER = "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/cover-template.jpg";
   const PORTRAITS_COVER = "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/portrait-album-cover.jpg";
   const COVER_URL = coverImageUrl ?? (bookType === "portraits" ? PORTRAITS_COVER : CHRONICLES_COVER);
 
+  // Cream base (matches interior pages)
+  doc.setFillColor(...CREAM);
+  doc.rect(0, 0, PAGE_W, PAGE_H, "F");
+
   try {
     const img = await fetchImageAsDataUrl(COVER_URL);
     if (img) {
-      const croppedDataUrl = await centerCropImage(img.dataUrl, PAGE_W / PAGE_H);
-      doc.addImage(croppedDataUrl, "JPEG", 0, 0, PAGE_W, PAGE_H);
+      // Full-bleed cover art — cover the square page without side bars
+      const props = doc.getImageProperties(img.dataUrl);
+      const imgRatio = props.width / props.height;
+      const pageRatio = PAGE_W / PAGE_H;
+      let drawW = PAGE_W;
+      let drawH = PAGE_H;
+      let drawX = 0;
+      let drawY = 0;
+      if (imgRatio > pageRatio) {
+        // wider — fit height, crop sides slightly
+        drawH = PAGE_H;
+        drawW = PAGE_H * imgRatio;
+        drawX = (PAGE_W - drawW) / 2;
+      } else {
+        // taller — fit width, crop top/bottom slightly (center)
+        drawW = PAGE_W;
+        drawH = PAGE_W / imgRatio;
+        drawY = (PAGE_H - drawH) / 2;
+      }
+      doc.addImage(img.dataUrl, img.format, drawX, drawY, drawW, drawH, undefined, "FAST");
     } else {
       drawFallbackCover(doc);
     }
@@ -91,37 +113,43 @@ async function drawCoverPageAsync(doc: jsPDF, childName: string, coverImageUrl?:
     drawFallbackCover(doc);
   }
 
-  // Book title — elegant, smaller, refined
   const line1 = `${childName}'s`;
   const line2 = bookType === "portraits" ? "Royal Portraits" : "Kingdom Chronicles";
 
-  // Subtle dark overlay strip at very bottom only
-  doc.setFillColor(10, 22, 40);
-  doc.setGState(doc.GState({ opacity: 0.55 }));
-  doc.rect(0, PAGE_H * 0.88, PAGE_W, PAGE_H * 0.12, "F");
+  // Soft cream title plaque at top (readable, matches watercolor books)
+  doc.setFillColor(248, 244, 236);
+  doc.setGState(doc.GState({ opacity: 0.92 }));
+  doc.roundedRect(PAGE_W * 0.12, PAGE_H * 0.04, PAGE_W * 0.76, PAGE_H * 0.16, 10, 10, "F");
   doc.setGState(doc.GState({ opacity: 1 }));
+  doc.setDrawColor(...GOLD);
+  doc.setLineWidth(1.5);
+  doc.roundedRect(PAGE_W * 0.12, PAGE_H * 0.04, PAGE_W * 0.76, PAGE_H * 0.16, 10, 10, "S");
 
-  // Name in elegant gold at top — small and refined
   doc.setFont("times", "bolditalic");
+  doc.setFontSize(28);
+  doc.setTextColor(...ROYAL_BLUE);
+  doc.text(line1, PAGE_W / 2, PAGE_H * 0.1, { align: "center" });
+
+  doc.setFont("times", "bold");
   doc.setFontSize(22);
-  doc.setTextColor(212, 176, 90);
-  doc.text(line1, PAGE_W / 2, PAGE_H * 0.06, { align: "center" });
+  doc.setTextColor(...GOLD_DARK);
+  doc.text(line2, PAGE_W / 2, PAGE_H * 0.155, { align: "center" });
 
-  doc.setFont("times", "italic");
-  doc.setFontSize(18);
-  doc.setTextColor(185, 138, 25);
-  doc.text(line2, PAGE_W / 2, PAGE_H * 0.11, { align: "center" });
+  // Soft cream footer plaque — no heavy navy bar
+  doc.setFillColor(248, 244, 236);
+  doc.setGState(doc.GState({ opacity: 0.92 }));
+  doc.roundedRect(PAGE_W * 0.18, PAGE_H * 0.88, PAGE_W * 0.64, PAGE_H * 0.08, 8, 8, "F");
+  doc.setGState(doc.GState({ opacity: 1 }));
+  doc.setDrawColor(...GOLD);
+  doc.setLineWidth(1);
+  doc.roundedRect(PAGE_W * 0.18, PAGE_H * 0.88, PAGE_W * 0.64, PAGE_H * 0.08, 8, 8, "S");
 
-  // Thin gold rule under name
-  doc.setDrawColor(...GOLD_DARK);
-  doc.setLineWidth(0.5);
-  doc.line(PAGE_W * 0.3, PAGE_H * 0.135, PAGE_W * 0.7, PAGE_H * 0.135);
-
-  // Bottom branding — small
   doc.setFont("times", "normal");
-  doc.setFontSize(9);
-  doc.setTextColor(212, 176, 90);
-  doc.text("Storybook Photos · Kingdom Quests", PAGE_W / 2, PAGE_H * 0.95, { align: "center" });
+  doc.setFontSize(11);
+  doc.setTextColor(...ROYAL_BLUE);
+  doc.text("Storybook Photos · Kingdom Quests", PAGE_W / 2, PAGE_H * 0.93, {
+    align: "center",
+  });
 }
 
 function drawFallbackCover(doc: jsPDF): void {
@@ -220,21 +248,20 @@ async function drawInteriorPage(
           const areaRatio = PAGE_W / imageAreaH;
 
           let drawW, drawH, drawX, drawY;
-          // Contain mode: never crop heads/feet — letterbox on cream if needed
+          // Full-bleed cover fit for the image band (4:3 art → no side bars)
           if (imgRatio > areaRatio) {
-            // Image wider than area — fit by width, pad top/bottom
-            drawW = PAGE_W;
-            drawH = PAGE_W / imgRatio;
-            drawX = 0;
-            drawY = (imageAreaH - drawH) / 2;
-          } else {
-            // Image taller than area — fit by height, pad left/right
+            // Image wider — fit height, slight side crop
             drawH = imageAreaH;
             drawW = imageAreaH * imgRatio;
             drawX = (PAGE_W - drawW) / 2;
             drawY = 0;
+          } else {
+            // Image taller — fit width, slight top/bottom crop (centered)
+            drawW = PAGE_W;
+            drawH = PAGE_W / imgRatio;
+            drawX = 0;
+            drawY = (imageAreaH - drawH) / 2;
           }
-          // Cream letterbox so uncropped art sits on storybook paper
           doc.setFillColor(...CREAM);
           doc.rect(0, 0, PAGE_W, imageAreaH, "F");
           doc.addImage(img.dataUrl, img.format, drawX, drawY, drawW, drawH, undefined, "FAST");
@@ -309,65 +336,62 @@ async function drawInteriorPage(
 // Back Cover
 // ─────────────────────────────────────────────────────────────────────────────
 function drawBackCover(doc: jsPDF): void {
-  // Full-page royal blue background
-  doc.setFillColor(...ROYAL_BLUE);
+  // Match interior watercolor books — cream storybook back, not corporate navy
+  doc.setFillColor(...CREAM);
   doc.rect(0, 0, PAGE_W, PAGE_H, "F");
 
-  // Decorative borders
-  drawGoldBorder(doc, 24, 24, PAGE_W - 48, PAGE_H - 48);
-  drawGoldBorder(doc, 32, 32, PAGE_W - 64, PAGE_H - 64, 0.5);
+  // Soft gold double frame
+  doc.setDrawColor(...GOLD);
+  doc.setLineWidth(2);
+  doc.roundedRect(28, 28, PAGE_W - 56, PAGE_H - 56, 14, 14, "S");
+  doc.setLineWidth(0.75);
+  doc.roundedRect(40, 40, PAGE_W - 80, PAGE_H - 80, 10, 10, "S");
 
-  // Brand logo text
-  doc.setTextColor(...GOLD);
+  // Small crown
+  drawCrown(doc, PAGE_W / 2, 150, 42, GOLD_DARK);
+  drawStar(doc, PAGE_W / 2 - 70, 118, 5, GOLD);
+  drawStar(doc, PAGE_W / 2 + 70, 118, 5, GOLD);
+  drawStar(doc, PAGE_W / 2, 100, 4, GOLD_DARK);
+
   doc.setFont("times", "bold");
-  doc.setFontSize(28);
-  doc.text("Storybook Photos", PAGE_W / 2, 180, { align: "center" });
+  doc.setFontSize(26);
+  doc.setTextColor(...ROYAL_BLUE);
+  doc.text("Storybook Photos", PAGE_W / 2, 230, { align: "center" });
 
-  doc.setFont("times", "normal");
+  doc.setFont("times", "italic");
   doc.setFontSize(16);
   doc.setTextColor(...GOLD_DARK);
-  doc.text("Kingdom Quests", PAGE_W / 2, 208, { align: "center" });
+  doc.text("Kingdom Quests", PAGE_W / 2, 258, { align: "center" });
 
-  // Crown centered
-  drawCrown(doc, PAGE_W / 2, 310, 55, GOLD);
+  doc.setDrawColor(...GOLD);
+  doc.setLineWidth(1);
+  doc.line(PAGE_W * 0.28, 278, PAGE_W * 0.72, 278);
 
-  // Star row
-  drawStar(doc, PAGE_W / 2 - 80, 260, 6, GOLD_DARK);
-  drawStar(doc, PAGE_W / 2,       255, 8, GOLD);
-  drawStar(doc, PAGE_W / 2 + 80, 260, 6, GOLD_DARK);
-
-  // Tagline
   doc.setFont("times", "italic");
-  doc.setFontSize(18);
-  doc.setTextColor(...GOLD);
-  const tagline = "Turn Your Child Into Royalty —";
-  const tagline2 = "With a Kingdom Chronicles";
-  doc.text(tagline,  PAGE_W / 2, 390, { align: "center" });
-  doc.text(tagline2, PAGE_W / 2, 413, { align: "center" });
-
-  // Divider
-  doc.setDrawColor(...GOLD_DARK);
-  doc.setLineWidth(0.75);
-  doc.line(PAGE_W / 2 - 100, 432, PAGE_W / 2 + 100, 432);
-
-  // Contact info
-  doc.setFont("times", "normal");
-  doc.setFontSize(13);
-  doc.setTextColor(...GOLD_DARK);
-  doc.text("storybookphotos.com", PAGE_W / 2, 458, { align: "center" });
-  // removed Costa Mesa
-
-  // Footer accent bar
-  doc.setFillColor(...GOLD);
-  doc.rect(0, PAGE_H - 60, PAGE_W, 60, "F");
-  doc.setFont("times", "bold");
-  doc.setFontSize(12);
+  doc.setFontSize(15);
   doc.setTextColor(...ROYAL_BLUE);
-  doc.text("© Storybook Photos  |  All Rights Reserved", PAGE_W / 2, PAGE_H - 30, { align: "center" });
+  doc.text("Every child is the hero of their own", PAGE_W / 2, 320, {
+    align: "center",
+  });
+  doc.text("kingdom adventure.", PAGE_W / 2, 342, { align: "center" });
 
-  // Corner star accents
-  drawStar(doc, 70, 700, 5, GOLD_DARK);
-  drawStar(doc, PAGE_W - 70, 700, 5, GOLD_DARK);
+  // Cream badge for URL
+  doc.setFillColor(255, 255, 255);
+  doc.roundedRect(PAGE_W * 0.22, 380, PAGE_W * 0.56, 48, 10, 10, "F");
+  doc.setDrawColor(...GOLD);
+  doc.setLineWidth(1);
+  doc.roundedRect(PAGE_W * 0.22, 380, PAGE_W * 0.56, 48, 10, 10, "S");
+  doc.setFont("times", "bold");
+  doc.setFontSize(14);
+  doc.setTextColor(...ROYAL_BLUE);
+  doc.text("storybookphotos.com", PAGE_W / 2, 410, { align: "center" });
+
+  doc.setFont("times", "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(...GOLD_DARK);
+  doc.text("© Storybook Photos · All rights reserved", PAGE_W / 2, PAGE_H - 56, {
+    align: "center",
+  });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

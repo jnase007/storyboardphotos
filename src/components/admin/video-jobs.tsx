@@ -151,8 +151,12 @@ export function VideoJobsPanel() {
               🎬 Animated Movie Queue
             </h1>
             <p className="text-gray-500 mt-1">
-              ListedFire-style production — coloring book pages + bedtime
-              narration
+              How it works: 1) Generate narration 2) Produce MP4 externally
+              3) Paste Final MP4 URL → Save → parent sees Watch movie
+            </p>
+            <p className="text-xs text-amber-800 mt-1 max-w-xl">
+              There is no auto-video yet. Until an MP4 is pasted, open the book and
+              use <strong>Play story slideshow</strong> (pages + narration).
             </p>
           </div>
           <button
@@ -274,6 +278,23 @@ CREATE INDEX IF NOT EXISTS idx_storybooks_video_status ON public.storybooks(vide
                         >
                           <ExternalLink className="w-3.5 h-3.5" /> Open book
                         </Link>
+                        <Link
+                          href={`/book/${job.id}?play=1`}
+                          target="_blank"
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 hover:underline"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" /> Play slideshow now
+                        </Link>
+                        {job.video_url ? (
+                          <a
+                            href={job.video_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1 text-xs font-bold text-emerald-800 hover:underline"
+                          >
+                            <Film className="w-3.5 h-3.5" /> Watch delivered MP4
+                          </a>
+                        ) : null}
                         <button
                           onClick={() => copyImages(job)}
                           className="inline-flex items-center gap-1 text-xs font-semibold text-blue-700 hover:underline"
