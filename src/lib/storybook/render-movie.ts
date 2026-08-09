@@ -10,9 +10,13 @@
  *
  * Tiers:
  * - draft    : still-hold slideshow (QA / feedback loop)
- * - standard : Seedance Fast 720p, max 6 clips x 5s (~$8-12)
+ * - standard : Seedance Fast 720p storybook-movie motion, capped clips (~$8-15)
  * - fast     : alias of standard
  * - premium  : blocked by default
+ *
+ * Animation goal (Justin):
+ * Soft classic storybook adventure film energy (Winnie-the-Pooh / picture-book cinema),
+ * same motion language every quest — NOT anime, NOT photoreal trailer.
  */
 
 import type { StoryPage } from "./types";
@@ -179,22 +183,39 @@ function extractVideoUrl(result: Record<string, unknown>): string | null {
   return typeof url === "string" && url ? url : null;
 }
 
-/** Motion direction per page — gentle storybook cinema, face-safe. */
+/**
+ * Shared movie animation language for EVERY quest.
+ * Target feel: classic soft storybook adventure film (Winnie-the-Pooh / picture-book cinema),
+ * NOT anime speed lines, NOT photoreal Seedance trailer energy.
+ */
+export const STORYBOOK_MOVIE_MOTION_BIBLE = [
+  "STYLE LOCK: 2D watercolor children's storybook illustration coming gently alive.",
+  "Same animation language on every quest / every page — consistent movie engine.",
+  "Feel like a soft classic storybook adventure short (Winnie-the-Pooh warmth, picture-book cinema).",
+  "NOT anime. NOT 3D CGI. NOT photoreal live-action. NOT hyper-kinetic action trailer.",
+  "Preserve exact art: soft sepia ink outlines, pastel watercolor washes, cream paper texture.",
+  "Face/identity LOCKED — no morphing, no warping, no age drift, no facial smear.",
+  "Camera: slow gentle push-in OR tiny parallax drift only. No whip pans. No shake-cam.",
+  "Motion vocabulary (reuse every page): soft breeze on hair/cape/leaves, cloth drift, lantern glow pulse,",
+  "cloud/sky drift, sparkle dust motes, character breathes/blinks subtly, small hand or head turn.",
+  "If the scene is action (bridge/climb/storm), show gentle storybook version of that action — readable, calm pacing.",
+  "Keep bold outlines sharp and colors stable. No realistic skin pores, no cinematic CGI lighting.",
+  "No text, letters, subtitles, watermark, logo, or UI.",
+  "Wholesome bedtime adventure energy — magical but safe.",
+].join(" ");
+
+/** Motion direction per page — shared engine + page beat. */
 export function buildMotionPrompt(
   page: StoryPage,
   childName: string,
   role: "King" | "Queen"
 ): string {
-  const beat = (page.title || page.text || "magical kingdom scene").slice(0, 160);
+  const beat = (page.title || page.text || "magical kingdom scene").slice(0, 180);
   return [
-    `A coloring-book / watercolor storybook page gently comes to life — NOT photoreal, NOT 3D, NOT live-action.`,
-    `Preserve exact illustration style: soft sepia ink outlines, pastel watercolor washes, cream paper texture, flat storybook look.`,
-    `Character likeness of ${role} ${childName} stays on-model; face stable — no morphing, no warping, no identity drift.`,
-    `Scene: ${beat}.`,
-    `Very subtle 2D motion only: tiny parallax, soft breeze on hair/cape/leaves, gentle push-in.`,
-    `Keep bold readable outlines sharp. No realistic skin pores, no cinematic CGI, no hyper-real lighting.`,
-    `No text, no letters, no subtitles, no watermark, no logo, no UI.`,
-    `Wholesome bedtime coloring-book energy.`,
+    STORYBOOK_MOVIE_MOTION_BIBLE,
+    `Hero is ${role} ${childName} — keep likeness and locked royal outfit stable.`,
+    `This shot beat: ${beat}.`,
+    `Animate this single storybook frame into a short continuous movie moment.`,
   ].join(" ");
 }
 
@@ -354,6 +375,7 @@ async function animatePage(options: {
   const resolution = "720p"; // never 1080p on $150 path
 
   try {
+    // Seedance image-to-video — prompt is the animation director for every quest
     const input: Record<string, unknown> = {
       prompt,
       image_url: page.imageUrl,
@@ -363,6 +385,8 @@ async function animatePage(options: {
       ),
       aspect_ratio: "16:9",
       generate_audio: false,
+      // Prefer calmer motion; narration carries the story energy
+      camera_fixed: false,
       bitrate_mode: "standard",
     };
 

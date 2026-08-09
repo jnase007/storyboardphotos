@@ -134,6 +134,6 @@ export async function generateNarrationAudio(options: {
   }
 }
 
-/** Motion prompt for Seedance / Higgsfield — keep pages looking like coloring art while alive */
+/** Motion prompt for Seedance — soft classic storybook adventure film (shared engine) */
 export const SEEDANCE_PAGE_MOTION_PROMPT =
-  "Whimsical watercolor children's storybook page gently coming to life, soft sepia ink outlines stay stable, pastel watercolor washes preserved, soft 2D parallax, hair and cape drift lightly, magical sparkles twinkle, slow elegant camera push-in, warm golden fairy light, no morphing face, no photorealism, no text, no watermark";
+  "Soft classic storybook adventure film motion (Winnie-the-Pooh warmth, picture-book cinema), whimsical watercolor children's page gently coming to life, soft sepia ink outlines stay stable, pastel watercolor washes preserved, soft 2D parallax, hair and cape drift lightly, magical sparkles twinkle, slow elegant camera push-in, warm golden fairy light, calm readable pacing, NOT anime, NOT 3D CGI, no morphing face, no photorealism, no text, no watermark";

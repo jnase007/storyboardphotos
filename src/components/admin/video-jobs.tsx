@@ -317,9 +317,9 @@ export function VideoJobsPanel() {
               Movies
             </h1>
             <p className="text-gray-600 mt-1 text-sm max-w-md">
-              Every video gets <strong>bedtime narration + sound</strong>. Test
-              draft = stills + voice (pennies × 30). Standard = light motion +
-              voice (~$10-15, max $50).
+              Every video gets <strong>bedtime narration + sound</strong>. Standard
+              motion = soft storybook adventure film (same animation language every
+              quest). Draft = stills + voice for cheap tests.
             </p>
           </div>
           <button
