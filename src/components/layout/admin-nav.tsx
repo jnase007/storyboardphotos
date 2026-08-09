@@ -94,7 +94,7 @@ export function AdminNav() {
   useEffect(() => {
     document.documentElement.style.setProperty(
       "--admin-nav-height",
-      unlocked ? "2.75rem" : "0px"
+      unlocked ? "3rem" : "0px"
     );
     return () => {
       document.documentElement.style.setProperty("--admin-nav-height", "0px");
@@ -105,13 +105,13 @@ export function AdminNav() {
 
   return (
     <div
-      className="fixed left-0 right-0 z-40 border-b border-royal-gold/25 bg-royal-blue/95 backdrop-blur-md top-[calc(var(--promo-bar-height,0px)+var(--navbar-height,6rem))] lg:top-[calc(var(--promo-bar-height,0px)+var(--navbar-height-lg,7rem))]"
+      className="fixed left-0 right-0 z-[55] border-b-2 border-royal-gold/70 bg-[#1a1230] shadow-[0_4px_18px_rgba(0,0,0,0.35)] top-[calc(var(--promo-bar-height,0px)+var(--navbar-height,6rem))] lg:top-[calc(var(--promo-bar-height,0px)+var(--navbar-height-lg,7rem))]"
       role="navigation"
       aria-label="Admin"
     >
       <div className="container mx-auto px-3 sm:px-4 lg:px-8">
-        <div className="flex h-11 items-stretch gap-0.5 sm:gap-1 overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <span className="shrink-0 self-center mr-1 sm:mr-2 text-[10px] font-semibold tracking-[0.18em] uppercase text-royal-gold/80">
+        <div className="flex h-12 items-stretch gap-1 sm:gap-1.5 overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <span className="shrink-0 self-center mr-1 sm:mr-2 rounded-sm bg-royal-gold px-2 py-0.5 text-[10px] font-bold tracking-[0.18em] uppercase text-royal-blue">
             Admin
           </span>
           {ADMIN_LINKS.map((link) => {
@@ -124,13 +124,13 @@ export function AdminNav() {
                 target={link.href.startsWith("http") ? "_blank" : undefined}
                 rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
                 className={cn(
-                  "shrink-0 inline-flex h-11 items-center gap-1 sm:gap-1.5 rounded-md px-2 sm:px-2.5 text-[11px] sm:text-xs font-semibold transition-colors",
+                  "shrink-0 inline-flex h-12 items-center gap-1 sm:gap-1.5 rounded-md px-2.5 sm:px-3 text-xs sm:text-sm font-semibold transition-colors",
                   active
-                    ? "bg-royal-gold text-royal-blue"
-                    : "text-royal-cream/75 hover:bg-white/10 hover:text-royal-gold"
+                    ? "bg-royal-gold text-royal-blue shadow-sm"
+                    : "text-royal-cream hover:bg-royal-gold/15 hover:text-royal-gold"
                 )}
               >
-                <Icon className="h-3.5 w-3.5 shrink-0" />
+                <Icon className="h-4 w-4 shrink-0" />
                 <span className="sm:hidden">{link.shortLabel}</span>
                 <span className="hidden sm:inline">{link.label}</span>
               </Link>

@@ -1,0 +1,3 @@
+Main nav/footer logo: storybook-photos-logo-white-v3.png
+Built from Justin color master cutout -> pure white transparent for dark nav.
+Justin white flat file saved as logo-white-incoming.jpg (same hash as latest send).
