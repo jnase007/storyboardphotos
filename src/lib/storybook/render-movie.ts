@@ -496,16 +496,29 @@ async function animatePage(options: {
     }
   }
 
-  // ALWAYS keep a picture on screen — still-hold if Seedance fails (never skip / blank)
+  // Customer movies need REAL animation. Still-hold only if explicitly allowed
+  // (env) or draft path above. Default: fail the page and try next — then hard-fail
+  // the whole render if zero Seedance clips succeed.
+  const allowStillFallback =
+    process.env.ALLOW_STILL_FALLBACK === "1" ||
+    process.env.ALLOW_STILL_FALLBACK === "true";
+
   if (!url) {
-    try {
-      url = await stillHoldClip(imageUrl, Math.max(duration, seedanceSec));
+    if (allowStillFallback) {
+      try {
+        url = await stillHoldClip(imageUrl, Math.max(duration, seedanceSec));
+        notes.push(
+          `clip ${index + 1}: STILL fallback (${Math.max(duration, seedanceSec)}s) — ALLOW_STILL_FALLBACK=1`
+        );
+      } catch (e3) {
+        notes.push(
+          `clip ${index + 1} dropped: ${e3 instanceof Error ? e3.message : String(e3)}`
+        );
+        return null;
+      }
+    } else {
       notes.push(
-        `clip ${index + 1}: STILL fallback (${Math.max(duration, seedanceSec)}s) — Seedance unavailable`
-      );
-    } catch (e3) {
-      notes.push(
-        `clip ${index + 1} dropped: ${e3 instanceof Error ? e3.message : String(e3)}`
+        `clip ${index + 1}: ANIMATION REQUIRED — Seedance failed, no still fallback`
       );
       return null;
     }
@@ -855,8 +868,25 @@ export async function renderPremiumStoryMovie(options: {
   }
 
   if (!clipUrls.length) {
-    throw new Error("All page animations failed — cannot build movie");
+    throw new Error(
+      "All page animations failed — cannot build movie. Seedance produced 0 clips."
+    );
   }
+
+  // Customer standard/premium movies must contain REAL motion, not only stills.
+  const animatedCount = notes.filter((n) =>
+    /Seedance|animated \(5s\)/i.test(n)
+  ).length;
+  if (
+    (quality === "standard" || quality === "premium") &&
+    animatedCount === 0 &&
+    process.env.ALLOW_STILL_FALLBACK !== "1"
+  ) {
+    throw new Error(
+      "Animation required: Seedance produced 0 motion clips. Refusing stills-only customer movie."
+    );
+  }
+  notes.push(`animated_clips=${animatedCount}/${clipUrls.length}`);
 
   // End card full-bleed
   try {
