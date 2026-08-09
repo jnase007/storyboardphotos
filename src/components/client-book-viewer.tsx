@@ -161,7 +161,9 @@ export function ClientBookViewer({ book }: { book: Book }) {
   const [requesting, setRequesting] = useState(false);
   const [contactName, setContactName] = useState("");
   const [contactEmail, setContactEmail] = useState("");
+  const [showMoviePlayer, setShowMoviePlayer] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const totalPages = book.pages.length;
   const role = book.gender === "boy" ? "King" : "Queen";
@@ -226,7 +228,17 @@ export function ClientBookViewer({ book }: { book: Book }) {
   const rightPage = book.pages[rightPageIdx];
   const currentPage = book.pages[pageIndex] ?? book.pages[0];
 
+  function pauseMovie() {
+    const video = videoRef.current;
+    if (video) {
+      video.pause();
+    }
+    setShowMoviePlayer(false);
+  }
+
   async function startSlideshow() {
+    // Exclusive: slideshow OR movie — never both
+    pauseMovie();
     setPageIndex(0);
     setSpreadIndex(0);
     setSlideshow(true);
@@ -252,6 +264,12 @@ export function ClientBookViewer({ book }: { book: Book }) {
       audio.pause();
     }
     setPlayingAudio(false);
+  }
+
+  function openMoviePlayer() {
+    // Exclusive: stop slideshow/narration before movie sound
+    stopSlideshow();
+    setShowMoviePlayer(true);
   }
 
   async function toggleNarration() {
@@ -379,16 +397,21 @@ export function ClientBookViewer({ book }: { book: Book }) {
 
         {movieReady ? (
           <>
-            <a
-              href={videoUrl!}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              type="button"
+              onClick={() => {
+                if (showMoviePlayer) {
+                  pauseMovie();
+                } else {
+                  openMoviePlayer();
+                }
+              }}
               className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold"
               style={{ background: "#C5A26F", color: "#0A1628" }}
             >
               <Film className="w-3.5 h-3.5" />
-              Watch movie
-            </a>
+              {showMoviePlayer ? "Hide movie" : "Watch movie"}
+            </button>
             <a
               href={videoUrl!}
               download={`${book.child_name.replace(/\s+/g, "-")}-Kingdom-Movie.mp4`}
@@ -467,13 +490,20 @@ export function ClientBookViewer({ book }: { book: Book }) {
         </div>
       )}
 
-      {movieReady && videoUrl && (
+      {/* Movie player only when user asks — never under an active slideshow */}
+      {movieReady && videoUrl && showMoviePlayer && !slideshow && (
         <div className="w-full max-w-2xl mb-3 shrink-0 rounded-xl overflow-hidden border border-[#C5A26F]/30">
           <video
+            ref={videoRef}
             src={videoUrl}
             controls
             playsInline
-            className="w-full max-h-[28vh] bg-black"
+            autoPlay
+            className="w-full max-h-[40vh] bg-black"
+            onPlay={() => {
+              // If user hits play on movie, kill slideshow audio
+              stopSlideshow();
+            }}
           />
         </div>
       )}
