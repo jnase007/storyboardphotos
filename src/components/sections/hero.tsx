@@ -10,6 +10,10 @@ import { EnchantEmbers } from "@/components/enchant-embers";
 
 const HERO_BACKGROUNDS = [
   {
+    src: "/brand-storefront.jpg",
+    alt: "Storybook Photos storefront — Est. Orange County",
+  },
+  {
     src: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/hero-images/gemini-watercolor-hero.jpg",
     alt: "Magical Kingdom Watercolor — Storybook Photos Kings & Queens",
   },
@@ -113,9 +117,15 @@ export function HeroSection() {
               </Link>
             </div>
 
-            <div className="flex items-center gap-2 text-royal-cream/70 text-sm">
-              <MapPin className="h-4 w-4 text-royal-gold shrink-0" />
-              <span>Premium studio in {SITE.location}</span>
+            <div className="flex flex-col gap-2 text-royal-cream/70 text-sm">
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-royal-gold shrink-0" />
+                <span>Premium studio in {SITE.location}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Heart className="h-4 w-4 text-royal-gold shrink-0" />
+                <span>Book · Movie · Memory they'll never outgrow</span>
+              </div>
             </div>
 
             <div className="flex gap-1 mt-8">
