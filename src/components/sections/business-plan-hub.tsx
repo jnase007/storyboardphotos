@@ -113,7 +113,7 @@ export function BusinessPlanHub({ initialTab }: { initialTab?: BizPlanTab }) {
   return (
     <div className="min-h-screen bg-enchanted-cream">
       {/* Unified section switcher */}
-      <div className="sticky top-[calc(var(--promo-bar-height,0px)+4rem+var(--admin-nav-height,0px))] z-30 border-b border-royal-gold/25 bg-[#F8F4EC]/95 backdrop-blur print:hidden">
+      <div className="sticky top-[calc(var(--promo-bar-height,0px)+var(--navbar-height,6rem)+var(--admin-nav-height,0px))] lg:top-[calc(var(--promo-bar-height,0px)+var(--navbar-height-lg,7rem)+var(--admin-nav-height,0px))] z-30 border-b border-royal-gold/25 bg-[#F8F4EC]/95 backdrop-blur print:hidden">
         <div className="container mx-auto px-4 lg:px-8 max-w-5xl py-3">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>

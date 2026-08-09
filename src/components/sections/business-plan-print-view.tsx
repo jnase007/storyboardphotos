@@ -43,15 +43,15 @@ export function BusinessPlanPrintView() {
       <div
         className={`min-h-screen bg-white ${
           adminOpen
-            ? "pt-[calc(var(--promo-bar-height,0px)+6.75rem)] lg:pt-[calc(var(--promo-bar-height,0px)+7.75rem)]"
-            : "pt-[calc(var(--promo-bar-height,0px)+4rem)] lg:pt-[calc(var(--promo-bar-height,0px)+5rem)]"
+            ? "pt-[calc(var(--promo-bar-height,0px)+var(--navbar-height,6rem)+2.75rem)] lg:pt-[calc(var(--promo-bar-height,0px)+var(--navbar-height-lg,7rem)+2.75rem)]"
+            : "pt-[calc(var(--promo-bar-height,0px)+var(--navbar-height,6rem))] lg:pt-[calc(var(--promo-bar-height,0px)+var(--navbar-height-lg,7rem))]"
         }`}
       >
         <div
           className={`print:hidden sticky z-20 border-b border-royal-gold/20 bg-royal-cream/95 backdrop-blur-sm ${
             adminOpen
-              ? "top-[calc(var(--promo-bar-height,0px)+6.75rem)] lg:top-[calc(var(--promo-bar-height,0px)+7.75rem)]"
-              : "top-[calc(var(--promo-bar-height,0px)+4rem)] lg:top-[calc(var(--promo-bar-height,0px)+5rem)]"
+              ? "top-[calc(var(--promo-bar-height,0px)+var(--navbar-height,6rem)+2.75rem)] lg:top-[calc(var(--promo-bar-height,0px)+var(--navbar-height-lg,7rem)+2.75rem)]"
+              : "top-[calc(var(--promo-bar-height,0px)+var(--navbar-height,6rem))] lg:top-[calc(var(--promo-bar-height,0px)+var(--navbar-height-lg,7rem))]"
           }`}
         >
           <div className="mx-auto max-w-3xl px-4 py-3 flex flex-wrap items-center justify-between gap-3">

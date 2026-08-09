@@ -35,6 +35,10 @@
   html {
     scroll-behavior: smooth;
     --promo-bar-height: 2rem;
+    /* Keep in sync with navbar row height (logo size) */
+    --navbar-height: 6rem; /* h-24 */
+    --navbar-height-lg: 7rem; /* h-28 */
+    --admin-nav-height: 0px;
   }
 
   body {

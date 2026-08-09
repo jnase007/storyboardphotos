@@ -35,8 +35,8 @@ export function Navbar() {
         "fixed left-0 right-0 z-50 transition-all duration-300",
         "top-[var(--promo-bar-height,0px)]",
         solid
-          ? "bg-royal-blue/90 backdrop-blur-xl shadow-lg shadow-black/25 border-b border-royal-gold/15"
-          : "bg-transparent"
+          ? "bg-royal-blue/95 backdrop-blur-xl shadow-lg shadow-black/25 border-b border-royal-gold/15"
+          : "bg-gradient-to-b from-royal-blue/80 via-royal-blue/35 to-transparent"
       )}
     >
       <nav className="container mx-auto px-4 lg:px-8">

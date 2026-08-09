@@ -33,14 +33,14 @@ export function PageShell({ children }: PageShellProps) {
     };
   }, []);
 
-  // promo (2.5rem) + nav (4rem / 5rem) + optional admin (2.75rem)
+  // promo bar + larger logo navbar (+ optional admin subnav)
   const padClass = adminOpen
-    ? "pt-[calc(var(--promo-bar-height,0px)+6.75rem)] lg:pt-[calc(var(--promo-bar-height,0px)+7.75rem)]"
-    : "pt-[calc(var(--promo-bar-height,0px)+4rem)] lg:pt-[calc(var(--promo-bar-height,0px)+5rem)]";
+    ? "pt-[calc(var(--promo-bar-height,0px)+var(--navbar-height,6rem)+2.75rem)] lg:pt-[calc(var(--promo-bar-height,0px)+var(--navbar-height-lg,7rem)+2.75rem)]"
+    : "pt-[calc(var(--promo-bar-height,0px)+var(--navbar-height,6rem))] lg:pt-[calc(var(--promo-bar-height,0px)+var(--navbar-height-lg,7rem))]";
 
   const glowTop = adminOpen
-    ? "top-[calc(var(--promo-bar-height,0px)+6.75rem)] lg:top-[calc(var(--promo-bar-height,0px)+7.75rem)]"
-    : "top-[calc(var(--promo-bar-height,0px)+4rem)] lg:top-[calc(var(--promo-bar-height,0px)+5rem)]";
+    ? "top-[calc(var(--promo-bar-height,0px)+var(--navbar-height,6rem)+2.75rem)] lg:top-[calc(var(--promo-bar-height,0px)+var(--navbar-height-lg,7rem)+2.75rem)]"
+    : "top-[calc(var(--promo-bar-height,0px)+var(--navbar-height,6rem))] lg:top-[calc(var(--promo-bar-height,0px)+var(--navbar-height-lg,7rem))]";
 
   return (
     <div className={`relative ${padClass}`}>

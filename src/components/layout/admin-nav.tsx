@@ -105,7 +105,7 @@ export function AdminNav() {
 
   return (
     <div
-      className="fixed left-0 right-0 z-40 border-b border-royal-gold/25 bg-royal-blue/95 backdrop-blur-md top-[calc(var(--promo-bar-height,0px)+4rem)] lg:top-[calc(var(--promo-bar-height,0px)+5rem)]"
+      className="fixed left-0 right-0 z-40 border-b border-royal-gold/25 bg-royal-blue/95 backdrop-blur-md top-[calc(var(--promo-bar-height,0px)+var(--navbar-height,6rem))] lg:top-[calc(var(--promo-bar-height,0px)+var(--navbar-height-lg,7rem))]"
       role="navigation"
       aria-label="Admin"
     >
