@@ -540,6 +540,8 @@ export async function renderPremiumStoryMovie(options: {
 
   onProgress({ stage: "stitching", detail: `Composing ${clipUrls.length} clips` });
 
+  // Build silent picture track first (reliable), then ALWAYS merge narration as a second step.
+  // fal compose audio tracks are flaky; merge-audio-video is the sound path that matters.
   let timestamp = 0;
   const videoKeyframes = clipUrls.map((url, i) => {
     const duration = clipDurationsMs[i] ?? 8000;
@@ -548,11 +550,7 @@ export async function renderPremiumStoryMovie(options: {
     return kf;
   });
 
-  const tracks: Array<{
-    id: string;
-    type: string;
-    keyframes: Array<{ timestamp: number; duration: number; url: string }>;
-  }> = [
+  const videoOnlyTracks = [
     {
       id: "video",
       type: "video",
@@ -560,32 +558,18 @@ export async function renderPremiumStoryMovie(options: {
     },
   ];
 
-  if (isHttpUrl(options.narrationUrl)) {
-    tracks.push({
-      id: "narration",
-      type: "audio",
-      keyframes: [
-        {
-          timestamp: 0,
-          duration: timestamp,
-          url: options.narrationUrl,
-        },
-      ],
-    });
-    notes.push("Narration track included in compose");
-  }
-
   let silentOrFullUrl: string | null = null;
   try {
     const composed = await falQueueResult(
       COMPOSE_MODEL,
-      { tracks },
+      { tracks: videoOnlyTracks },
       { timeoutMs: 10 * 60_000, pollMs: 2500 }
     );
     silentOrFullUrl = extractVideoUrl(composed);
     if (!silentOrFullUrl) {
       throw new Error("compose returned no video_url");
     }
+    notes.push(`silent compose ok (${Math.round(timestamp / 1000)}s picture)`);
   } catch (err) {
     notes.push(
       `compose failed: ${err instanceof Error ? err.message : String(err)}`
@@ -594,32 +578,51 @@ export async function renderPremiumStoryMovie(options: {
   }
 
   let finalUrl = silentOrFullUrl;
+  const narrationUrl = options.narrationUrl;
 
-  if (
-    isHttpUrl(options.narrationUrl) &&
-    finalUrl &&
-    !notes.some((n) => n.includes("Narration track included"))
-  ) {
+  if (isHttpUrl(narrationUrl) && finalUrl) {
     try {
-      onProgress({ stage: "audio", detail: "Merging bedtime narration" });
+      onProgress({
+        stage: "audio",
+        detail: "Adding bedtime story narration…",
+      });
       const merged = await falQueueResult(
         MERGE_AV_MODEL,
         {
           video_url: finalUrl,
-          audio_url: options.narrationUrl,
+          audio_url: narrationUrl,
         },
         { timeoutMs: 8 * 60_000 }
       );
       const murl = extractVideoUrl(merged);
-      if (murl) {
-        finalUrl = murl;
-        notes.push("Narration merged via merge-audio-video");
+      if (!murl) {
+        throw new Error("merge-audio-video returned no url");
       }
+      finalUrl = murl;
+      notes.push("SOUND: bedtime narration merged into MP4");
     } catch (err) {
-      notes.push(
-        `audio merge skipped: ${err instanceof Error ? err.message : String(err)}`
+      const msg = err instanceof Error ? err.message : String(err);
+      notes.push(`SOUND FAILED: ${msg.slice(0, 180)}`);
+      // Customer videos should not silently ship mute if narration was expected
+      if (quality === "standard" || quality === "premium") {
+        throw new Error(
+          `Narration merge failed — refusing silent customer video. ${msg.slice(0, 160)}`
+        );
+      }
+    }
+  } else if (!narrationUrl) {
+    notes.push("SOUND: no narrationUrl provided (silent video)");
+  } else if (narrationUrl.startsWith("data:")) {
+    notes.push(
+      "SOUND FAILED: narration is still a data: URL — must upload to public https first"
+    );
+    if (quality === "standard" || quality === "premium") {
+      throw new Error(
+        "Narration audio is not a public URL. Upload ElevenLabs MP3 to storage first."
       );
     }
+  } else {
+    notes.push(`SOUND FAILED: invalid narration url ${String(narrationUrl).slice(0, 80)}`);
   }
 
   if (!finalUrl) {

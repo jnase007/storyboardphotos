@@ -33,7 +33,8 @@ const bodySchema = z.object({
    */
   quality: z.enum(["draft", "fast", "standard", "premium"]).default("draft"),
   force: z.boolean().optional(),
-  generateNarrationIfMissing: z.boolean().optional().default(false),
+  /** default true — movies should have bedtime story sound */
+  generateNarrationIfMissing: z.boolean().optional().default(true),
   /** async (default): return immediately + Domino tracker; sync: wait for MP4 */
   mode: z.enum(["async", "sync"]).default("async"),
 });
@@ -130,11 +131,21 @@ async function runRenderJob(options: {
       return;
     }
 
-    await bump("prep", "Warming up narration + page lineup…");
+    await bump("prep", "Recording bedtime narration…");
 
     let narrationUrl = book.narration_url as string | null;
+    // data: URLs cannot be merged by fal — force regenerate/upload
+    if (narrationUrl && narrationUrl.startsWith("data:")) {
+      narrationUrl = null;
+    }
 
-    if (!narrationUrl && generateNarrationIfMissing) {
+    const wantsSound =
+      generateNarrationIfMissing ||
+      quality === "standard" ||
+      quality === "premium" ||
+      quality === "draft";
+
+    if (!narrationUrl && wantsSound) {
       const gender = (book.gender === "girl" ? "girl" : "boy") as "boy" | "girl";
       const role = TITLE_ROLE[gender];
       const script =
@@ -144,7 +155,16 @@ async function runRenderJob(options: {
         text: script,
         filename: `${book.child_name}-narration.mp3`,
       });
-      if (audio.audioUrl) {
+      if (!audio.audioUrl) {
+        const msg = audio.error || "ElevenLabs narration failed";
+        // Standard/customer videos must have sound
+        if (quality === "standard" || quality === "premium") {
+          await bump("failed", msg, { error: msg });
+          return;
+        }
+        // Draft can continue silent but mark it
+        await bump("prep", `Narration failed (draft continues silent): ${msg}`);
+      } else {
         narrationUrl = audio.audioUrl;
         if (audio.audioUrl.startsWith("data:audio")) {
           const base64 = audio.audioUrl.split(",")[1] ?? "";
@@ -153,21 +173,31 @@ async function runRenderJob(options: {
           const { error: upErr } = await supabase.storage
             .from("storybook-assets")
             .upload(path, bytes, { contentType: "audio/mpeg", upsert: true });
-          if (!upErr) {
+          if (upErr) {
+            const msg = `Narration storage upload failed: ${upErr.message}`;
+            if (quality === "standard" || quality === "premium") {
+              await bump("failed", msg, { error: msg });
+              return;
+            }
+            narrationUrl = null;
+          } else {
             const { data: pub } = supabase.storage
               .from("storybook-assets")
               .getPublicUrl(path);
             narrationUrl = pub.publicUrl;
           }
         }
-        await supabase
-          .from("storybooks")
-          .update({
-            narration_url: narrationUrl,
-            narration_script: script,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", id);
+        if (narrationUrl && !narrationUrl.startsWith("data:")) {
+          await supabase
+            .from("storybooks")
+            .update({
+              narration_url: narrationUrl,
+              narration_script: script,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", id);
+          await bump("prep", "Narration ready — building picture track…");
+        }
       }
     }
 

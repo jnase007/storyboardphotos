@@ -192,8 +192,8 @@ export function VideoJobsPanel() {
           package: "teaser",
           quality,
           force,
-          // Draft tests stay silent/cheap; standard may add narration
-          generateNarrationIfMissing: quality === "standard",
+          // Always try bedtime narration — this is the product sound
+          generateNarrationIfMissing: true,
           mode: "async",
         }),
       });
@@ -315,9 +315,9 @@ export function VideoJobsPanel() {
               Movies
             </h1>
             <p className="text-gray-600 mt-1 text-sm max-w-md">
-              Coloring-book videos: gentle 2D motion, not hyper-real. Testing =
-              <strong> Test draft</strong> (pennies × 30). Delivery =
-              <strong> Standard ~$10-15</strong> (max $50).
+              Every video gets <strong>bedtime narration + sound</strong>. Test
+              draft = stills + voice (pennies × 30). Standard = light motion +
+              voice (~$10-15, max $50).
             </p>
           </div>
           <button
@@ -352,10 +352,10 @@ export function VideoJobsPanel() {
               Improve the <strong>book</strong> first (art + story).
             </li>
             <li>
-              <strong>Test draft video</strong> for pacing/end card (pennies). Do your 30 passes here.
+              <strong>Test draft</strong> = pages + story narration/sound (pennies). Do your 30 passes here.
             </li>
             <li>
-              When locked, run <strong>one Standard</strong> coloring-book video (~$10-15, max $50).
+              When locked, run <strong>one Standard</strong> with light motion + narration (~$10-15, max $50).
             </li>
           </ol>
         </div>
