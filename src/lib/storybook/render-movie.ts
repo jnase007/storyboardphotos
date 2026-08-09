@@ -1,17 +1,18 @@
 /**
- * Storybook movie engine — cost-tiered.
+ * Storybook movie engine — cost-tiered for $150 video SKU.
  *
- * Quality tiers:
- * - draft   (DEFAULT): still-hold slideshow via fal ffmpeg images-to-video
- *            pennies, good enough to review pacing + narration + end card
- * - fast    : Seedance 2.0 Fast @ 720p, short clips — mid-cost motion preview
- * - premium : Seedance 2.0 full @ 1080p — $2–3k heirloom final ONLY
+ * HARD RULES (Justin 2026-08-09):
+ * - Target COGS <= $15 / video
+ * - Hard max COGS = $50 / video
+ * - Testing loop (30+ passes) = DRAFT only (pennies)
+ * - Paid delivery = STANDARD (Seedance Fast 720p, capped clips)
+ * - Premium 1080p blocked unless ALLOW_PREMIUM_MOVIE=1
  *
- * Pipeline:
- * 1) Page stills → motion clips (tier-dependent)
- * 2) Clip stitch via fal FFmpeg compose
- * 3) Optional bedtime narration merge
- * 4) Optional upload to Supabase public storage
+ * Tiers:
+ * - draft    : still-hold slideshow (QA / feedback loop)
+ * - standard : Seedance Fast 720p, max 6 clips x 5s (~$8-12)
+ * - fast     : alias of standard
+ * - premium  : blocked by default
  */
 
 import type { StoryPage } from "./types";
@@ -30,8 +31,63 @@ const MOVIE_END_CARD_URL =
   "https://www.storybookphotos.com/brand/movie-end-card-v3.png";
 const END_CARD_DURATION_SEC = 4;
 
-export type MovieQuality = "draft" | "fast" | "premium";
+export type MovieQuality = "draft" | "fast" | "standard" | "premium";
 export type MoviePackage = "teaser" | "full";
+
+/** Target COGS for $150 video product. */
+export const VIDEO_COGS_TARGET_USD = 15;
+/** Hard fail above this estimated motion+stitch COGS. */
+export const VIDEO_COGS_MAX_USD = 50;
+
+const SEEDANCE_FAST_USD_PER_SEC = 0.242; // fal Seedance Fast 720p
+const SEEDANCE_PREMIUM_USD_PER_SEC = 0.68; // too expensive for $150 SKU
+
+/** Paid $150 shape: stays near $15 target, under $50 hard cap. */
+export const STANDARD_MAX_CLIPS = 6;
+export const STANDARD_SEC_PER_CLIP = 5;
+
+export function estimateMotionCostUsd(opts: {
+  quality: MovieQuality;
+  clips: number;
+  secPerClip: number;
+}): number {
+  const q = opts.quality === "fast" ? "standard" : opts.quality;
+  const secs = Math.max(0, opts.clips) * Math.max(0, opts.secPerClip);
+  if (q === "draft") return 0.4; // still-hold + stitch
+  if (q === "standard") return secs * SEEDANCE_FAST_USD_PER_SEC + 1.5;
+  return secs * SEEDANCE_PREMIUM_USD_PER_SEC + 2;
+}
+
+export function assertUnderBudget(opts: {
+  quality: MovieQuality;
+  clips: number;
+  secPerClip: number;
+  allowPremium?: boolean;
+}): { ok: true; estimate: number } | { ok: false; estimate: number; reason: string } {
+  const q = opts.quality === "fast" ? "standard" : opts.quality;
+  if (q === "premium" && !opts.allowPremium) {
+    const estimate = estimateMotionCostUsd({ ...opts, quality: "premium" });
+    return {
+      ok: false,
+      estimate,
+      reason:
+        "Premium blocked for $150 video (>$50 COGS risk). Use draft for testing or standard for delivery.",
+    };
+  }
+  const estimate = estimateMotionCostUsd({
+    quality: q,
+    clips: opts.clips,
+    secPerClip: opts.secPerClip,
+  });
+  if (estimate > VIDEO_COGS_MAX_USD) {
+    return {
+      ok: false,
+      estimate,
+      reason: `Estimated $${estimate.toFixed(0)} exceeds $${VIDEO_COGS_MAX_USD} hard COGS cap.`,
+    };
+  }
+  return { ok: true, estimate };
+}
 
 function falKey(): string | null {
   return process.env.FAL_KEY ?? process.env.FAL_API_KEY ?? null;
@@ -131,38 +187,30 @@ export function buildMotionPrompt(
 ): string {
   const beat = (page.title || page.text || "magical kingdom scene").slice(0, 160);
   return [
-    `Premium Disney-quality children's storybook illustration coming gently to life.`,
-    `Preserve the exact watercolor painting, soft sepia ink outlines, cream paper texture, and character likeness of ${role} ${childName}.`,
+    `A coloring-book / watercolor storybook page gently comes to life — NOT photoreal, NOT 3D, NOT live-action.`,
+    `Preserve exact illustration style: soft sepia ink outlines, pastel watercolor washes, cream paper texture, flat storybook look.`,
+    `Character likeness of ${role} ${childName} stays on-model; face stable — no morphing, no warping, no identity drift.`,
     `Scene: ${beat}.`,
-    `Cinematic slow camera push-in with subtle parallax depth.`,
-    `Soft magical sparkles and warm fairy light drift through the air.`,
-    `Hair, cape, leaves, banners, and candle flames move lightly and naturally.`,
-    `Keep face stable and on-model — no morphing, no warping, no identity drift.`,
+    `Very subtle 2D motion only: tiny parallax, soft breeze on hair/cape/leaves, gentle push-in.`,
+    `Keep bold readable outlines sharp. No realistic skin pores, no cinematic CGI, no hyper-real lighting.`,
     `No text, no letters, no subtitles, no watermark, no logo, no UI.`,
-    `Wholesome fairytale bedtime energy, rich color, high production value.`,
+    `Wholesome bedtime coloring-book energy.`,
   ].join(" ");
 }
 
 function pageDurationSec(
-  page: StoryPage,
+  _page: StoryPage,
   packageKind: MoviePackage,
   quality: MovieQuality
 ): number {
-  const words = (page.text || "").trim().split(/\s+/).filter(Boolean).length;
-  // ~130 wpm narration + breathing room
-  const fromWords = Math.ceil((words / 130) * 60) + 2;
-
   if (quality === "draft") {
-    const base = packageKind === "teaser" ? 4 : 5;
-    return Math.min(8, Math.max(base, Math.min(fromWords, 7)));
+    return packageKind === "teaser" ? 4 : 5;
   }
-  if (quality === "fast") {
-    const base = packageKind === "teaser" ? 4 : 5;
-    return Math.min(8, Math.max(base, Math.min(fromWords, 7)));
+  // standard/fast: fixed 5s to hit ~$15 target
+  if (quality === "fast" || quality === "standard") {
+    return STANDARD_SEC_PER_CLIP;
   }
-  // premium
-  const base = packageKind === "teaser" ? 6 : 8;
-  return Math.min(12, Math.max(base, fromWords));
+  return 6; // premium override only
 }
 
 function selectPages(
@@ -194,40 +242,44 @@ function selectPages(
     return pages;
   }
 
-  if (quality === "fast") {
-    if (packageKind === "teaser" && pages.length > 5) {
+  if (quality === "fast" || quality === "standard") {
+    const max = STANDARD_MAX_CLIPS;
+    if (pages.length > max) {
       const idxs = [
         0,
-        Math.floor(pages.length * 0.3),
-        Math.floor(pages.length * 0.55),
+        Math.floor(pages.length * 0.2),
+        Math.floor(pages.length * 0.4),
+        Math.floor(pages.length * 0.6),
         Math.floor(pages.length * 0.8),
         pages.length - 1,
       ];
-      const uniq = [...new Set(idxs)].sort((a, b) => a - b);
+      const uniq = [...new Set(idxs)].sort((a, b) => a - b).slice(0, max);
       pages = uniq.map((i) => pages[i]);
-      notes.push(`Fast teaser: ${pages.length} motion beats @ 720p`);
-    } else if (pages.length > 8) {
-      pages = pages.slice(0, 8);
-      notes.push("Fast full capped at 8 animated pages");
     }
+    const est = estimateMotionCostUsd({
+      quality: "standard",
+      clips: pages.length,
+      secPerClip: STANDARD_SEC_PER_CLIP,
+    });
+    notes.push(
+      `Standard $150 movie: ${pages.length}x${STANDARD_SEC_PER_CLIP}s Fast 720p (est $${est.toFixed(0)}, target $${VIDEO_COGS_TARGET_USD}, max $${VIDEO_COGS_MAX_USD})`
+    );
     return pages;
   }
 
-  // premium
-  if (packageKind === "teaser" && pages.length > 5) {
+  // premium override — still clamp
+  if (pages.length > STANDARD_MAX_CLIPS) {
     const idxs = [
       0,
-      Math.floor(pages.length * 0.3),
-      Math.floor(pages.length * 0.55),
+      Math.floor(pages.length * 0.2),
+      Math.floor(pages.length * 0.4),
+      Math.floor(pages.length * 0.6),
       Math.floor(pages.length * 0.8),
       pages.length - 1,
     ];
-    const uniq = [...new Set(idxs)].sort((a, b) => a - b);
+    const uniq = [...new Set(idxs)].sort((a, b) => a - b).slice(0, STANDARD_MAX_CLIPS);
     pages = uniq.map((i) => pages[i]);
-    notes.push(`Premium teaser: ${pages.length} hero beats`);
-  } else if (pages.length > 10) {
-    pages = pages.slice(0, 10);
-    notes.push("Premium full capped at 10 animated pages for runtime");
+    notes.push("Premium clamped to 6 beats (cost guard)");
   }
   return pages;
 }
@@ -296,29 +348,32 @@ async function animatePage(options: {
     }
   }
 
-  const model = quality === "fast" ? SEEDANCE_FAST : SEEDANCE_PREMIUM;
+  const usePremium = quality === "premium";
+  const model = usePremium ? SEEDANCE_PREMIUM : SEEDANCE_FAST;
   const prompt = buildMotionPrompt(page, childName, role);
-  const resolution = quality === "fast" ? "720p" : "1080p";
+  const resolution = "720p"; // never 1080p on $150 path
 
   try {
     const input: Record<string, unknown> = {
       prompt,
       image_url: page.imageUrl,
       resolution,
-      duration: String(Math.min(12, Math.max(4, duration))),
+      duration: String(
+        Math.min(usePremium ? 8 : STANDARD_SEC_PER_CLIP, Math.max(4, duration))
+      ),
       aspect_ratio: "16:9",
       generate_audio: false,
-      bitrate_mode: quality === "premium" ? "high" : "standard",
+      bitrate_mode: "standard",
     };
 
     const result = await falQueueResult(model, input, {
-      timeoutMs: quality === "premium" ? 15 * 60_000 : 10 * 60_000,
+      timeoutMs: 10 * 60_000,
       pollMs: 3000,
     });
     const url = extractVideoUrl(result);
     if (!url) throw new Error(`No video url for page ${index + 1}`);
     notes.push(
-      `clip ${index + 1}: ${quality === "fast" ? "Seedance Fast" : "Seedance"} ok (${duration}s ${resolution})`
+      `clip ${index + 1}: ${usePremium ? "Seedance premium" : "Seedance Fast"} ok (${duration}s ${resolution})`
     );
     return url;
   } catch (err) {
@@ -361,15 +416,29 @@ export async function renderPremiumStoryMovie(options: {
 
   const role = options.gender === "girl" ? "Queen" : "King";
   const packageKind = options.package ?? "teaser";
-  const quality: MovieQuality = options.quality ?? "draft";
+  let quality: MovieQuality = options.quality ?? "draft";
+  if (quality === "fast") quality = "standard";
+
+  const allowPremium =
+    process.env.ALLOW_PREMIUM_MOVIE === "1" ||
+    process.env.ALLOW_PREMIUM_MOVIE === "true";
+
+  if (quality === "premium" && !allowPremium) {
+    throw new Error(
+      "Premium disabled. For testing use draft (pennies). For $150 delivery use standard (≤$15 target, $50 max). Set ALLOW_PREMIUM_MOVIE=1 only to override."
+    );
+  }
+
   const notes: string[] = [
     `quality=${quality}`,
     `package=${packageKind}`,
+    `cogs_target_usd=${VIDEO_COGS_TARGET_USD}`,
+    `cogs_max_usd=${VIDEO_COGS_MAX_USD}`,
     quality === "draft"
-      ? "COST MODE: still-hold draft (cheap). Not Seedance."
-      : quality === "fast"
-        ? "COST MODE: Seedance Fast 720p mid-tier."
-        : "COST MODE: Seedance 2.0 1080p PREMIUM — expensive final only.",
+      ? "COST MODE: DRAFT for QA/feedback loop (pennies). Use this for ~30 test videos."
+      : quality === "standard"
+        ? `COST MODE: STANDARD $150 delivery — Fast 720p, ≤${STANDARD_MAX_CLIPS}x${STANDARD_SEC_PER_CLIP}s, target $${VIDEO_COGS_TARGET_USD}.`
+        : "COST MODE: PREMIUM override only.",
   ];
 
   let pages = stripRedundantTitlePages(options.pages || []).filter((p) =>
@@ -382,13 +451,26 @@ export async function renderPremiumStoryMovie(options: {
 
   pages = selectPages(pages, packageKind, quality, notes);
 
+  const secPerClip =
+    quality === "draft" ? 5 : quality === "premium" ? 6 : STANDARD_SEC_PER_CLIP;
+  const budget = assertUnderBudget({
+    quality,
+    clips: pages.length,
+    secPerClip,
+    allowPremium,
+  });
+  notes.push(`cost_estimate_usd≈${budget.estimate.toFixed(2)}`);
+  if (!budget.ok) {
+    throw new Error(budget.reason);
+  }
+
   const onProgress = options.onProgress ?? (() => undefined);
   const motionLabel =
     quality === "draft"
       ? "still-hold draft"
-      : quality === "fast"
-        ? "Seedance Fast"
-        : "Seedance premium";
+      : quality === "standard"
+        ? "Seedance Fast coloring-book motion (≤$15 target)"
+        : "Seedance premium override";
 
   onProgress({
     stage: "animating",
@@ -549,9 +631,9 @@ export async function renderPremiumStoryMovie(options: {
   const provider =
     quality === "draft"
       ? "draft-still-hold+ffmpeg"
-      : quality === "fast"
-        ? "seedance-fast-720p+ffmpeg"
-        : "seedance-2.0-1080p+ffmpeg";
+      : quality === "standard"
+        ? "standard-seedance-fast-720p+ffmpeg"
+        : "premium-override+ffmpeg";
 
   return {
     videoUrl: finalUrl,

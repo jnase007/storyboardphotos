@@ -42,7 +42,7 @@ type Job = {
   updated_at?: string | null;
 };
 
-type Quality = "draft" | "fast" | "premium";
+type Quality = "draft" | "standard" | "premium";
 
 function minutesAgo(iso?: string | null): number | null {
   if (!iso) return null;
@@ -161,19 +161,20 @@ export function VideoJobsPanel() {
 
   async function makeMovie(id: string, quality: Quality, force = false) {
     const labels: Record<Quality, string> = {
-      draft: "Cheap preview (pennies)",
-      fast: "Better motion (~$ few)",
-      premium: "Premium final (EXPENSIVE)",
+      draft: "Test draft (pennies)",
+      standard: "Customer coloring-book video (~$10-15)",
+      premium: "Premium (blocked)",
     };
 
     if (quality === "premium") {
-      const ok = window.confirm(
-        "Premium Seedance 1080p is EXPENSIVE.\n\nOnly use this for a sold $2–3k movie.\n\nContinue?"
+      toast.error(
+        "Premium is blocked. $150 coloring-book videos use Standard (~$15). Testing uses Draft."
       );
-      if (!ok) return;
-    } else if (quality === "fast") {
+      return;
+    }
+    if (quality === "standard") {
       const ok = window.confirm(
-        "Seedance Fast costs real money (less than premium).\n\nUse for a nicer sample, not endless testing.\n\nContinue?"
+        "Customer coloring-book video (~$8-$15, max $50).\n\nGentle 2D motion only — not hyper-real.\nUse when the book is approved.\nFor ~30 test passes, use Test draft.\n\nContinue?"
       );
       if (!ok) return;
     }
@@ -188,11 +189,11 @@ export function VideoJobsPanel() {
           "x-admin-code": ADMIN_CODE,
         },
         body: JSON.stringify({
-          package: quality === "draft" ? "teaser" : "teaser",
+          package: "teaser",
           quality,
           force,
-          // narration off for draft to avoid ElevenLabs 401 blocking cheap path
-          generateNarrationIfMissing: quality !== "draft",
+          // Draft tests stay silent/cheap; standard may add narration
+          generateNarrationIfMissing: quality === "standard",
           mode: "async",
         }),
       });
@@ -314,8 +315,9 @@ export function VideoJobsPanel() {
               Movies
             </h1>
             <p className="text-gray-600 mt-1 text-sm max-w-md">
-              Simple path: make a <strong>cheap preview</strong> first. Only use
-              better/premium when you love the book.
+              Coloring-book videos: gentle 2D motion, not hyper-real. Testing =
+              <strong> Test draft</strong> (pennies × 30). Delivery =
+              <strong> Standard ~$10-15</strong> (max $50).
             </p>
           </div>
           <button
@@ -337,23 +339,23 @@ export function VideoJobsPanel() {
               </p>
               <p className="text-sm text-red-700">
                 Server died mid-render (common on long Seedance jobs). Tap{" "}
-                <strong>Unstick</strong>, then <strong>Cheap preview</strong>.
+                <strong>Unstick</strong>, then <strong>Test draft</strong>.
               </p>
             </div>
           </div>
         ) : null}
 
         <div className="mb-6 rounded-xl border border-emerald-100 bg-white px-4 py-3 text-sm text-gray-700">
-          <p className="font-semibold text-gray-900 mb-1">How to use</p>
+          <p className="font-semibold text-gray-900 mb-1">How to test without burning cash</p>
           <ol className="list-decimal ml-5 space-y-1">
             <li>
-              <strong>Cheap preview</strong> — still slideshow + end logo (~pennies)
+              Improve the <strong>book</strong> first (art + story).
             </li>
             <li>
-              <strong>Better motion</strong> — short Seedance Fast sample (costs $)
+              <strong>Test draft video</strong> for pacing/end card (pennies). Do your 30 passes here.
             </li>
             <li>
-              <strong>Premium final</strong> — only for paid $2–3k movies
+              When locked, run <strong>one Standard</strong> coloring-book video (~$10-15, max $50).
             </li>
           </ol>
         </div>
@@ -437,7 +439,7 @@ export function VideoJobsPanel() {
                       {state.kind === "stuck" ? (
                         <div className="mt-3 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
                           This one died on the server. Unstick it, then run{" "}
-                          <strong>Cheap preview</strong> (not premium).
+                          <strong>Test draft</strong> (not customer/premium).
                         </div>
                       ) : null}
 
@@ -502,32 +504,28 @@ export function VideoJobsPanel() {
                                 <Sparkles className="w-4 h-4" />
                               )}
                               {job.video_url
-                                ? "Remake cheap preview"
-                                : "Make cheap preview"}
+                                ? "Remake test draft"
+                                : "Make test draft"}
                             </button>
 
                             <div className="grid grid-cols-2 gap-2">
                               <button
                                 onClick={() =>
-                                  makeMovie(job.id, "fast", Boolean(job.video_url))
+                                  makeMovie(job.id, "standard", Boolean(job.video_url))
                                 }
                                 disabled={busy}
                                 className="inline-flex items-center justify-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs font-bold text-amber-900 disabled:opacity-60"
                               >
-                                Better motion ($)
+                                Customer video (~$15)
                               </button>
                               <button
                                 onClick={() =>
-                                  makeMovie(
-                                    job.id,
-                                    "premium",
-                                    Boolean(job.video_url)
-                                  )
+                                  makeMovie(job.id, "premium", Boolean(job.video_url))
                                 }
                                 disabled={busy}
                                 className="inline-flex items-center justify-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2.5 text-xs font-bold text-rose-800 disabled:opacity-60"
                               >
-                                Premium final ($$$)
+                                Premium blocked
                               </button>
                             </div>
                           </>

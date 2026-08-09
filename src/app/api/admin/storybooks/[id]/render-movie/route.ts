@@ -26,10 +26,14 @@ type Params = { params: Promise<{ id: string }> };
 
 const bodySchema = z.object({
   package: z.enum(["teaser", "full"]).default("teaser"),
-  /** draft=cheap still-hold (DEFAULT); fast=Seedance Fast 720p; premium=Seedance 1080p final only */
-  quality: z.enum(["draft", "fast", "premium"]).default("draft"),
+  /**
+   * draft = QA/testing (DEFAULT, pennies)
+   * standard|fast = $150 coloring-book delivery (~$15 target / $50 max)
+   * premium = blocked unless ALLOW_PREMIUM_MOVIE=1
+   */
+  quality: z.enum(["draft", "fast", "standard", "premium"]).default("draft"),
   force: z.boolean().optional(),
-  generateNarrationIfMissing: z.boolean().optional().default(true),
+  generateNarrationIfMissing: z.boolean().optional().default(false),
   /** async (default): return immediately + Domino tracker; sync: wait for MP4 */
   mode: z.enum(["async", "sync"]).default("async"),
 });
@@ -63,7 +67,7 @@ async function writeTracker(
 async function runRenderJob(options: {
   id: string;
   packageKind: "teaser" | "full";
-  quality: "draft" | "fast" | "premium";
+  quality: "draft" | "fast" | "standard" | "premium";
   force?: boolean;
   generateNarrationIfMissing: boolean;
 }) {
