@@ -26,11 +26,53 @@ type Book = {
   gender: string;
   pages: StoryPage[];
   status: string;
+  notes?: string | null;
+  book_title?: string | null;
+  adventure_path?: string | null;
   narration_url?: string | null;
   video_status?: string | null;
   video_url?: string | null;
   video_package?: string | null;
 };
+
+const QUEST_LABELS: Record<string, string> = {
+  "dragon-slayer": "Dragon Mountain",
+  "rescue-mission": "Broken Bridge Rescue",
+  "lost-crown": "Crown of the Cliffs",
+  "forest-guardian": "Storm in the Living Forest",
+  "kindness-quest": "Midnight Lantern Run",
+  "light-treasure": "Treasure Gauntlet",
+};
+
+function resolveBookDisplayTitle(book: Book, role: string): string {
+  const notes = book.notes || "";
+  const tagged = notes.match(/\[BookTitle:\s*([^\]]+)\]/i)?.[1]?.trim();
+  if (tagged && /\band\b/i.test(tagged)) return tagged.replace(/\s+/g, " ").trim();
+
+  const stored = (book.book_title || "").replace(/\s+/g, " ").trim();
+  if (stored && /\band\b/i.test(stored)) return stored;
+
+  // Infer quest from first page text/title when book_title missing
+  const first = book.pages?.[0];
+  const blob = `${first?.title || ""}\n${first?.text || ""}`;
+  const m = blob.match(
+    /(?:King|Queen)\s+[\w'’.-]+(?:\s+[\w'’.-]+){0,2}\s+and\s+(?:the\s+)?[^\n.]+/i
+  );
+  if (m) return m[0].replace(/\s+/g, " ").trim();
+
+  const adv =
+    book.adventure_path ||
+    notes.match(/\[Adventure:\s*([^\]]+)\]/i)?.[1]?.trim() ||
+    "";
+  const quest =
+    (adv && QUEST_LABELS[adv]) ||
+    (first?.title && !/^title page$/i.test(first.title) ? first.title : null);
+  if (quest) {
+    const q = quest.replace(/^the\s+/i, "").trim();
+    return `${role} ${book.child_name} and the ${q}`;
+  }
+  return `${role} ${book.child_name}'s Kingdom Chronicles`;
+}
 
 function BookPage({
   page,
@@ -167,6 +209,7 @@ export function ClientBookViewer({ book }: { book: Book }) {
 
   const totalPages = book.pages.length;
   const role = book.gender === "boy" ? "King" : "Queen";
+  const displayTitle = resolveBookDisplayTitle(book, role);
 
   const autoPlayRequested = useMemo(() => {
     if (typeof window === "undefined") return false;
@@ -347,7 +390,7 @@ export function ClientBookViewer({ book }: { book: Book }) {
           className="text-lg sm:text-xl font-bold"
           style={{ color: "#C5A26F", fontFamily: "Georgia, serif" }}
         >
-          {role} {book.child_name}'s Kingdom Chronicles
+          {displayTitle}
         </h1>
         <p className="text-white/40 text-xs mt-1">
           A Storybook Photos Adventure

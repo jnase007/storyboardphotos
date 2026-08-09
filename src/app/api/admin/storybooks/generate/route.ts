@@ -135,10 +135,17 @@ export async function POST(request: NextRequest) {
 
     if (storybookId && hasRealSupabase()) {
       const supabase = createServiceClient();
+      // Persist quest title in notes so cover/UI can recover it without a schema migration
+      const titleTag = `[BookTitle: ${story.bookTitle}]`;
+      const notesWithTitle = notes
+        ? `${titleTag} [Adventure: ${adventure_path}] [Package: ${outputPackage}] ${notes}`
+        : `${titleTag} [Adventure: ${adventure_path}] [Package: ${outputPackage}]`;
+
       await supabase
         .from("storybooks")
         .update({
           pages,
+          notes: notesWithTitle,
           status: "ready",
           updated_at: new Date().toISOString(),
         })

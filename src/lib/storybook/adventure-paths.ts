@@ -133,6 +133,25 @@ export function loadAdventurePathsClient(): AdventurePath[] {
   }
 }
 
+/** Canonical front-cover title: "Queen River and the Broken Bridge Rescue" */
+export function buildBookTitle(
+  path: Pick<AdventurePath, "bookTitleTemplate" | "title">,
+  childName: string,
+  gender: StoryGender
+): string {
+  const fromTemplate = fillPlaceholders(
+    path.bookTitleTemplate || `[Role] [Name] and the ${path.title}`,
+    childName,
+    gender
+  )
+    .replace(/\s+/g, " ")
+    .trim();
+  if (/\band\b/i.test(fromTemplate) && fromTemplate.length > 8) return fromTemplate;
+  const role = TITLE_ROLE[gender];
+  const quest = (path.title || "Kingdom Quest").replace(/^the\s+/i, "").trim();
+  return `${role} ${childName} and the ${quest}`;
+}
+
 /** Build generator StoryPage[] from an adventure script. */
 export function materializeAdventureStory(
   path: AdventurePath,
@@ -141,8 +160,9 @@ export function materializeAdventureStory(
   childAge: number,
   notes?: string
 ): { bookTitle: string; pages: StoryPage[] } {
-  const role = TITLE_ROLE[gender];
-  const bookTitle = fillPlaceholders(path.bookTitleTemplate, childName, gender);
+  const bookTitle = buildBookTitle(path, childName, gender);
+  // Page 1 text always mirrors the hardcover title exactly
+  const coverTitleText = bookTitle.replace(/^(.+?)\s+and\s+/i, "$1\nand ");
 
   // Keep title/cover script pages so they get UNIQUE art for the hardcover.
   // Interior reading/PDF still strips them via stripRedundantTitlePages (cover already shows name + hero).
@@ -152,11 +172,17 @@ export function materializeAdventureStory(
     const photoSet = p.photoSet ?? null;
     const useSessionPhoto =
       p.useSessionPhoto ?? (photoSet !== null || idx === 0 || p.page === 8);
+    const isCoverPage = idx === 0 || p.page === 1;
 
     return {
       page: idx + 1,
-      title: fillPlaceholders(p.title, childName, gender),
-      text: fillPlaceholders(p.text, childName, gender),
+      // Cover page title = full quest name for UI/PDF; interior keeps beat titles
+      title: isCoverPage
+        ? bookTitle
+        : fillPlaceholders(p.title, childName, gender),
+      text: isCoverPage
+        ? coverTitleText
+        : fillPlaceholders(p.text, childName, gender),
       imageUrl: null,
       photoSet,
       useSessionPhoto,
@@ -247,13 +273,13 @@ export const ADVENTURE_PATHS: AdventurePath[] = [
       "Be strong and courageous. Do not be afraid… for the Lord your God is with you wherever you go.",
     aiTheme:
       `${BIBLICAL_STORY_GUARDRAILS} ONE LAND: Dragon Mountain only. ACTION QUEST: climb, rockfall, fire-gusts, stand ground, win the peak. Hero CONQUERS fear and frees the pass. No kingdom tour. No soft filler. Age-appropriate peril, no gore, no killing required — dragon may yield and become guardian after the win. Joshua 1:9.`,
-    bookTitleTemplate: "[Role] [Name] and Dragon Mountain",
+    bookTitleTemplate: "[Role] [Name] and the Dragon Mountain",
     pages: [
       {
         page: 1,
         title: "Dragon Mountain",
         staticScene: "dragon-slayer/title",
-        text: `[Role] [Name] and Dragon Mountain`,
+        text: `[Role] [Name] and the Dragon Mountain`,
         photoCaption: "Dragon Mountain awaits",
         useSessionPhoto: false,
         imagePromptHint: "title page dragon mountain watercolor no text",
@@ -718,14 +744,14 @@ The End.`,
       "The Lord God took the man and put him in the garden of Eden to work it and keep it.",
     aiTheme:
       `${BIBLICAL_STORY_GUARDRAILS} ONE LAND: Living Forest in a storm. ACTION: falling branches, flooded path, jammed river rocks, climb to free water, protect animals/trees. Hero CONQUERS the storm crisis as steward. No kingdom tour. Genesis 2:15.`,
-    bookTitleTemplate: "[Role] [Name] and the Forest Storm",
+    bookTitleTemplate: "[Role] [Name] and the Storm in the Living Forest",
     pages: [
       {
         page: 1,
         title: "Storm in the Living Forest",
         staticScene: "forest-guardian/title",
         text: `[Role] [Name]
-and the Forest Storm`,
+and the Storm in the Living Forest`,
         photoCaption: "The forest needs help",
         useSessionPhoto: false,
         imagePromptHint: "cover hero in windy living forest storm light watercolor no text",

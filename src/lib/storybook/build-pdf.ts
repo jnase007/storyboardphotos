@@ -68,7 +68,7 @@ export async function buildStorybookPdf(options: {
   if (includeCover) {
     if (pageCount > 0) doc.addPage();
     pageCount++;
-    await drawCoverPageAsync(doc, childName, resolvedCoverUrl, bookType);
+    await drawCoverPageAsync(doc, childName, bookTitle, resolvedCoverUrl, bookType);
   }
 
   // ── Interior pages ────────────────────────────────────────────────────────
@@ -94,7 +94,50 @@ export async function buildStorybookPdf(options: {
 // ─────────────────────────────────────────────────────────────────────────────
 // Cover Page
 // ─────────────────────────────────────────────────────────────────────────────
-async function drawCoverPageAsync(doc: jsPDF, childName: string, coverImageUrl?: string, bookType: "chronicles" | "portraits" = "chronicles"): Promise<void> {
+/** Cover title: "Queen River and the Broken Bridge Rescue" */
+function formatCoverTitleLines(
+  bookTitle: string,
+  childName: string,
+  bookType: "chronicles" | "portraits"
+): { line1: string; line2: string; line3?: string } {
+  if (bookType === "portraits") {
+    return { line1: `${childName}'s`, line2: "Royal Portraits" };
+  }
+  const clean = (bookTitle || "").replace(/\s+/g, " ").trim();
+  // Prefer "Role Name and the Quest Name" split after " and "
+  const m = clean.match(/^(.*?\S)\s+and\s+(the\s+)?(.+)$/i);
+  if (m) {
+    const hero = m[1].trim();
+    const quest = `${m[2] || ""}${m[3]}`.replace(/\s+/g, " ").trim();
+    // Keep "and the" on line 2 for classic storybook cadence
+    return {
+      line1: hero,
+      line2: m[2] ? `and the` : "and",
+      line3: m[2] ? m[3].trim() : quest,
+    };
+  }
+  if (clean) {
+    // Fallback: first half / second half
+    const words = clean.split(" ");
+    if (words.length >= 5) {
+      const mid = Math.ceil(words.length / 2);
+      return {
+        line1: words.slice(0, mid).join(" "),
+        line2: words.slice(mid).join(" "),
+      };
+    }
+    return { line1: clean, line2: "A Kingdom Quest" };
+  }
+  return { line1: `${childName}'s`, line2: "Kingdom Chronicles" };
+}
+
+async function drawCoverPageAsync(
+  doc: jsPDF,
+  childName: string,
+  bookTitle: string,
+  coverImageUrl?: string,
+  bookType: "chronicles" | "portraits" = "chronicles"
+): Promise<void> {
   // Prefer first story page art as cover so it matches the book look
   const CHRONICLES_COVER = "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/cover-template.jpg";
   const PORTRAITS_COVER = "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/portrait-album-cover.jpg";
@@ -134,27 +177,50 @@ async function drawCoverPageAsync(doc: jsPDF, childName: string, coverImageUrl?:
     drawFallbackCover(doc);
   }
 
-  const line1 = `${childName}'s`;
-  const line2 = bookType === "portraits" ? "Royal Portraits" : "Kingdom Chronicles";
+  const { line1, line2, line3 } = formatCoverTitleLines(
+    bookTitle,
+    childName,
+    bookType
+  );
+  const threeLine = Boolean(line3);
+  const plaqueH = threeLine ? PAGE_H * 0.22 : PAGE_H * 0.16;
 
   // Soft cream title plaque at top (readable, matches watercolor books)
   doc.setFillColor(248, 244, 236);
   doc.setGState(doc.GState({ opacity: 0.92 }));
-  doc.roundedRect(PAGE_W * 0.12, PAGE_H * 0.04, PAGE_W * 0.76, PAGE_H * 0.16, 10, 10, "F");
+  doc.roundedRect(PAGE_W * 0.1, PAGE_H * 0.035, PAGE_W * 0.8, plaqueH, 10, 10, "F");
   doc.setGState(doc.GState({ opacity: 1 }));
   doc.setDrawColor(...GOLD);
   doc.setLineWidth(1.5);
-  doc.roundedRect(PAGE_W * 0.12, PAGE_H * 0.04, PAGE_W * 0.76, PAGE_H * 0.16, 10, 10, "S");
+  doc.roundedRect(PAGE_W * 0.1, PAGE_H * 0.035, PAGE_W * 0.8, plaqueH, 10, 10, "S");
 
-  doc.setFont("times", "bolditalic");
-  doc.setFontSize(28);
-  doc.setTextColor(...ROYAL_BLUE);
-  doc.text(line1, PAGE_W / 2, PAGE_H * 0.1, { align: "center" });
-
+  // Hero line: Queen River
   doc.setFont("times", "bold");
-  doc.setFontSize(22);
+  doc.setFontSize(line1.length > 22 ? 22 : 26);
+  doc.setTextColor(...ROYAL_BLUE);
+  doc.text(line1, PAGE_W / 2, PAGE_H * (threeLine ? 0.09 : 0.1), {
+    align: "center",
+    maxWidth: PAGE_W * 0.72,
+  });
+
+  // and the / quest
+  doc.setFont("times", "italic");
+  doc.setFontSize(16);
   doc.setTextColor(...GOLD_DARK);
-  doc.text(line2, PAGE_W / 2, PAGE_H * 0.155, { align: "center" });
+  doc.text(line2, PAGE_W / 2, PAGE_H * (threeLine ? 0.135 : 0.155), {
+    align: "center",
+    maxWidth: PAGE_W * 0.72,
+  });
+
+  if (line3) {
+    doc.setFont("times", "bold");
+    doc.setFontSize(line3.length > 28 ? 18 : 22);
+    doc.setTextColor(...ROYAL_BLUE);
+    doc.text(line3, PAGE_W / 2, PAGE_H * 0.19, {
+      align: "center",
+      maxWidth: PAGE_W * 0.72,
+    });
+  }
 
   // Soft cream footer plaque — no heavy navy bar
   doc.setFillColor(248, 244, 236);

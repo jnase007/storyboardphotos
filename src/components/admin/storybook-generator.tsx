@@ -264,9 +264,25 @@ export function StorybookGenerator() {
 
         if (cancelled) return;
 
+        const role =
+          data.gender === "boy" ? "King" : "Queen";
+        // Prefer [BookTitle: ...] stamped into notes at generate time
+        const notesText = data.notes || "";
+        const tagged =
+          notesText.match(/\[BookTitle:\s*([^\]]+)\]/i)?.[1]?.trim() || "";
+        const advFromNotes =
+          notesText.match(/\[Adventure:\s*([^\]]+)\]/i)?.[1]?.trim() ||
+          data.adventure_path;
+        const pathMeta = advFromNotes
+          ? ADVENTURE_PATHS.find((p) => p.id === advFromNotes)
+          : undefined;
+        const questName =
+          pathMeta?.title?.replace(/^the\s+/i, "") || "Kingdom Quest";
+        const fallbackTitle = `${role} ${data.child_name || "Child"} and the ${questName}`;
         const loaded: GeneratedBook = {
           id: data.id || loadId!,
-          bookTitle: `${data.child_name || "Child"}'s Kingdom Chronicles`,
+          bookTitle:
+            tagged && /\band\b/i.test(tagged) ? tagged : fallbackTitle,
           child_name: data.child_name || "Child",
           child_age: data.child_age || 6,
           gender: data.gender === "boy" || data.gender === "girl" ? data.gender : "girl",
