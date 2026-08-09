@@ -10,6 +10,7 @@ import {
   Mic,
   RefreshCw,
   Save,
+  Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -49,6 +50,7 @@ export function VideoJobsPanel() {
   const [error, setError] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [narratingId, setNarratingId] = useState<string | null>(null);
+  const [renderingId, setRenderingId] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<
     Record<string, { status: string; url: string; notes: string }>
   >({});
@@ -131,6 +133,40 @@ export function VideoJobsPanel() {
     }
   }
 
+  async function renderPremiumMovie(id: string, force = false) {
+    setRenderingId(id);
+    toast.message(
+      "Rendering premium MP4 (Seedance motion + stitch + narration). Can take 10–25 min…"
+    );
+    try {
+      const res = await fetch(`/api/admin/storybooks/${id}/render-movie`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-code": ADMIN_CODE,
+        },
+        body: JSON.stringify({
+          package: "full",
+          force,
+          generateNarrationIfMissing: true,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Render failed");
+      toast.success(
+        data.reused
+          ? "Movie already ready"
+          : `MP4 ready · ${data.pages_used ?? "?"} pages animated`
+      );
+      await load();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Render failed");
+      await load();
+    } finally {
+      setRenderingId(null);
+    }
+  }
+
   function copyImages(job: Job) {
     const text = job.page_images.join("\n");
     navigator.clipboard.writeText(text || "(no images)");
@@ -151,12 +187,12 @@ export function VideoJobsPanel() {
               🎬 Animated Movie Queue
             </h1>
             <p className="text-gray-500 mt-1">
-              How it works: 1) Generate narration 2) Produce MP4 externally
-              3) Paste Final MP4 URL → Save → parent sees Watch movie
+              Premium movie ($2–3k gift tier): Seedance animates each page → stitch
+              → ElevenLabs narration → downloadable MP4.
             </p>
-            <p className="text-xs text-amber-800 mt-1 max-w-xl">
-              There is no auto-video yet. Until an MP4 is pasted, open the book and
-              use <strong>Play story slideshow</strong> (pages + narration).
+            <p className="text-xs text-emerald-800 mt-1 max-w-xl">
+              Tap <strong>Render premium MP4</strong> on a job (10–25 min). Or paste
+              a Final MP4 URL manually. Slideshow is only a temporary preview.
             </p>
           </div>
           <button
@@ -309,6 +345,25 @@ CREATE INDEX IF NOT EXISTS idx_storybooks_video_status ON public.storybooks(vide
                             <Copy className="w-3.5 h-3.5" /> Copy script
                           </button>
                         ) : null}
+                        <button
+                          onClick={() =>
+                            renderPremiumMovie(job.id, Boolean(job.video_url))
+                          }
+                          disabled={renderingId === job.id}
+                          className="inline-flex items-center gap-1 text-xs font-bold text-rose-700 hover:underline disabled:opacity-50"
+                          title="Seedance + stitch + narration → real MP4"
+                        >
+                          {renderingId === job.id ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <Sparkles className="w-3.5 h-3.5" />
+                          )}
+                          {renderingId === job.id
+                            ? "Rendering MP4…"
+                            : job.video_url
+                              ? "Re-render premium MP4"
+                              : "Render premium MP4"}
+                        </button>
                         <button
                           onClick={() => generateNarration(job.id)}
                           disabled={narratingId === job.id}

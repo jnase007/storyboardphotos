@@ -3,6 +3,7 @@ import { createServiceClient } from "@/lib/supabase/admin";
 import { notFound } from "next/navigation";
 import { ClientBookViewer } from "@/components/client-book-viewer";
 import { buildMetadata } from "@/lib/seo";
+import { stripRedundantTitlePages } from "@/lib/storybook/adventure-paths";
 
 export const metadata: Metadata = buildMetadata({
   title: "Your Kingdom Chronicles Storybook",
@@ -24,5 +25,10 @@ export default async function BookPage(props: {
 
   if (error || !data) return notFound();
 
-  return <ClientBookViewer book={data} />;
+  const book = {
+    ...data,
+    pages: stripRedundantTitlePages(data.pages ?? []),
+  };
+
+  return <ClientBookViewer book={book} />;
 }

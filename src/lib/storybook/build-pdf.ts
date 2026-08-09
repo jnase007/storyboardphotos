@@ -1,5 +1,6 @@
 import { jsPDF } from "jspdf";
 import type { StoryPage } from "./types";
+import { stripRedundantTitlePages } from "./adventure-paths";
 
 // ─── Brand Colors ────────────────────────────────────────────────────────────
 const ROYAL_BLUE   = [10,  22,  40]  as [number, number, number]; // #0A1628
@@ -53,11 +54,13 @@ export async function buildStorybookPdf(options: {
   }
 
   // ── Interior pages ────────────────────────────────────────────────────────
-  const totalStoryPages = pages.length;
-  for (let i = 0; i < pages.length; i++) {
+  // Drop redundant title/portrait interior page (cover already has name + hero)
+  const storyPages = stripRedundantTitlePages(pages);
+  const totalStoryPages = storyPages.length;
+  for (let i = 0; i < storyPages.length; i++) {
     if (pageCount > 0) doc.addPage();
     pageCount++;
-    await drawInteriorPage(doc, pages[i], i + 1, totalStoryPages, childName, bookTitle);
+    await drawInteriorPage(doc, storyPages[i], i + 1, totalStoryPages, childName, bookTitle);
   }
 
   // ── Back cover ────────────────────────────────────────────────────────────
@@ -293,41 +296,84 @@ async function drawInteriorPage(
   doc.setFillColor(...GOLD);
   doc.rect(0, textAreaY, PAGE_W, 2, "F");
 
-  // Page title — skip generic labels
-  const skipTitles = ["Title Page", "The Dragon Quest", "The Rescue Mission", "The Lost Crown", "The Forest Guardian", "The Kindness Quest", "The Light Treasure"];
-  const displayTitle = skipTitles.includes(page.title) ? "" : page.title;
-  
+  // Page title — skip generic adventure labels + pure title pages
+  const skipTitles = [
+    "Title Page",
+    "The Dragon Quest",
+    "The Rescue Mission",
+    "The Lost Crown",
+    "The Forest Guardian",
+    "The Kindness Quest",
+    "The Light Treasure",
+  ];
+  // Avoid "The End" title when body already ends with The End
+  let displayTitle = skipTitles.includes(page.title) ? "" : page.title;
+  if (
+    displayTitle &&
+    /the end\.?$/i.test((page.text || "").trim()) &&
+    /^the end$/i.test(displayTitle.trim())
+  ) {
+    displayTitle = "";
+  }
+
+  const bodyText = (page.text || "").trim();
+  const charCount = bodyText.length;
+  // Bigger type for short storybook pages — fill the cream band, less empty white
+  let bodySize = 16;
+  let lineH = 22;
+  if (charCount > 520) {
+    bodySize = 12.5;
+    lineH = 17;
+  } else if (charCount > 320) {
+    bodySize = 14;
+    lineH = 19;
+  } else if (charCount > 180) {
+    bodySize = 15.5;
+    lineH = 21;
+  } else {
+    bodySize = 17.5;
+    lineH = 24;
+  }
+
+  const titleBlockH = displayTitle ? 36 : 12;
+  const textTop = textAreaY + titleBlockH;
+  const footerReserve = 26;
+  const maxTextH = PAGE_H - textTop - footerReserve;
+  const textWidth = PAGE_W - MARGIN * 2.2;
+
   if (displayTitle) {
-    doc.setTextColor(...GOLD);
-    doc.setFont("times", "bold");
-    doc.setFontSize(15);
-    doc.text(displayTitle, PAGE_W / 2, textAreaY + 22, { align: "center", maxWidth: PAGE_W - MARGIN * 2 });
-  }
-
-  // Page subtitle (set name)
-  if (page.photoSet) {
-    doc.setFont("times", "italic");
-    doc.setFontSize(9);
     doc.setTextColor(...GOLD_DARK);
-    doc.text(page.photoSet, MARGIN + 12, textAreaY + 52, { maxWidth: PAGE_W - MARGIN * 2 });
+    doc.setFont("times", "bold");
+    doc.setFontSize(18);
+    doc.text(displayTitle, PAGE_W / 2, textAreaY + 26, {
+      align: "center",
+      maxWidth: PAGE_W - MARGIN * 2,
+    });
   }
 
-  // Story text in royal blue - fit within available space
+  // Story text — large, centered in the text band when short
   doc.setFont("times", "normal");
-  doc.setFontSize(10.5);
+  doc.setFontSize(bodySize);
   doc.setTextColor(...ROYAL_BLUE);
-  const allLines = doc.splitTextToSize(page.text, PAGE_W - MARGIN * 2.5);
-  const textStartY = textAreaY + (displayTitle ? (page.photoSet ? 55 : 46) : (page.photoSet ? 44 : 32));
-  const maxTextH = PAGE_H - textStartY - 28; // leave room for footer
-  const lineH = 14;
-  const maxLines = Math.floor(maxTextH / lineH);
+  const allLines: string[] = doc.splitTextToSize(bodyText, textWidth);
+  const maxLines = Math.max(1, Math.floor(maxTextH / lineH));
   const textLines = allLines.slice(0, maxLines);
-  doc.text(textLines, MARGIN * 1.25, textStartY, { maxWidth: PAGE_W - MARGIN * 2.5 });
+  const blockH = textLines.length * lineH;
+  // Vertically center short copy in the cream zone so it doesn't float at the top
+  const startY =
+    textLines.length * lineH < maxTextH * 0.72
+      ? textTop + Math.max(8, (maxTextH - blockH) / 2)
+      : textTop + 6;
+  doc.text(textLines, PAGE_W / 2, startY, {
+    align: "center",
+    maxWidth: textWidth,
+    lineHeightFactor: lineH / bodySize,
+  });
 
-  // ── Footer — just page number, elegant ──────────────────────────────────
+  // ── Footer — page number ────────────────────────────────────────────────
   const footerY = PAGE_H - 14;
   doc.setFont("times", "italic");
-  doc.setFontSize(13);
+  doc.setFontSize(12);
   doc.setTextColor(...GOLD_DARK);
   doc.text(`${pageNum}`, PAGE_W / 2, footerY, { align: "center" });
 }

@@ -1293,10 +1293,10 @@ function BookFlipPreview({
                   </div>
                 ) : (
                   <div>
-                    <h3 className="font-serif text-xl sm:text-2xl font-bold text-royal-blue mb-3 leading-tight">
+                    <h3 className="font-serif text-xl sm:text-2xl font-bold text-royal-blue mb-3 leading-tight text-center">
                       {["Title Page","The Dragon Quest","The Lost Crown","The Rescue Mission","The Forest Guardian","The Kindness Quest","The Light Treasure"].includes(page.title) ? "" : page.title}
                     </h3>
-                    <p className="text-royal-blue/75 leading-relaxed text-sm sm:text-base whitespace-pre-line">
+                    <p className="text-royal-blue/85 leading-snug text-base sm:text-lg md:text-xl whitespace-pre-line text-center">
                       {page.text}
                     </p>
                   </div>

@@ -124,22 +124,22 @@ function BookPage({
         }}
       />
 
-      <div className="flex-1 overflow-hidden p-4 flex flex-col">
+      <div className="flex-1 overflow-hidden px-4 py-3 sm:px-5 sm:py-4 flex flex-col justify-center">
         {showTitle && (
           <h3
-            className="font-bold text-sm mb-2"
+            className="font-bold text-base sm:text-lg mb-2 text-center"
             style={{ color: "#B98A19", fontFamily: "Georgia, serif" }}
           >
             {page.title}
           </h3>
         )}
         <p
-          className="text-xs leading-relaxed flex-1 overflow-hidden"
+          className="text-[15px] sm:text-lg leading-snug sm:leading-relaxed text-center flex-1 overflow-hidden whitespace-pre-line"
           style={{ color: "#0A1628", fontFamily: "Georgia, serif" }}
         >
           {page.text}
         </p>
-        <div className="text-center mt-2">
+        <div className="text-center mt-2 shrink-0">
           <span className="text-xs italic" style={{ color: "#B98A19" }}>
             {pageNum}
           </span>
@@ -378,16 +378,25 @@ export function ClientBookViewer({ book }: { book: Book }) {
         </button>
 
         {movieReady ? (
-          <a
-            href={videoUrl!}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold"
-            style={{ background: "#C5A26F", color: "#0A1628" }}
-          >
-            <Film className="w-3.5 h-3.5" />
-            Watch movie
-          </a>
+          <>
+            <a
+              href={videoUrl!}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold"
+              style={{ background: "#C5A26F", color: "#0A1628" }}
+            >
+              <Film className="w-3.5 h-3.5" />
+              Watch movie
+            </a>
+            <a
+              href={videoUrl!}
+              download={`${book.child_name.replace(/\s+/g, "-")}-Kingdom-Movie.mp4`}
+              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold border border-[#C5A26F]/50 text-[#C5A26F] hover:bg-white/5"
+            >
+              Download MP4
+            </a>
+          </>
         ) : movieRequested ? (
           <span
             className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold"
@@ -395,7 +404,7 @@ export function ClientBookViewer({ book }: { book: Book }) {
               background: "rgba(197,162,111,0.2)",
               color: "#C5A26F",
             }}
-            title="MP4 not uploaded yet — use Play story slideshow now"
+            title="Premium MP4 rendering — use Play story slideshow while you wait"
           >
             <Film className="w-3.5 h-3.5" />
             Movie in production
@@ -406,7 +415,7 @@ export function ClientBookViewer({ book }: { book: Book }) {
             className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold border border-[#C5A26F]/50 text-[#C5A26F] hover:bg-white/5"
           >
             <Film className="w-3.5 h-3.5" />
-            Animate my book · $299
+            Animated movie · from $2,000
           </button>
         )}
       </div>
@@ -420,8 +429,9 @@ export function ClientBookViewer({ book }: { book: Book }) {
           }}
         >
           <p className="text-white/70 text-xs mb-2 leading-relaxed">
-            Premium keepsake: pages come alive as a finished MP4 with motion +
-            bedtime narration. Until production delivers, use{" "}
+            Heirloom animated movie ($2,000–$3,000): each page comes alive with
+            cinematic motion + bedtime narration — real downloadable MP4, not a
+            slideshow. While we produce it, use{" "}
             <strong>Play story slideshow</strong> above.
           </p>
           <div className="grid gap-2 sm:grid-cols-2">

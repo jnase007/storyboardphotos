@@ -129,13 +129,16 @@ export function materializeAdventureStory(
   const role = TITLE_ROLE[gender];
   const bookTitle = fillPlaceholders(path.bookTitleTemplate, childName, gender);
 
-  const pages: StoryPage[] = path.pages.map((p) => {
+  // Cover already shows name + hero art — drop redundant interior title/portrait page
+  const rawPages = path.pages.filter((p) => !isRedundantTitleScriptPage(p));
+
+  const pages: StoryPage[] = rawPages.map((p, idx) => {
     const photoSet = p.photoSet ?? null;
     const useSessionPhoto =
-      p.useSessionPhoto ?? (photoSet !== null || p.page === 1 || p.page === 8);
+      p.useSessionPhoto ?? (photoSet !== null || idx === 0 || p.page === 8);
 
     return {
-      page: p.page,
+      page: idx + 1,
       title: fillPlaceholders(p.title, childName, gender),
       text: fillPlaceholders(p.text, childName, gender),
       imageUrl: null,
@@ -152,11 +155,67 @@ export function materializeAdventureStory(
     };
   });
 
-  if (notes?.trim() && pages[1]) {
-    pages[1].text += `\n\n(Special note from the session: ${notes.trim()})`;
+  if (notes?.trim() && pages[0]) {
+    pages[0].text += `\n\n(Special note from the session: ${notes.trim()})`;
   }
 
   return { bookTitle, pages };
+}
+
+/** True for interior title-only pages that duplicate the hardcover cover. */
+function isRedundantTitleScriptPage(p: {
+  page: number;
+  title: string;
+  text: string;
+  photoSet?: string | null;
+  useSessionPhoto?: boolean;
+}): boolean {
+  const title = (p.title || "").trim().toLowerCase();
+  if (title === "title page") return true;
+  // First script page that is only "King/Queen Name and the …" with no real story body
+  if (p.page !== 1) return false;
+  const text = (p.text || "").trim();
+  const plain = text.replace(/\s+/g, " ");
+  if (plain.length <= 90 && /\[Role\]\s*\[Name\]/i.test(text) && /and the /i.test(text)) {
+    return true;
+  }
+  // Dragon-slayer style: title page text is just the adventure name line
+  if (
+    plain.length <= 80 &&
+    !text.includes("\n") &&
+    /and the /i.test(text) &&
+    !p.photoSet
+  ) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Strip duplicate title/portrait intro pages from an already-generated book.
+ * Cover already carries name + hero — interior should start on the story.
+ */
+export function stripRedundantTitlePages<T extends { page?: number; title?: string; text?: string }>(
+  pages: T[]
+): T[] {
+  if (!pages?.length) return pages;
+  const filtered = pages.filter((p, idx) => {
+    const title = (p.title || "").trim().toLowerCase();
+    if (title === "title page" || title === "royal portrait") return false;
+    if (idx !== 0) return true;
+    const text = (p.text || "").trim();
+    const plain = text.replace(/\s+/g, " ");
+    // "King Justin and the Rescue Mission" only (no real paragraphs)
+    if (plain.length <= 100 && /\band the\b/i.test(plain) && plain.split(/[.!?]/).length <= 2) {
+      // Keep if it looks like a real paragraph story start
+      if (plain.length > 60 && (plain.includes(",") || plain.split(" ").length > 14)) {
+        return true;
+      }
+      return false;
+    }
+    return true;
+  });
+  return filtered.map((p, i) => ({ ...p, page: i + 1 }));
 }
 
 export const ADVENTURE_PATHS: AdventurePath[] = [
