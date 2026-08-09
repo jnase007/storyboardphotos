@@ -47,9 +47,9 @@ export const metadata: Metadata = {
     images: [
       {
         url: `${SITE.url}/og-image.jpg`,
-        width: 1024,
-        height: 744,
-        alt: `${SITE.name} — ${SITE.tagline}`,
+        width: 1280,
+        height: 698,
+        alt: `${SITE.name} storefront — Est. Orange County. ${SITE.tagline}`,
       },
     ],
   },

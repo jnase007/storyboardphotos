@@ -27,7 +27,7 @@ const adminUpdateSchema = z.object({
       "cancelled",
     ])
     .optional(),
-  video_url: z.string().url().optional().nullable(),
+  video_url: z.union([z.string().url(), z.literal("")]).optional().nullable(),
   video_package: z.enum(["teaser", "full"]).optional().nullable(),
   video_notes: z.string().max(2000).optional().nullable(),
 });

@@ -11,6 +11,7 @@ import {
   RefreshCw,
   Save,
   Sparkles,
+  Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -148,6 +149,7 @@ export function VideoJobsPanel() {
   const [savingId, setSavingId] = useState<string | null>(null);
   const [narratingId, setNarratingId] = useState<string | null>(null);
   const [renderingId, setRenderingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<
     Record<string, { status: string; url: string; notes: string }>
   >({});
@@ -240,6 +242,58 @@ export function VideoJobsPanel() {
       toast.error(err instanceof Error ? err.message : "Narration failed");
     } finally {
       setNarratingId(null);
+    }
+  }
+
+  async function deleteJob(job: Job, mode: "queue" | "book" = "queue") {
+    const role = job.gender === "boy" ? "King" : "Queen";
+    const label = `${role} ${job.child_name}`;
+    if (mode === "book") {
+      const ok = window.confirm(
+        `Delete entire storybook for ${label}?\n\nThis removes the book + movie job forever.`
+      );
+      if (!ok) return;
+    } else {
+      const ok = window.confirm(
+        `Remove ${label} from the Movie Queue?\n\nBook stays — only the movie job is cleared.`
+      );
+      if (!ok) return;
+    }
+
+    setDeletingId(job.id);
+    try {
+      if (mode === "book") {
+        const res = await fetch(`/api/admin/storybooks/${job.id}`, {
+          method: "DELETE",
+          headers: { "x-admin-code": ADMIN_CODE },
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || "Delete failed");
+        toast.success(`Deleted ${label}`);
+      } else {
+        // Soft-remove from queue only
+        const res = await fetch(`/api/storybooks/${job.id}/video`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            "x-admin-code": ADMIN_CODE,
+          },
+          body: JSON.stringify({
+            video_status: "none",
+            video_url: null,
+            video_notes: null,
+            video_package: null,
+          }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || "Could not clear queue item");
+        toast.success(`Removed ${label} from queue`);
+      }
+      await load();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Delete failed");
+    } finally {
+      setDeletingId(null);
     }
   }
 
@@ -469,6 +523,28 @@ CREATE INDEX IF NOT EXISTS idx_storybooks_video_status ON public.storybooks(vide
                             <Copy className="w-3.5 h-3.5" /> Copy script
                           </button>
                         ) : null}
+                        <button
+                          onClick={() => deleteJob(job, "queue")}
+                          disabled={deletingId === job.id}
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-gray-600 hover:underline disabled:opacity-50"
+                          title="Clear movie job — keep the book"
+                        >
+                          {deletingId === job.id ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <Trash2 className="w-3.5 h-3.5" />
+                          )}
+                          Remove from queue
+                        </button>
+                        <button
+                          onClick={() => deleteJob(job, "book")}
+                          disabled={deletingId === job.id}
+                          className="inline-flex items-center gap-1 text-xs font-bold text-red-700 hover:underline disabled:opacity-50"
+                          title="Permanently delete this storybook"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          Delete book
+                        </button>
                         <button
                           onClick={() =>
                             renderPremiumMovie(job.id, Boolean(job.video_url))
