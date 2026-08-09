@@ -7,12 +7,12 @@ import { BookingForm } from "@/components/booking-form";
 
 
 const QUESTS = [
-  { id: "dragon-slayer", num: 1, title: "Slay the Dragon", desc: "Face the great dragon with courage — and discover that bravery and kindness can turn a foe into a friend. (Joshua 1:9)", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/dragon-slayer.jpg" },
-  { id: "rescue-mission", num: 2, title: "Rescue Mission", desc: "Someone needs help! Race through the kingdom to rescue friends and bring them safely home. (Luke 15:4)", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/rescue-mission.jpg" },
-  { id: "lost-crown", num: 3, title: "Find the Crown", desc: "The royal crown is missing! Follow clues across the kingdom and return it with a true heart. (Proverbs 4:23)", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/lost-crown.jpg" },
-  { id: "forest-guardian", num: 4, title: "Forest Guardian", desc: "God's green world needs a protector. Care for the creatures and restore light to the trees. (Genesis 2:15)", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/forest-guardian.jpg" },
-  { id: "kindness-quest", num: 5, title: "Kindness Quest", desc: "A lonely corner of the kingdom needs warmth. Heal hearts with courage and kindness. (Ephesians 4:32)", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/kindness-quest.jpg" },
-  { id: "light-treasure", num: 6, title: "Find the Treasure", desc: "An old map, hidden clues, and a real treasure chest to find — then share with the kingdom. (Matthew 5:14)", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/light-treasure.jpg" },
+  { id: "dragon-slayer", num: 1, title: "Dragon Mountain", desc: "Climb the Ember Path, face fire-gusts on the peak, and conquer Dragon Land. (Joshua 1:9)", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/dragon-slayer.jpg" },
+  { id: "rescue-mission", num: 2, title: "Broken Bridge Rescue", desc: "Race the storm, cross a shattered bridge, and pull lost friends off the cliff path. (Luke 15:4)", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/rescue-mission.jpg" },
+  { id: "lost-crown", num: 3, title: "Crown of the Cliffs", desc: "Scale the White Cliffs, outsmart the wind, and reclaim the lost crown. (Proverbs 4:23)", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/lost-crown.jpg" },
+  { id: "forest-guardian", num: 4, title: "Storm in the Forest", desc: "Race a wild storm, free the trapped river, and save the ancient trees. (Genesis 2:15)", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/forest-guardian.jpg" },
+  { id: "kindness-quest", num: 5, title: "Midnight Lantern Run", desc: "Village goes dark in a storm — race supplies across a broken footbridge before midnight. (Ephesians 4:32)", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/kindness-quest.jpg" },
+  { id: "light-treasure", num: 6, title: "Treasure Gauntlet", desc: "Map, traps, tunnels, final leap to the chest — then share the treasure. (Matthew 5:14)", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/light-treasure.jpg" },
 ];
 
 export function BookingSection() {

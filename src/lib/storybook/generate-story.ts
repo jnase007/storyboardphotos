@@ -40,8 +40,8 @@ function resolvePath(input: StoryInput): AdventurePath {
  */
 export function buildStoryPrompts(input: StoryInput) {
   const role = TITLE_ROLE[input.gender];
-  // Print sides ≈ leaves×2; target a fuller bedtime book (~14–16 sides / ~7–8 leaves after title strip)
-  const pages = Math.min(16, Math.max(11, input.pageCount ?? 14));
+  // Fuller action bedtime book — longer + more pages by default
+  const pages = Math.min(18, Math.max(12, input.pageCount ?? 16));
   const notes = input.notes?.trim()
     ? `Staff notes about the child: ${input.notes.trim()}`
     : "No extra notes.";
@@ -55,15 +55,20 @@ export function buildStoryPrompts(input: StoryInput) {
     )
     .join("\n");
 
+  const outlinePhotoSets = path.pages
+    .map((p) => p.photoSet)
+    .filter(Boolean);
+  const forceFourSets = outlinePhotoSets.length >= 3;
+
   const system = `You are a children's storybook author for Storybook Photos | Kings & Queens, a premium kingdom photo studio.
-Write warm, brave adventure stories for ages 2–12 that sound beautiful when read aloud as bedtime narration.
+Write exciting, brave adventure stories for ages 2–12 that still sound beautiful read aloud at bedtime — but NEVER boring.
 ALWAYS call the child ${role} ${input.childName}. Never use he/she/they/him/her/his/hers pronouns — repeat the name instead.
 Boy = King, Girl = Queen only.
 The child chose this adventure path: "${path.title}" (${path.label}).
 Theme guidance: ${path.aiTheme}
-Follow the plot beats of the outline below — personalize wording, keep the same page count and photoSet assignments.
-Structure the quest through these four sets in order somewhere in the middle pages:
-1) Throne Room 2) Royal Forest 3) Royal Garden 4) Chastle.
+Follow the plot beats of the outline below — personalize and EXPAND them with more action. Keep photoSet assignments from the outline only if present.
+IMPORTANT: Do NOT force a tour of every kingdom set. Stay inside the quest's land from the outline. Only use Throne Room / Royal Forest / Royal Garden / Chastle if the outline actually includes those photoSets.
+${forceFourSets ? "This outline uses multiple studio sets — keep those photoSet pages." : "This quest is ONE-LAND focused. Do not add extra kingdom-set filler pages."}
 Return ONLY valid JSON (no markdown) matching:
 {
   "bookTitle": string,
@@ -73,12 +78,15 @@ Return ONLY valid JSON (no markdown) matching:
 }
 Rules:
 - Exactly ${pages} pages.
-- Pages 1–2: title / call to adventure (photoSet null or portrait; useSessionPhoto true ok).
-- Include each of the four kingdom sets on distinct pages with useSessionPhoto true.
-- Final 1–2 pages: return + The End.
+- Pages 1–2: title / urgent call to adventure.
+- Middle pages MUST be ACTION-HEAVY: running, climbing, storms, broken bridges, rockfalls, races against time, leaps, rescues, puzzles with stakes. Something physical should happen almost every page.
+- Include at least 4 clear action set-pieces before the victory.
+- Clear CONQUEST / victory climax (hero WINS something real) — not only a gentle talk.
+- Final 1–2 pages: victory aftermath + The End.
+- Do NOT write boring travel filler, quiet garden strolls, or multi-location kingdom tours unless the outline demands that exact obstacle.
 - imagePrompt: short WATERCOLOR STORYBOOK illustration prompt (full-bleed 4:3 landscape, soft sepia ink outlines, soft pastel watercolor washes, faith-friendly fairytale look, warm golden light, edge-to-edge scene with NO vine border and NO white side margins, full body in frame with headroom above crown, no cropped heads, no empty line-art coloring page, NO wands, NO glowing staffs, NO spell casting, no text). Each page MUST describe a DIFFERENT location/pose than other pages, but the hero MUST wear the SAME locked royal outfit on every page (do not describe clothing changes). Mention ${role} ${input.childName}, age ${input.childAge}.
-- Each page text: 3–6 short paragraphs (fuller bedtime read-aloud — not one-liners), suitable for a printed spread.
-- Never graphic violence; keep dragon/conflict age-appropriate and hopeful.`;
+- Each page text: 4–7 short paragraphs (longer bedtime read-aloud with momentum), suitable for a printed spread.
+- Never graphic violence; peril is age-appropriate and hopeful, but the hero must WIN.`
 
   const user = `Write an ${pages}-page personalized story for ${role} ${input.childName}, age ${input.childAge}, gender ${input.gender}.
 Adventure chosen: Option ${path.option} — ${path.title}. ${path.description}

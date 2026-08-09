@@ -69,8 +69,8 @@ export function fillPlaceholders(
     .replace(/\[Role\]/g, role);
 }
 
-/** v5 = longer bedtime scripts + real treasure hunt + outfit-lock era */
-export const ADVENTURE_PATHS_STORAGE_KEY = "sbp-adventure-paths-v5";
+/** v7 = longer action quests (cliffs/bridges/storms) + one-land focus */
+export const ADVENTURE_PATHS_STORAGE_KEY = "sbp-adventure-paths-v7";
 
 /** Shared AI guardrails for every quest (faith-friendly kingdom stories). */
 export const BIBLICAL_STORY_GUARDRAILS =
@@ -238,1046 +238,834 @@ export const ADVENTURE_PATHS: AdventurePath[] = [
   {
     id: "dragon-slayer",
     option: 1,
-    label: "Slay the Dragon",
-    title: "The Dragon Quest",
+    label: "Dragon Mountain",
+    title: "Dragon Mountain",
     description:
-      "Face the great dragon with courage — and discover that bravery and kindness can turn a foe into a friend.",
+      "Climb the Ember Path, face fire-gusts on the peak, and conquer Dragon Land.",
     bibleVerse: "Joshua 1:9",
     bibleVerseText:
       "Be strong and courageous. Do not be afraid… for the Lord your God is with you wherever you go.",
     aiTheme:
-      `${BIBLICAL_STORY_GUARDRAILS} Child faces a fearsome-but-not-gory dragon. Climax is courage and kindness that calms or befriends the dragon — never graphic violence, never spells. Theme: true strength protects others (Joshua 1:9).`,
-    bookTitleTemplate: "[Role] [Name] and the Dragon Quest",
+      `${BIBLICAL_STORY_GUARDRAILS} ONE LAND: Dragon Mountain only. ACTION QUEST: climb, rockfall, fire-gusts, stand ground, win the peak. Hero CONQUERS fear and frees the pass. No kingdom tour. No soft filler. Age-appropriate peril, no gore, no killing required — dragon may yield and become guardian after the win. Joshua 1:9.`,
+    bookTitleTemplate: "[Role] [Name] and Dragon Mountain",
     pages: [
       {
         page: 1,
-        title: `The Dragon Quest`,
+        title: "Dragon Mountain",
         staticScene: "dragon-slayer/title",
-        text: `[Role] [Name] and the Dragon Quest`,
-        photoCaption: `A kingdom of light awaits`,
+        text: `[Role] [Name] and Dragon Mountain`,
+        photoCaption: "Dragon Mountain awaits",
         useSessionPhoto: false,
-        imagePromptHint: "title page watercolor no text, no wands no spells",
+        imagePromptHint: "title page dragon mountain watercolor no text",
       },
       {
         page: 2,
-        title: `The Kingdom of Light`,
-        staticScene: "kingdom-map",
-        text: `Welcome to the Kingdom of Light — a bright realm of living forests, royal gardens, and ancient castles.
+        title: "Smoke on the Peak",
+        staticScene: "dragon-slayer/call",
+        text: `Dragon Mountain smoked like a giant campfire left too long. Sparks hopped in the night sky. The valley pass was blocked. Carts stopped. Sheep stayed home. Fear sat heavy on every rooftop.
 
-Every path leads to adventure. Every adventure begins with a brave heart.
+"[Role] [Name]," the elder said, "someone must climb Dragon Mountain and take back the high pass."
 
-Your kingdom awaits, [Role] [Name].
+[Role] [Name] felt the fear — then felt courage push louder.
+
+"I will climb," [Name] said. "I will face the dragon. I will free the mountain."
 
 Be strong and courageous… for the Lord your God is with you. — Joshua 1:9`,
-        photoCaption: `Map of the Kingdom`,
+        photoCaption: "The call",
         useSessionPhoto: false,
-        imagePromptHint: "kingdom map watercolor no text",
+        imagePromptHint: "smoky dragon mountain valley people looking up watercolor no text",
       },
       {
         page: 3,
-        title: `The Call`,
-        staticScene: "dragon-slayer/call",
-        text: `In the Kingdom of Light, a golden morning turned to shadow when word arrived: a great dragon had settled in the hills beyond the valley, and the people trembled with fear.
+        title: "Through the Gate of Ash",
+        text: `The Gate of Ash was black stone, warm to the touch. Hot wind slapped [Role] [Name]'s cheeks.
 
-The King himself walked slowly to the throne room window and gazed out at the distant smoke curling above the mountains. He had heard of one person brave enough — one whose heart was made not just of courage, but of kindness.
+[Name] did not wait for perfect bravery. [Name] stepped through.
 
-He turned and called out the name that made the whole kingdom hold its breath.
-
-"[Name]," the King said softly, "the dragon does not need to be defeated. It needs to be understood. Will you go? Will you bring peace back to our land?"
-
-[Role] [Name] looked out at the distant mountains, felt afraid — just a little — and then felt something stronger rising in [Name]'s chest: a deep and steady courage, like a flame that cannot be blown out.
-
-[Name] stood tall and answered with one quiet word: "Yes."`,
-        photoCaption: `The quest begins`,
+On the other side, the Ember Path glowed faintly underfoot — a road of cracked rock and orange light, climbing straight into danger.`,
+        photoCaption: "Entering Dragon Land",
         useSessionPhoto: false,
-        imagePromptHint: "call to adventure watercolor no text",
+        imagePromptHint: "hero stepping through scorched ash gate watercolor no text",
       },
       {
         page: 4,
-        title: `The Royal Throne`,
-        text: `The Throne Room was the most magnificent place [Role] [Name] had ever seen. Banners of crimson and gold hung from the vaulted ceiling, and every stone in the walls had been polished smooth by generations of royal hands.
+        title: "Rockfall!",
+        text: `Halfway up, the mountain shook. Stones bounced down the cliff like angry drums.
 
-In the center of the room, upon a platform of pure white marble, stood the throne — carved from the wood of an ancient oak, inlaid with gold, and draped in velvet the color of midnight sky.
+"Move!" [Role] [Name] shouted to nobody but [Name]'s own feet.
 
-[Role] [Name] walked toward it slowly, footsteps echoing in the sacred silence of the hall. [Name] sat down gently, as one sits on something holy.
+[Name] dashed under a stone overhang as boulders smashed the path behind. Dust filled the air. For one breath, the world was only noise.
 
-Because it was.
+Then quiet.
 
-This was where every great leader of the kingdom had sat before [Name]. This was where decisions were made that changed lives. This was where courage lived — not in swords or armies, but in the quiet, steady commitment to do what was right.
+[Role] [Name] crawled out, brushed ash from the royal outfit, and grinned a shaky grin. "Nice try, mountain."
 
-[Role] [Name] straightened [Name]'s back, lifted [Name]'s chin, and whispered the words that every ruler must one day learn to believe: "I am ready."`,
-        photoCaption: `Portrait from the Throne Room`,
-        photoSet: "Throne Room",
-        useSessionPhoto: true,
-        imagePromptHint: "throne room portrait watercolor no text",
+The climb continued — steeper now.`,
+        photoCaption: "Escaping the rockfall",
+        useSessionPhoto: false,
+        imagePromptHint: "hero diving under overhang as rocks fall on mountain path watercolor no text",
       },
       {
         page: 5,
-        title: `A Royal Promise`,
-        staticScene: "dragon-slayer/call",
-        text: `[Role] [Name] rose from the golden throne and walked to the great balcony that overlooked the kingdom. Far below, the people had gathered — farmers and bakers, children and elders — all of them looking upward with hope in their eyes.
+        title: "The Broken Cliff Bridge",
+        text: `A rope bridge once crossed a deep ravine. Now half the boards were gone, swinging over empty air.
 
-A hush fell over the crowd.
+Far below: mist and teeth of stone.
 
-[Role] [Name] placed one hand over [Name]'s heart and spoke in a voice clear and calm enough to carry to the very edges of the kingdom: "I will face the dragon. Not with anger — but with understanding. Not with a desire to win — but with a desire to make peace. I give you my word."
+[Role] [Name] tested the first rope. It held. Barely.
 
-For a long moment, there was silence. And then — the cheering began. It rolled across the courtyard like thunder, warm and full and generous, the sound of a people who believed in their [role] with every fiber of their being.
+"One board. One breath. One prayer," [Name] whispered.
 
-[Role] [Name] smiled. It was time.`,
-        photoCaption: `A royal promise`,
+Step… slide… catch… step. Wind shoved hard. A board cracked and fell spinning into the mist. [Name] froze — then kept going.
+
+At the far side, [Role] [Name] dropped to safe rock and laughed once, wild and free. "I crossed it."`,
+        photoCaption: "Crossing the broken bridge",
         useSessionPhoto: false,
-        imagePromptHint: "royal promise watercolor coloring book no text",
+        imagePromptHint: "hero crossing broken rope bridge over mountain ravine watercolor no text",
       },
       {
         page: 6,
-        title: `Into the Royal Forest`,
-        text: `The Royal Forest was ancient and alive, full of the kind of quiet that feels inhabited — as if the trees themselves were listening.
+        title: "Cave of Echoes",
+        text: `The path dove into a black cave. Every footstep roared back twice as loud.
 
-[Role] [Name] walked along the lantern-lit path, each step soft on the mossy ground. The light from the lanterns filtered through the leaves in golden patches, and somewhere high above, birds called to one another in the canopy.
+"Too small," the echoes mocked.
+"Too scared."
+"Turn around."
 
-At the base of an enormous oak tree, a small woodland creature sat watching [Name] with bright, kind eyes.
+[Role] [Name] planted feet in the dark. "I am [Role] [Name]! Fear can talk — fear does not get the last word!"
 
-"You have come far," it said. "And you have a good heart. But hearts alone do not win battles. You must learn one more thing before you face the dragon."
+The cave went quiet. A thin gold crack of daylight opened ahead.
 
-[Role] [Name] sat down on a nearby stone. "What must I learn?"
-
-The creature was quiet for a moment, then said: "That the bravest thing you can do is to see someone — truly see them — even when they are frightening. Especially then."
-
-[Role] [Name] sat with those words until they settled deep inside [Name], like seeds finding soil.`,
-        photoCaption: `Portrait in the Royal Forest`,
-        photoSet: "Royal Forest",
-        useSessionPhoto: true,
-        imagePromptHint: "royal forest portrait watercolor no text",
+[Name] ran toward it.`,
+        photoCaption: "Through the cave",
+        useSessionPhoto: false,
+        imagePromptHint: "hero running through dark mountain cave toward light watercolor no text",
       },
       {
         page: 7,
-        title: `Face to Face`,
+        title: "The Dragon Rises",
         staticScene: "dragon-slayer/dragon",
-        text: `The dragon emerged from behind a curtain of morning mist — enormous and ancient, with scales the color of storm clouds and eyes like amber lanterns burning in the dark.
+        text: `Wings blotted the sun.
 
-For a long moment, neither of them moved.
+The dragon exploded from the crater — storm-colored scales, amber eyes, wind like a hurricane. Fire-gusts rolled across the ledge. Sparks stung the air.
 
-[Role] [Name] felt [Name]'s heart beating fast. But [Name] did not run. Instead, [Name] took one slow step forward. Then another. Until [Name] stood close enough to feel the warmth radiating from the dragon's great chest.
+[Role] [Name] did not hide.
 
-"I'm not here to fight you," [Name] said, voice steady and clear. "I'm here because I believe you are more than what they say you are."
+"This mountain is not yours alone!" [Name] shouted. "The people need the pass. I came to take it back!"
 
-The dragon lowered its head. Its breath came out in slow plumes of smoke. And then — very softly — it spoke.
-
-"I just want to belong somewhere. I just want a home."
-
-[Role] [Name] felt something break open inside [Name] — not pain, but tenderness. The deep and aching tenderness of recognizing another soul who is lonely.
-
-"Then you have already found one," [Name] said. "I promise."`,
-        photoCaption: `The dragon encounter`,
+The dragon roared so hard the stone sang. This was the fight — courage against fear, heart against heat.`,
+        photoCaption: "Dragon encounter",
         useSessionPhoto: false,
-        imagePromptHint: "dragon encounter watercolor no text",
+        imagePromptHint: "hero facing giant dragon on mountain ledge fire wind watercolor no text",
       },
       {
         page: 8,
-        title: `The Royal Garden`,
-        text: `The Royal Garden was the most beautiful place in all the kingdom — a living tapestry of color and fragrance that seemed to exist outside of time.
+        title: "Stand in the Fire-Wind",
+        text: `Again the dragon dove. Again golden heat blasted the peak.
 
-[Role] [Name] walked slowly through the garden paths, letting the peace of the place settle over [Name] like a warm blanket. Roses climbed the stone walls. Butterflies drifted from flower to flower. The air smelled of honey and earth and something sweeter that had no name.
+Most people would run. [Role] [Name] stepped forward into the fire-wind, shield of will raised high, royal outfit snapping like a banner.
 
-In the very center of the garden grew a flower unlike any other — a single blossom that glowed softly, as if it had captured a piece of the sun inside itself.
+"You will not rule by fear!" [Name] cried.
 
-[Role] [Name] knew immediately what it was: the gift that would seal the promise. The thing that would turn a former enemy into a lifelong friend.
+The dragon wheeled, shocked. [Name] advanced. Inch by inch, [Role] [Name] claimed the ledge. Roars turned shorter. Wings beat slower.
 
-[Name] reached down gently, cupped the flower in both hands, and lifted it carefully. It pulsed once — warm and steady — like a heartbeat.
-
-"Thank you," [Name] whispered to the garden. And [Name] could have sworn the flowers nodded back.`,
-        photoCaption: `Portrait in the Royal Garden`,
-        photoSet: "Royal Garden",
-        useSessionPhoto: true,
-        imagePromptHint: "royal garden portrait watercolor no text",
+Courage was winning.`,
+        photoCaption: "Standing firm",
+        useSessionPhoto: false,
+        imagePromptHint: "hero advancing through dragon fire gust on peak watercolor no text",
       },
       {
         page: 9,
-        title: `The Courage Quest`,
-        text: `The Courage Quest was the final challenge — a place of great and ancient power, where the kingdom's story had been written and rewritten across centuries.
+        title: "The Peak Is Won",
+        staticScene: "dragon-slayer/victory",
+        text: `[Role] [Name] reached the crown of Dragon Mountain and struck the ancient bronze victory gong.
 
-[Role] [Name] arrived at the summit as the sun was beginning its slow descent toward the horizon. The light was golden and warm, painting everything it touched in shades of amber and rose.
+CLANG — the sound rolled over the whole land like sunrise made of metal.
 
-[Name] stood still for a moment and breathed it all in: the smell of stone and sky, the distant sound of the kingdom below, the weight of the glowing blossom still cradled in [Name]'s hands.
+The dragon landed hard… then folded its wings… then bowed its great head.
 
-This was it. This was the moment.
+"The pass is free," [Name] said. "Fear does not sit on this throne anymore."
 
-[Role] [Name] was not the same person who had answered the King's call that morning. [Name] had walked through lantern-lit forests and sat upon ancient thrones. [Name] had looked into the eyes of something frightening and chosen love over fear.
-
-And now [Name] was ready — not because [Name] had no fear left, but because [Name] had learned that courage was never the absence of fear. Courage was the decision that something — and someone — else mattered more.`,
-        photoCaption: `Portrait at the Courage Quest`,
-        photoSet: "Chastle",
-        useSessionPhoto: true,
-        imagePromptHint: "courage quest portrait watercolor no text",
+In that moment, [Role] [Name] conquered Dragon Mountain.`,
+        photoCaption: "Victory on the peak",
+        useSessionPhoto: false,
+        imagePromptHint: "hero striking bronze gong on mountain peak dragon bowing watercolor no text",
       },
       {
         page: 10,
-        title: `The Kingdom Rejoices`,
-        staticScene: "dragon-slayer/victory",
-        text: `When [Role] [Name] returned home, the dragon flew peacefully above the castle towers — not as a threat, but as a guardian. Its great wings caught the evening light, turning it into something that looked almost like a sunset made of scales.
+        title: "Guardian of the Pass",
+        text: `From that day the dragon guarded the pass instead of blocking it. Wings made shade for travelers. Night-flame on the peak became a lighthouse for the valley.
 
-The people of the kingdom had gathered in the courtyard. When they saw [Role] [Name] walk through the gates — and saw the dragon land gently on the castle wall above — the cheering that rose up was unlike anything any of them had ever heard before.
+Carts rolled again. Children pointed up and cheered: "[Role] [Name]!"
 
-The King stepped forward and placed his hands on [Role] [Name]'s shoulders.
-
-"You did not just save the kingdom," he said, his voice full and quiet at the same time. "You showed us what it means to be truly brave. You showed us that the greatest strength is not force — it is love."
-
-[Role] [Name] looked out at the faces of the people — all those faces alight with joy and wonder and relief — and felt something complete settle into place deep in [Name]'s chest.
-
-This was what [Name] had been made for. Not glory. Not power. But this: the quiet, impossible, perfect miracle of bringing people home to one another.`,
-        photoCaption: `The kingdom rejoices`,
+[Name] had won more than a mountain. [Name] had won the road home for everyone.`,
+        photoCaption: "Dragon guards the pass",
         useSessionPhoto: false,
-        imagePromptHint: "victory watercolor no text",
+        imagePromptHint: "dragon guarding mountain pass hero standing proud watercolor no text",
       },
       {
         page: 11,
-        title: `Always a Hero`,
+        title: "Home From the Mountain",
         staticScene: "dragon-slayer/end",
-        text: `That night, after the celebrations had faded and the kingdom had grown quiet, [Role] [Name] sat by the window and looked out at the stars.
+        text: `Bells rang in the valley. Flowers filled the road. [Role] [Name] came down dusty, tired, shining.
 
-The dragon was there — curled around the highest tower like a great, gentle guardian — its breath rising slowly in the cool night air. Every now and then, a small flame flickered at its nostrils, and for a moment the darkness glowed gold.
+"You conquered the mountain!" the people cried.
 
-[Role] [Name] thought about the journey. About the fear and the courage. About the loneliness in the dragon's eyes and the warmth of the moment it had been seen — truly seen — for the first time.
+That night [Name] looked back at Dragon Mountain and whispered, "Courage first."
 
-About how a single act of bravery had not just saved a kingdom, but had changed two hearts forever.
+Far above, a gentle flame answered on the peak.
 
-Somewhere in the streets below, a child looked up at the stars and spoke a name in a wondering whisper. [Role] [Name] heard it carried on the wind, and smiled.
-
-Because that is what heroes do. Not because they are fearless. Not because they are perfect. But because when the moment comes — when the world needs someone to step forward and choose love — they say yes.
-
-Always, they say yes.`,
-        photoCaption: `The end`,
+The End.`,
+        photoCaption: "The end",
         useSessionPhoto: false,
-        imagePromptHint: "peaceful ending watercolor no text",
+        imagePromptHint: "hero returning from dragon mountain celebration watercolor no text",
       },
     ],
   },
   {
     id: "rescue-mission",
     option: 2,
-    label: "Rescue Mission",
-    title: "The Rescue Mission",
+    label: "Broken Bridge Rescue",
+    title: "The Broken Bridge Rescue",
     description:
-      "Someone needs help! Race through the kingdom to rescue friends and bring them safely home.",
+      "Race the storm, cross a shattered bridge, and pull lost friends off the cliff path.",
     bibleVerse: "Luke 15:4",
     bibleVerseText:
-      "What man of you, having a hundred sheep, if he has lost one of them, does not leave the ninety-nine… and go after the one that is lost?",
+      "What man of you, having a hundred sheep, if he has lost one of them, does not… go after the one that is lost?",
     aiTheme:
-      `${BIBLICAL_STORY_GUARDRAILS} Child leads a rescue to find friends who are lost or scared (never dark/horror). Theme: the Good Shepherd heart — leave none behind (Luke 15:4). No spells or wands.`,
-    bookTitleTemplate: "[Role] [Name] and the Rescue Mission",
+      `${BIBLICAL_STORY_GUARDRAILS} ONE QUEST LAND: storm valley + cliff road + broken bridge. ACTION: race against weather, climb, haul rope, cross broken bridge, rescue friends from ledge. Hero CONQUERS danger to save others. No full kingdom tour. Luke 15:4.`,
+    bookTitleTemplate: "[Role] [Name] and the Broken Bridge Rescue",
     pages: [
       {
         page: 1,
-        title: "Title Page",
-        text: "[Role] [Name]\nand the Rescue Mission",
-        photoCaption: "Royal portrait of the child",
+        title: "The Broken Bridge Rescue",
         staticScene: "rescue-mission/title",
+        text: `[Role] [Name]
+and the Broken Bridge Rescue`,
+        photoCaption: "Rescue begins",
         useSessionPhoto: false,
-        imagePromptHint:
-          "COVER PORTRAIT: [Role] [Name] ready for rescue with a simple lantern, soft throne or courtyard backdrop, calm brave smile, watercolor, NO text NO wand",
+        imagePromptHint: "cover hero with rope and lantern storm clouds watercolor no text",
       },
       {
         page: 2,
-        title: "The Kingdom of Light",
-        staticScene: "kingdom-map",
-        text: `Welcome to the Kingdom of Light — a bright realm of living forests, royal gardens, and ancient castles.
+        title: "Storm Warning",
+        staticScene: "rescue-mission/call",
+        text: `Thunder grumbled over the valley. A scout stumbled into the courtyard, soaked and breathless.
 
-Every path leads to adventure. Every adventure begins with a brave heart.
+"Friends are stuck on Cliff Road," the scout gasped. "The bridge is breaking. The storm is faster than they are."
 
-Your kingdom awaits, [Role] [Name].
+[Role] [Name] grabbed a rope, a lantern, and courage.
 
-What man of you, having a hundred sheep, if he has lost one of them, does not… go after the one that is lost? — Luke 15:4`,
-        photoCaption: "Map of the Kingdom",
+"I'm going now."
+
+What man… does not go after the one that is lost? — Luke 15:4`,
+        photoCaption: "The urgent call",
         useSessionPhoto: false,
-        imagePromptHint: "watercolor kingdom map overview warm gold light, no text",
+        imagePromptHint: "courtyard storm messenger hero grabbing rope watercolor no text",
       },
       {
         page: 3,
-        staticScene: "rescue-mission/call",
-        title: "The Call",
-        text: `A messenger raced into the courtyard as the sun dipped low. Friends from the valley had not come home — night was falling fast.
+        title: "Race the Rain",
+        text: `Rain slapped the trail. Wind shoved sideways. [Role] [Name] ran anyway — boots splashing, lantern swinging, rope coiled tight.
 
-The King turned to [Role] [Name].
+Lightning flashed white. For a second the whole valley looked like a sketch.
 
-"[Name], will you lead the rescue? The kingdom trusts your brave and caring heart."
-
-[Role] [Name] felt a flutter of worry, then something steadier: love that would not leave anyone behind.
-
-"I will find them," [Name] said.
-
-What man… does not go after the one that is lost? — Luke 15:4`,
-        photoCaption: "Child looking determined",
-        imagePromptHint:
-          "THE CALL: castle courtyard golden hour, [Role] [Name] receiving urgent news from a messenger, DIFFERENT from cover, watercolor, no text no wand",
+[Name] did not slow down. Someone needed [Name] on the other side of the storm.`,
+        photoCaption: "Running through the storm",
+        useSessionPhoto: false,
+        imagePromptHint: "hero running on muddy trail in rain with lantern watercolor no text",
       },
       {
         page: 4,
-        title: "The Royal Throne",
-        text: `In the Throne Room, banners of crimson and gold hung still in the quiet.
+        title: "Cliff Road",
+        text: `Cliff Road clung to the mountain like a skinny ribbon. One side: rock wall. Other side: empty air and roaring river far below.
 
-[Role] [Name] received a royal map and a lantern of hope. The King rested a hand on [Name]'s shoulder.
+[Role] [Name] pressed a hand to the wet stone and edged forward.
 
-"No one in our kingdom is left behind," [Name] promised the people gathered at the doors.
+"Hold on!" [Name] called into the wind. "I am coming!"
 
-[Name] sat one moment on the great oak throne, lifted [Name]'s chin, and whispered, "I am ready."
-
-Then [Name] set out, heart steady and eyes bright.`,
-        photoCaption: "Photo from Castle Throne Room",
-        photoSet: "Throne Room",
-        useSessionPhoto: true,
-        imagePromptHint:
-          "throne room: [Role] [Name] with map and lantern, marble banners, full body, watercolor, no text",
+A tiny voice answered from ahead — scared, but alive.`,
+        photoCaption: "On the cliff path",
+        useSessionPhoto: false,
+        imagePromptHint: "hero on narrow cliff path storm river below watercolor no text",
       },
       {
         page: 5,
-        title: "Into the Valley Road",
-        text: `Beyond the castle gates the valley road wound between soft hills.
+        title: "The Bridge Breaks",
+        text: `There it was — the rope bridge, half-torn, boards missing, one side hanging low.
 
-[Role] [Name] walked quickly but carefully, calling friendly names into the dusk. Crickets began their song. The lantern made a warm circle on the path.
+Two friends crouched on the far ledge. One plank snapped and spun into the mist.
 
-A farmer pointed toward the Royal Forest. "I heard voices that way — little ones, tired ones."
+"Don't move!" [Role] [Name] shouted. "I will bring the rope!"
 
-[Name] thanked him and hurried on. Every step was a promise: I am coming.`,
-        photoCaption: "The valley road",
+[Name]'s heart hammered. This was the moment bravery becomes action.`,
+        photoCaption: "Broken bridge ahead",
         useSessionPhoto: false,
-        imagePromptHint:
-          "dusk valley road: [Role] [Name] walking with lantern toward forest hills, full body, watercolor, no text",
+        imagePromptHint: "broken rope bridge cliff friends stranded hero arriving watercolor no text",
       },
       {
         page: 6,
-        title: "Royal Forest",
-        text: `Through the Royal Forest, [Name] followed soft footprints and distant calls for help.
+        title: "Rope Across the Gap",
+        text: `[Role] [Name] tied the rope to an iron ring, spun it once, and threw.
 
-Lantern light guided [Name] between the trees until [Name] found the first friend — cold, scared, but safe beside a mossy log.
+Miss.
 
-"You're not alone anymore," [Role] [Name] said gently, wrapping a cloak around small shoulders.
+Wind laughed. [Name] threw again — harder.
 
-Together they listened. Another call floated from deeper in the woods. The rescue was only beginning.`,
-        photoCaption: "Photo from Royal Forest",
-        photoSet: "Royal Forest",
-        useSessionPhoto: true,
-        imagePromptHint:
-          "lantern forest: [Role] [Name] comforting a small friend, caring moment, full body, watercolor, no text no wand",
+Catch! The far friend grabbed it.
+
+"Tie it around the rock!" [Name] called. "Tight!"
+
+When the line went taut, [Role] [Name] clipped courage to the rope and stepped onto the first trembling board.`,
+        photoCaption: "Throwing the rescue rope",
+        useSessionPhoto: false,
+        imagePromptHint: "hero throwing rope across broken bridge storm watercolor no text",
       },
       {
         page: 7,
-        title: "Royal Garden",
-        text: `In the Royal Garden, another friend had wandered among the roses and lost the path home.
+        title: "Crossing",
+        text: `Step. Slide. Catch. Step.
 
-[Role] [Name] offered a hand and a smile. "We go together."
+A board cracked. [Role] [Name] dropped to a knee, held the rope, and breathed through the scare.
 
-They walked the blooming paths, counting lantern posts and laughing a little when a butterfly landed on the map.
+"I am [Role] [Name]," [Name] said through clenched teeth. "I do not leave people behind."
 
-The garden seemed to bloom brighter with every step of kindness. Two friends found. Hearts lighter. Still one more to go.`,
-        photoCaption: "Photo from Royal Garden",
-        photoSet: "Royal Garden",
-        useSessionPhoto: true,
-        imagePromptHint:
-          "royal garden: [Role] [Name] helping a friend through roses, warm light, full body, watercolor, no text",
+Across the gap [Name] went — wet, shaking, unstoppable — until boots hit solid ledge and arms wrapped the waiting friends.`,
+        photoCaption: "Crossing the broken bridge",
+        useSessionPhoto: false,
+        imagePromptHint: "hero crossing damaged rope bridge in rain watercolor no text",
       },
       {
         page: 8,
-        title: "The High Bridge",
-        text: `The final rescue waited at the Courage Quest — a gentle stone bridge that felt too high for little feet, and a friend too frightened to cross.
+        title: "Pull to Safety",
+        text: `One friend was too tired to walk. [Role] [Name] made a rope harness and guided each person back across, one at a time, body a shield against the wind.
 
-[Role] [Name] stood beside them and whispered, "We go together. One step, then another."
+When the last friend reached safe rock, the bridge gave a final groan and sagged even lower.
 
-Hand in hand, they crossed. The river sang below. On the far side, all three friends hugged [Name] at once.
-
-Everyone was safe.`,
-        photoCaption: "Photo from Courage Quest",
-        photoSet: "Chastle",
-        useSessionPhoto: true,
-        imagePromptHint:
-          "stone bridge overlook: [Role] [Name] helping a friend cross bravely, kind and steady, full body, watercolor, no text",
+They had made it. Just in time.`,
+        photoCaption: "Everyone safe",
+        useSessionPhoto: false,
+        imagePromptHint: "hero helping friends off cliff ledge after bridge crossing watercolor no text",
       },
       {
         page: 9,
-        staticScene: "rescue-mission/found",
-        title: "The Long Walk Home",
-        text: `Home was a long walk in the best way.
+        title: "Down the Safe Trail",
+        text: `On the sheltered trail below, the storm softened to a whisper. [Role] [Name] shared the lantern's warm circle and walked the friends home.
 
-[Role] [Name] led the little group along the lantern path, singing a soft marching song so tired feet kept moving. Stars blinked on one by one.
-
-When the castle towers rose ahead, someone cheered. Then everyone did.
-
-[Name] smiled. Finding the lost felt like finding treasure — the living kind.`,
-        photoCaption: "Walking home together",
+No throne room tour. No garden stroll. Just the best kind of victory: people safe because someone ran toward the danger.`,
+        photoCaption: "Walking home",
         useSessionPhoto: false,
-        imagePromptHint:
-          "night path to castle: [Role] [Name] leading small friends home under stars, joyful, full body, watercolor, no text",
+        imagePromptHint: "hero leading rescued friends down trail after storm watercolor no text",
       },
       {
         page: 10,
-        title: "The Kingdom Rejoices",
-        text: `Back at the castle, cheers rose like music.
-
-Families hugged. Friends laughed. Warm bread and honey milk appeared as if by kindness alone.
-
-The King placed a hand on [Name]'s shoulder.
-
-"You did not just find the lost," he said. "You reminded us what royalty means — to care for one another."
-
-[Role] [Name] looked at every safe face and felt something complete settle deep in [Name]'s chest.`,
-        photoCaption: "Child looking proud",
-        useSessionPhoto: false,
-        imagePromptHint:
-          "castle hall celebration: [Role] [Name] with rescued friends and families hugging, warm light, watercolor, no text",
-      },
-      {
-        page: 11,
-        title: "The End",
+        title: "Home Bells",
         staticScene: "rescue-mission/end",
-        useSessionPhoto: false,
-        text: `That night [Role] [Name] sat by the window and watched the valley lights.
+        text: `Village bells rang when they returned. Hugs. Blankets. Warm bread.
 
-Somewhere a child slept safe because someone went looking.
+"You crossed the broken bridge," an elder said. "You conquered the storm with love."
 
-And so, [Role] [Name] lived bravely ever after,
-knowing [Name] is strong, kind, and deeply loved.
+[Role] [Name] smiled, soaked and shining. "No one gets left behind."
 
 The End.`,
-        photoCaption: "Final portrait",
-        imagePromptHint:
-          "peaceful night window ending with [Role] [Name], soft golden light, watercolor, no text",
+        photoCaption: "The end",
+        useSessionPhoto: false,
+        imagePromptHint: "hero homecoming after rescue wet but happy watercolor no text",
       },
     ],
   },
   {
     id: "lost-crown",
     option: 3,
-    label: "Find the Crown",
-    title: "The Lost Crown",
+    label: "Crown of the Cliffs",
+    title: "Crown of the Cliffs",
     description:
-      "The royal crown is missing! Follow clues across the kingdom and return it with a true heart.",
+      "Scale the White Cliffs, outsmart the wind thieves, and reclaim the lost crown.",
     bibleVerse: "Proverbs 4:23",
-    bibleVerseText:
-      "Keep your heart with all vigilance, for from it flow the springs of life.",
+    bibleVerseText: "Keep your heart with all vigilance, for from it flow the springs of life.",
     aiTheme:
-      `${BIBLICAL_STORY_GUARDRAILS} Mystery: the royal crown is lost. Child follows clues and recovers it with honesty, not greed. Theme: guard your heart; true royalty serves (Proverbs 4:23). No magical artifacts that cast spells — crown is a symbol of responsibility.`,
-    bookTitleTemplate: "[Role] [Name] and the Lost Crown",
+      `${BIBLICAL_STORY_GUARDRAILS} ONE LAND: White Cliffs. ACTION: climb, wind blasts, narrow ledges, tricky goats/wind-thieves (playful not evil), reclaim crown at summit. Hero CONQUERS the climb. No kingdom tour. Proverbs 4:23 — guard what matters.`,
+    bookTitleTemplate: "[Role] [Name] and the Crown of the Cliffs",
     pages: [
       {
         page: 1,
-        title: "Title Page",
-        text: "[Role] [Name]\nand the Lost Crown",
-        photoCaption: "Royal portrait of the child",
+        title: "Crown of the Cliffs",
         staticScene: "lost-crown/title",
+        text: `[Role] [Name]
+and the Crown of the Cliffs`,
+        photoCaption: "The cliffs await",
         useSessionPhoto: false,
-        imagePromptHint:
-          "COVER PORTRAIT: [Role] [Name] with soft crown motif, calm curious smile, simple throne or cream backdrop, watercolor, NO text NO wand",
+        imagePromptHint: "cover hero looking up white cliffs crown glint watercolor no text",
       },
       {
         page: 2,
-        title: "The Kingdom of Light",
-        staticScene: "kingdom-map",
-        text: `Welcome to the Kingdom of Light — a bright realm of living forests, royal gardens, and ancient castles.
+        title: "The Crown Is Gone",
+        staticScene: "lost-crown/call",
+        text: `A wild wind ripped through the courtyard and lifted the royal crown clean off the pillow.
 
-Every path leads to adventure. Every adventure begins with a brave heart.
+Up it spun — gold flashing — until it snagged on the highest tooth of the White Cliffs.
 
-Your kingdom awaits, [Role] [Name].
+"That crown belongs to the kingdom," the King said. "And the climb belongs to the brave."
 
-Keep your heart with all vigilance, for from it flow the springs of life. — Proverbs 4:23`,
-        photoCaption: "Map of the Kingdom",
+[Role] [Name] tied a climbing sash. "I will bring it home."`,
+        photoCaption: "Crown stolen by wind",
         useSessionPhoto: false,
-        imagePromptHint: "watercolor kingdom map overview, no text",
+        imagePromptHint: "crown blown by wind toward white cliffs hero determined watercolor no text",
       },
       {
         page: 3,
-        staticScene: "lost-crown/call",
-        title: "The Call",
-        text: `Morning bells rang strangely in the Kingdom of Light — the royal crown was gone from its velvet pillow!
+        title: "Base of the White Cliffs",
+        text: `The White Cliffs rose like a wall of chalk and sunlight. Birds wheeled. Wind whistled through cracks.
 
-Courtiers whispered. The King looked to [Role] [Name].
+[Role] [Name] found the first handhold and pulled up.
 
-"You notice what others miss. Will you find our crown and restore the kingdom's light?"
-
-[Name] nodded. A mystery awaited — not for glory, but for a true heart.
-
-Keep your heart with all vigilance… — Proverbs 4:23`,
-        photoCaption: "Child looking curious",
-        imagePromptHint:
-          "THE CALL: [Role] [Name] beside empty velvet crown pillow in castle hall, mystery mood, DIFFERENT from cover, watercolor, no text",
+"One hold at a time," [Name] said. "Courage is a climb."`,
+        photoCaption: "Starting the climb",
+        useSessionPhoto: false,
+        imagePromptHint: "hero starting climb on tall white cliffs watercolor no text",
       },
       {
         page: 4,
-        title: "Castle Throne Room",
-        text: `In the Castle Throne Room, [Role] [Name] searched carefully — under banners, along marble steps, beside the great oak chair.
+        title: "The Wind Shoves Back",
+        text: `Halfway up, a gust hit like a giant's push. [Role] [Name]'s foot slipped. Fingers burned on the rock.
 
-Beneath a hanging banner, [Name] found the first clue: a golden thread leading toward the forest doors.
+[Name] hugged the cliff, heart pounding, and waited out the wind.
 
-"Every clue brings us closer," [Name] said with a spark of hope.
-
-[Name] tied the thread gently around a finger and stepped into the adventure.`,
-        photoCaption: "Photo from Castle Throne Room",
-        photoSet: "Throne Room",
-        useSessionPhoto: true,
-        imagePromptHint:
-          "throne room clue: [Role] [Name] finding golden thread under a banner, full body, watercolor, no text",
+Then [Name] laughed — short and fierce — and kept climbing higher than the fear.`,
+        photoCaption: "Holding on in the wind",
+        useSessionPhoto: false,
+        imagePromptHint: "hero clinging to cliff face in strong wind watercolor no text",
       },
       {
         page: 5,
-        title: "Footprints of Gold",
-        text: `Outside the castle, the golden thread glittered across the courtyard stones.
+        title: "Goat Thieves of the Ledge",
+        text: `On a wide ledge, three cheeky cliff-goats blocked the path, crowns of wildflowers on their heads like tiny jokes.
 
-[Role] [Name] followed it past the fountain and the bakery cart. A child pointed: "It went toward the trees!"
+They had nudged the royal crown higher with their horns for fun.
 
-[Name] thanked them and hurried on. Mystery felt less scary when the whole kingdom helped a little.`,
-        photoCaption: "Courtyard clues",
+"I need that crown," [Role] [Name] said firmly. "Not for pride — for the people."
+
+[Name] offered the goats sweet clover from a pouch. While they munched, [Name] slipped past toward the final chimney of rock.`,
+        photoCaption: "Outsmarting the goats",
         useSessionPhoto: false,
-        imagePromptHint:
-          "castle courtyard: [Role] [Name] following thin golden thread toward forest gate, full body, watercolor, no text",
+        imagePromptHint: "hero on cliff ledge with playful goats flower crowns watercolor no text",
       },
       {
         page: 6,
-        title: "Royal Forest",
-        text: `The golden thread wound through the Royal Forest.
+        title: "The Chimney Crack",
+        text: `The last stretch was a narrow crack — a rock chimney. [Role] [Name] pressed back and feet to opposite walls and wriggled upward, inch by inch.
 
-Among the lanterns, [Name] discovered a second clue — a jewel that belonged to the crown, resting in a nest of soft moss.
+Sweat. Dust. A scrape on the royal sleeve (same outfit, still locked, just a little cliff-dusty).
 
-"Thank you, forest," [Name] whispered.
-
-The path was becoming clear. Integrity meant picking up what was lost — and not keeping it for yourself.`,
-        photoCaption: "Photo from Royal Forest",
-        photoSet: "Royal Forest",
-        useSessionPhoto: true,
-        imagePromptHint:
-          "lantern forest: [Role] [Name] finding a jewel clue in moss, full body, watercolor, no text no wand",
+Then [Name]'s hand found open air and blue sky.`,
+        photoCaption: "The hardest climb",
+        useSessionPhoto: false,
+        imagePromptHint: "hero chimney-climbing up narrow rock crack watercolor no text",
       },
       {
         page: 7,
-        title: "Royal Garden",
-        text: `In the Royal Garden, petals hid a tiny map drawn in gold ink.
+        title: "Crown on the Summit",
+        staticScene: "lost-crown/find",
+        text: `There it was — the crown — caught on a sunlit spike of stone, glittering like a captured star.
 
-It pointed to the Courage Quest hills — where the crown waited for someone brave enough to claim it with honesty, not greed.
+[Role] [Name] crawled across the summit spine, wind roaring, and lifted the crown free with both hands.
 
-[Role] [Name] tucked the map beside the jewel and the thread.
+"Got you," [Name] whispered.
 
-"Almost there," [Name] said, and the roses seemed to nod in the breeze.`,
-        photoCaption: "Photo from Royal Garden",
-        photoSet: "Royal Garden",
-        useSessionPhoto: true,
-        imagePromptHint:
-          "garden: [Role] [Name] reading tiny gold map among flowers, full body, watercolor, no text",
+Below, the whole kingdom looked tiny. Above, the sky felt huge. [Name] had conquered the cliffs.`,
+        photoCaption: "Crown recovered",
+        useSessionPhoto: false,
+        imagePromptHint: "hero on cliff summit holding crown high watercolor no text",
       },
       {
         page: 8,
-        title: "Courage Quest",
-        text: `At the Courage Quest, [Role] [Name] found the crown resting on a stone of light.
+        title: "The Careful Way Down",
+        text: `Getting down was its own adventure. [Role] [Name] used the rope, tested every hold, and talked courage into tired arms.
 
-A soft voice asked — maybe the wind, maybe the heart — "Who seeks the crown: for glory, or for the people?"
-
-"For the people," [Name] answered.
-
-The crown gleamed in the sun, and [Name] lifted it with care, never placing it on [Name]'s own head. It belonged to the kingdom.`,
-        photoCaption: "Photo from Courage Quest",
-        photoSet: "Chastle",
-        useSessionPhoto: true,
-        imagePromptHint:
-          "hill stone of light: [Role] [Name] carefully lifting a simple gold crown, humble pose, full body, watercolor, no text",
+When boots hit grass at the bottom, [Name] raised the crown and whooped so loud the goats answered from above.`,
+        photoCaption: "Safe descent",
+        useSessionPhoto: false,
+        imagePromptHint: "hero descending cliffs with crown secured watercolor no text",
       },
       {
         page: 9,
-        staticScene: "lost-crown/discovery",
-        title: "The Careful Return",
-        text: `Carrying a crown is a holy kind of careful.
-
-[Role] [Name] walked home slowly so no jewel would slip. Birds hopped along the path as if escorting a parade.
-
-Villagers bowed not to the gold — but to the child who brought it back without keeping it.`,
-        photoCaption: "Returning the crown",
-        useSessionPhoto: false,
-        imagePromptHint:
-          "[Role] [Name] walking home carrying crown carefully on a cushion or both hands, villagers watching kindly, watercolor, no text",
-      },
-      {
-        page: 10,
-        title: "The Kingdom Glows",
-        text: `When [Role] [Name] returned the crown to the King, the kingdom glowed brighter than before.
-
-"You found more than gold," the King said. "You found the meaning of royalty — to serve with a true heart."
-
-Bells rang the right way again. Children clapped. [Name] felt rich without keeping a single coin.`,
-        photoCaption: "Child looking proud",
-        useSessionPhoto: false,
-        imagePromptHint:
-          "castle hall: [Role] [Name] returning crown to King, celebration light, watercolor, no text",
-      },
-      {
-        page: 11,
-        title: "The End",
+        title: "Crown Restored",
         staticScene: "lost-crown/end",
-        useSessionPhoto: false,
-        text: `That night [Role] [Name] sat by the window. The crown rested safe on its velvet pillow once more.
+        text: `In the courtyard [Role] [Name] set the crown back where it belonged — not as a trophy of ego, but as a promise kept.
 
-And so, [Role] [Name] lived bravely ever after,
-knowing [Name] is strong, kind, and deeply loved.
+"You guarded what matters," the King said. "You conquered the cliffs."
+
+[Name] stood tall, dusty, victorious.
+
+Keep your heart with all vigilance… — Proverbs 4:23
 
 The End.`,
-        photoCaption: "Final portrait",
-        imagePromptHint:
-          "peaceful ending [Role] [Name] by window, soft golden light, watercolor, no text",
+        photoCaption: "The end",
+        useSessionPhoto: false,
+        imagePromptHint: "hero returning crown to courtyard celebration watercolor no text",
       },
     ],
   },
   {
     id: "forest-guardian",
     option: 4,
-    label: "Forest Guardian",
-    title: "The Forest Guardian",
+    label: "Storm in the Forest",
+    title: "Storm in the Living Forest",
     description:
-      "God's green world needs a protector. Care for the creatures and restore the light to the trees.",
+      "Race a wild storm through the Living Forest, free the trapped river, and save the ancient trees.",
     bibleVerse: "Genesis 2:15",
     bibleVerseText:
       "The Lord God took the man and put him in the garden of Eden to work it and keep it.",
     aiTheme:
-      `${BIBLICAL_STORY_GUARDRAILS} Child becomes guardian of the living forest, helping animals and restoring light to the trees. Theme: stewardship of creation (Genesis 2:15). No magic spells — light is care, courage, and God's good design.`,
-    bookTitleTemplate: "[Role] [Name] and the Forest Guardian",
+      `${BIBLICAL_STORY_GUARDRAILS} ONE LAND: Living Forest in a storm. ACTION: falling branches, flooded path, jammed river rocks, climb to free water, protect animals/trees. Hero CONQUERS the storm crisis as steward. No kingdom tour. Genesis 2:15.`,
+    bookTitleTemplate: "[Role] [Name] and the Forest Storm",
     pages: [
       {
         page: 1,
-        title: "Title Page",
-        text: "[Role] [Name]\nand the Forest Guardian",
-        photoCaption: "Royal portrait of the child",
+        title: "Storm in the Living Forest",
         staticScene: "forest-guardian/title",
+        text: `[Role] [Name]
+and the Forest Storm`,
+        photoCaption: "The forest needs help",
         useSessionPhoto: false,
-        imagePromptHint:
-          "COVER PORTRAIT only: [Role] [Name] facing viewer in a soft garden arch or simple throne backdrop, calm smile, holding flowers or a small unlit lantern — NOT deep forest action, NO staff, NO wand, NO fairies casting spells, children's book style, no text",
+        imagePromptHint: "cover hero in windy living forest storm light watercolor no text",
       },
       {
         page: 2,
-        title: "The Kingdom of Light",
-        staticScene: "kingdom-map",
-        text: `Welcome to the Kingdom of Light — a bright realm of living forests, royal gardens, and ancient castles.
+        title: "Trees in Trouble",
+        staticScene: "forest-guardian/call",
+        text: `The Living Forest groaned. Wind twisted the high branches. Animals ran toward the castle path.
 
-Every path leads to adventure. Every adventure begins with a brave heart.
+"The river is blocked," a woodcutter cried. "If the water can't move, the roots will drown and the storm will break the old trees."
 
-Your kingdom awaits, [Role] [Name].
-
-The Lord God took the man and put him in the garden of Eden to work it and keep it. — Genesis 2:15`,
-        photoCaption: "Map of the Kingdom",
+[Role] [Name] took a deep breath. "Then I go into the storm."`,
+        photoCaption: "The call",
         useSessionPhoto: false,
-        imagePromptHint: "watercolor kingdom map with green forest emphasis, no text",
+        imagePromptHint: "stormy forest edge animals fleeing hero determined watercolor no text",
       },
       {
         page: 3,
-        staticScene: "forest-guardian/call",
-        title: "The Call",
-        text: `The lanterns of the Royal Forest flickered weakly — the light that kept the woodland creatures safe was fading.
+        title: "Into the Roar",
+        text: `Leaves flew like green birds. [Role] [Name] pushed into the Living Forest as the canopy thrashed overhead.
 
-The King asked [Role] [Name]:
+A branch crashed across the path. [Name] leapt it. Another cracked to the right — [Name] rolled left and kept running.
 
-"Will you become the Forest Guardian and bring the light back to the trees?"
-
-[Name] felt the call to care for creation and whispered, "Yes."
-
-The Lord God… put him in the garden… to work it and keep it. — Genesis 2:15`,
-        photoCaption: "Child looking wonder-struck",
-        imagePromptHint:
-          "THE CALL scene — DIFFERENT from cover: castle courtyard steps at golden hour, King or messenger with [Role] [Name], kingdom walls behind, beginning of journey pose, NO deep lantern forest clone of the cover, NO staff, NO wand, warm natural light, children's book style, no text",
+This was not a stroll. This was a rescue at full speed.`,
+        photoCaption: "Running the storm path",
+        useSessionPhoto: false,
+        imagePromptHint: "hero running through stormy forest falling branches watercolor no text",
       },
       {
         page: 4,
-        title: "Castle Throne Room",
-        text: `In the Castle Throne Room, [Role] [Name] received a guardian's cloak woven with leaf-gold thread.
+        title: "The Flooded Path",
+        text: `Brown water covered the trail. [Role] [Name] waded in up to the knees, holding the lantern high.
 
-"Protect the small and the quiet," the King said. "That is true power."
+Something bumped [Name]'s leg — a little fox stranded on a root island. [Name] scooped it up and set it on higher ground.
 
-[Name] bowed, fastened the cloak, and set out for the woods with a simple lantern and a faithful heart.`,
-        photoCaption: "Photo from Castle Throne Room",
-        photoSet: "Throne Room",
-        useSessionPhoto: true,
-        imagePromptHint:
-          "Watercolor of [Role] [Name] receiving a leaf-gold cloak in a throne room, children's book illustration, no text no wand",
+"I've got you. Now the river."`,
+        photoCaption: "Wading the flood",
+        useSessionPhoto: false,
+        imagePromptHint: "hero wading flooded forest path rescuing fox watercolor no text",
       },
       {
         page: 5,
-        title: "Listening to the Trees",
-        text: `At the forest edge, [Role] [Name] stopped and listened.
+        title: "Rocks in the River",
+        text: `At the bend, storm-tumbled boulders jammed the river into a furious swirl. Water had nowhere good to go.
 
-Wind moved the leaves like a soft conversation. A rabbit watched from the ferns. The first lantern on the path was dark.
+[Role] [Name] climbed onto the wet rocks, found the keystone boulder, and shoved with everything [Name] had.
 
-[Name] cleaned the glass, trimmed the wick, and lit it with care from the castle flame.
+It budged an inch. Then another.
 
-One light. Then the path invited another step.`,
-        photoCaption: "First lantern",
+"Move!" [Name] yelled — and the rock rolled free with a thunder-splash.`,
+        photoCaption: "Freeing the river",
         useSessionPhoto: false,
-        imagePromptHint:
-          "forest edge: [Role] [Name] lighting first path lantern, rabbit watching, full body, watercolor, no text no wand no staff",
+        imagePromptHint: "hero pushing boulder in raging forest river storm watercolor no text",
       },
       {
         page: 6,
-        title: "Royal Forest",
-        text: `Deep in the Royal Forest, [Name] found frightened creatures hiding from the dark.
+        title: "Water Roars Free",
+        text: `The river punched through the jam and raced down its old path, singing a wild relieved song.
 
-[Name] lit the lanterns one by one and sang a soft song of courage.
+Trees straightened as the drowning pressure eased. The worst of the thrashing calmed.
 
-The trees seemed to lean closer, listening. Owls blinked kindly. The woods felt less afraid with every warm circle of light.`,
-        photoCaption: "Photo from Royal Forest",
-        photoSet: "Royal Forest",
-        useSessionPhoto: true,
-        imagePromptHint:
-          "Watercolor of [Role] [Name] lighting lanterns for forest creatures, living trees warm light, no spells no wands, children's book style, no text",
+[Role] [Name] stood on the rock, soaked, laughing, victorious — guardian in action, not in title only.`,
+        photoCaption: "River freed",
+        useSessionPhoto: false,
+        imagePromptHint: "hero standing on rocks as forest river bursts free watercolor no text",
       },
       {
         page: 7,
-        title: "Royal Garden",
-        text: `The Royal Garden offered seeds of hope — tiny gifts that could strengthen tired roots.
+        title: "Quiet After the Storm",
+        staticScene: "forest-guardian/gift",
+        text: `Sunbeams found the leaves again. Birds tried out their voices. The little fox flicked its tail like a thank-you flag.
 
-[Role] [Name] carried them carefully in a small pouch, knowing every living thing deserved care.
-
-[Name] planted a few along the garden wall and watered them gently. Stewardship looked like small hands doing faithful work.`,
-        photoCaption: "Photo from Royal Garden",
-        photoSet: "Royal Garden",
-        useSessionPhoto: true,
-        imagePromptHint:
-          "Watercolor of [Role] [Name] gathering and planting hopeful seeds in a garden, warm daylight, no spells no wands, children's book illustration, no text",
+[Role] [Name] walked the path once more, checking nests and roots, making sure the Living Forest could breathe.`,
+        photoCaption: "Forest calms",
+        useSessionPhoto: false,
+        imagePromptHint: "calm after storm forest sunbeams hero with animals watercolor no text",
       },
       {
         page: 8,
-        title: "Courage Quest",
-        text: `At the Courage Quest, a soft shadow tried to snuff out the last forest light.
-
-[Role] [Name] planted the seeds of hope, stood firm, and shielded the final lantern with [Name]'s cloak.
-
-Light returned. The shadow fled like mist at sunrise. The forest breathed again — and [Name] kept it with a faithful heart.`,
-        photoCaption: "Photo from Courage Quest",
-        photoSet: "Chastle",
-        useSessionPhoto: true,
-        imagePromptHint:
-          "Watercolor of [Role] [Name] restoring forest light against a soft shadow, children's book style, no text no wand no staff",
-      },
-      {
-        page: 9,
-        title: "Creatures of the Green",
-        text: `When the lanterns burned steady, the creatures came out to say thank you — deer at the path edge, squirrels in the branches, a fox with bright polite eyes.
-
-[Role] [Name] did not boast. [Name] simply bowed to the woods.
-
-"I will keep you," [Name] promised. "As long as I am able."`,
-        photoCaption: "Forest friends",
-        useSessionPhoto: false,
-        imagePromptHint:
-          "[Role] [Name] among gentle forest animals near lit lanterns, peaceful stewardship, full body, watercolor, no text no wand",
-      },
-      {
-        page: 10,
-        staticScene: "forest-guardian/magic",
-        title: "The Return",
-        text: `When [Role] [Name] returned, birds sang over the castle walls.
-
-The King smiled. "You guarded what could not speak for itself. That is the heart of a true [Role]."
-
-The people cheered for the Forest Guardian — not for power, but for care.`,
-        photoCaption: "Child looking proud",
-        imagePromptHint:
-          "Watercolor of [Role] [Name] welcomed home with birds and forest light, children's book style, no text",
-      },
-      {
-        page: 11,
-        title: "The End",
+        title: "Keeper of the Woods",
         staticScene: "forest-guardian/end",
-        useSessionPhoto: false,
-        text: `That night the forest lanterns glowed like a string of quiet stars.
+        text: `When [Role] [Name] returned, the people had seen the river run true again.
 
-And so, [Role] [Name] lived bravely ever after,
-knowing [Name] is strong, kind, and deeply loved.
+"You kept the garden of the woods," the King said. "That is holy work."
+
+[Name] looked back at the green cathedral of trees and felt proud all the way through.
+
+The Lord God… put him in the garden… to work it and keep it. — Genesis 2:15
 
 The End.`,
-        photoCaption: "Final portrait",
-        imagePromptHint:
-          "Watercolor closing scene of [Role] [Name] with soft forest-gold light, children's book illustration, no text",
+        photoCaption: "The end",
+        useSessionPhoto: false,
+        imagePromptHint: "hero returning from forest after storm success watercolor no text",
       },
     ],
   },
   {
     id: "kindness-quest",
     option: 5,
-    label: "Kindness Quest",
-    title: "The Kindness Quest",
+    label: "Lantern Run",
+    title: "The Midnight Lantern Run",
     description:
-      "A lonely corner of the kingdom needs warmth. Heal hearts with courage and kindness.",
+      "A village goes dark in a storm. Race supplies across a broken footbridge before midnight.",
     bibleVerse: "Ephesians 4:32",
     bibleVerseText:
       "Be kind to one another, tenderhearted, forgiving one another, as God in Christ forgave you.",
     aiTheme:
-      `${BIBLICAL_STORY_GUARDRAILS} Child spreads kindness to heal loneliness in the kingdom. Theme: be kind and tenderhearted (Ephesians 4:32). No "royal magic" — kindness is love in action, not a spell.`,
-    bookTitleTemplate: "[Role] [Name] and the Kindness Quest",
+      `${BIBLICAL_STORY_GUARDRAILS} ONE QUEST: storm-dark village + broken footbridge + midnight deadline. ACTION kindness: race with supply sled/lanterns, cross damaged bridge, restart the village light-tower, include the left-out child. Kindness is brave and physical, not boring notes-only. Ephesians 4:32.`,
+    bookTitleTemplate: "[Role] [Name] and the Midnight Lantern Run",
     pages: [
       {
         page: 1,
-        title: "Title Page",
-        text: "[Role] [Name]\nand the Kindness Quest",
-        photoCaption: "Royal portrait of the child",
+        title: "The Midnight Lantern Run",
         staticScene: "kindness-quest/title",
+        text: `[Role] [Name]
+and the Midnight Lantern Run`,
+        photoCaption: "Lanterns ready",
         useSessionPhoto: false,
-        imagePromptHint:
-          "COVER PORTRAIT: [Role] [Name] with a warm gentle smile, soft cream or garden arch backdrop, watercolor, NO text NO wand",
+        imagePromptHint: "cover hero with glowing lantern night village watercolor no text",
       },
       {
         page: 2,
-        title: "The Kingdom of Light",
-        staticScene: "kingdom-map",
-        text: `Welcome to the Kingdom of Light — a bright realm of living forests, royal gardens, and ancient castles.
+        title: "The Lights Go Out",
+        staticScene: "kindness-quest/call",
+        text: `A hard storm knocked out the village light-tower. Windows went black. The cold crept in. People were scared and stuck on opposite sides of the swollen creek.
 
-Every path leads to adventure. Every adventure begins with a brave heart.
+"If the lanterns aren't across by midnight," the elder said, "families stay separated till morning."
 
-Your kingdom awaits, [Role] [Name].
+[Role] [Name] loaded a sled with blankets, bread, and lanterns.
 
-Be kind to one another, tenderhearted, forgiving one another, as God in Christ forgave you. — Ephesians 4:32`,
-        photoCaption: "Map of the Kingdom",
+"Kindness moves," [Name] said. "I'm running."`,
+        photoCaption: "Dark village crisis",
         useSessionPhoto: false,
-        imagePromptHint: "watercolor kingdom map warm friendly light, no text",
+        imagePromptHint: "dark storm village light tower out hero with supply sled watercolor no text",
       },
       {
         page: 3,
-        staticScene: "kindness-quest/call",
-        title: "The Call",
-        text: `Not every quest needs a sword. In the Kingdom of Light, a quiet sadness had settled over one village — people felt unseen and alone.
+        title: "Sled Through the Gale",
+        text: `Wind tried to steal the sled. Rain tried to slow the boots. [Role] [Name] leaned forward and pulled harder.
 
-The King asked [Role] [Name]:
+Through the square. Past the bakery. Down to the creek roar.
 
-"Will you carry kindness like a lantern and remind everyone they belong?"
-
-[Name]'s answer was soft and sure: "I will."
-
-Be kind to one another, tenderhearted… — Ephesians 4:32`,
-        photoCaption: "Child looking compassionate",
-        imagePromptHint:
-          "THE CALL: [Role] [Name] holding a simple lantern of kindness in courtyard, DIFFERENT from cover, watercolor, no text no wand",
+Every step was a gift in motion.`,
+        photoCaption: "Pulling supplies",
+        useSessionPhoto: false,
+        imagePromptHint: "hero pulling supply sled through windy rainy street watercolor no text",
       },
       {
         page: 4,
-        title: "Castle Throne Room",
-        text: `From the Castle Throne Room, [Role] [Name] gathered notes of encouragement written in gold ink.
+        title: "The Broken Footbridge",
+        text: `The footbridge sagged. Two boards missing. Water licked the underside like a hungry animal.
 
-"Words can be as brave as armor," [Name] said, tucking them into a satchel.
+[Role] [Name] lashed the lanterns tight, tested the rope rail, and stepped out.
 
-Then [Name] set out to share them — one person, one smile, one brave sentence at a time.`,
-        photoCaption: "Photo from Castle Throne Room",
-        photoSet: "Throne Room",
-        useSessionPhoto: true,
-        imagePromptHint:
-          "Watercolor of [Role] [Name] with golden notes of encouragement in a throne room, children's book illustration, no text",
+"People need light more than I need dry socks," [Name] muttered — and crossed.`,
+        photoCaption: "Bridge crossing",
+        useSessionPhoto: false,
+        imagePromptHint: "hero crossing broken footbridge with lanterns night storm watercolor no text",
       },
       {
         page: 5,
-        title: "The Quiet Village",
-        text: `The village streets were neat but hushed. Doors stayed half-closed. A baker sighed without looking up.
+        title: "Almost Dropped",
+        text: `Mid-bridge, a plank tipped. The sled skidded. One lantern bounced toward the dark water—
 
-[Role] [Name] began simply: a greeting, a thank-you, a note left on a windowsill that read You are seen.
+[Role] [Name] dove flat and caught the handle with two fingers.
 
-One curtain opened. Then another. Kindness is contagious when someone goes first.`,
-        photoCaption: "Village kindness",
+"Not tonight," [Name] told the storm.
+
+Back on feet. Forward again. The far bank came like a cheer.`,
+        photoCaption: "Saving the lantern",
         useSessionPhoto: false,
-        imagePromptHint:
-          "quiet village street: [Role] [Name] leaving a kind note at a door, warm hopeful mood, full body, watercolor, no text on note legible",
+        imagePromptHint: "hero catching falling lantern on broken bridge watercolor no text",
       },
       {
         page: 6,
-        title: "Royal Forest",
-        text: `In the Royal Forest, [Name] met a traveler who had lost hope.
+        title: "Lights for Every Door",
+        text: `Door to door [Role] [Name] ran — knock, lantern, blanket, bread, smile, next house.
 
-[Name] sat beside them, listened without rushing, and left a note that read: You matter.
+A shy child stood alone at the edge of the crowd. [Name] turned back on purpose.
 
-The forest felt warmer somehow — not from fire, but from friendship beginning again.`,
-        photoCaption: "Photo from Royal Forest",
-        photoSet: "Royal Forest",
-        useSessionPhoto: true,
-        imagePromptHint:
-          "Watercolor of [Role] [Name] comforting a traveler in a lantern forest, children's book style, no text no wand",
+"This one's yours. Walk with me."
+
+Kindness isn't only soft. Sometimes it is fast feet and a hand that refuses to leave anyone out.`,
+        photoCaption: "Delivering light",
+        useSessionPhoto: false,
+        imagePromptHint: "hero giving lanterns door to door including shy child watercolor no text",
       },
       {
         page: 7,
-        title: "Royal Garden",
-        text: `In the Royal Garden, [Role] [Name] invited shy children to plant flowers together.
+        title: "Restart the Tower",
+        staticScene: "kindness-quest/gift",
+        text: `At the light-tower, [Role] [Name] climbed the wet stairs two at a time and set the master lantern in its glass crown.
 
-Laughter returned like spring rain. Hands got dirty. Petals stuck to noses.
+Gold light blasted across the roofs. Windows answered one by one until the whole village glowed like a constellation on the ground.
 
-Kindness, [Name] learned, grows when it is shared — and gardens remember joy.`,
-        photoCaption: "Photo from Royal Garden",
-        photoSet: "Royal Garden",
-        useSessionPhoto: true,
-        imagePromptHint:
-          "Premium watercolor of [Role] [Name] planting flowers with friends in a garden, bold ink outlines, cream paper feel, no text",
+Midnight had not won.`,
+        photoCaption: "Village lit again",
+        useSessionPhoto: false,
+        imagePromptHint: "hero at top of light tower lighting village night watercolor no text",
       },
       {
         page: 8,
-        title: "Courage Quest",
-        text: `The Courage Quest asked [Name] to speak kindness even when it felt hard — to include someone who had been left out at the edge of the crowd.
+        title: "Tables in the Street",
+        text: `People pulled tables into the street under the new light. Soup steamed. Laughter came back shy, then loud.
 
-[Name] reached out a hand. "Walk with us."
-
-That single brave moment lit the whole kingdom more than any banner ever could.`,
-        photoCaption: "Photo from Courage Quest",
-        photoSet: "Chastle",
-        useSessionPhoto: true,
-        imagePromptHint:
-          "Watercolor of [Role] [Name] including someone left out, warm heroic kindness, children's book style, no text",
+[Role] [Name] sat in the middle, not the throne end — passing bowls, listening, tired in the best way.`,
+        photoCaption: "Shared victory meal",
+        useSessionPhoto: false,
+        imagePromptHint: "village street meal under lantern light hero among people watercolor no text",
       },
       {
         page: 9,
-        title: "Tables Made Longer",
-        text: `By evening the village tables were pulled into the street. Bread was broken. Stories were told.
-
-[Role] [Name] did not sit at the head like a show. [Name] sat in the middle, passing plates, listening, laughing.
-
-Loneliness had less room when chairs kept being added.`,
-        photoCaption: "Shared table",
-        useSessionPhoto: false,
-        imagePromptHint:
-          "village evening long table feast: [Role] [Name] seated among neighbors sharing food, joyful, watercolor, no text",
-      },
-      {
-        page: 10,
-        staticScene: "kindness-quest/gift",
-        title: "The Return",
-        text: `When [Role] [Name] returned, the village glowed with new friendships.
-
-The King said, "You healed what swords cannot. That is true royalty — love in action."
-
-[Name] bowed, cheeks warm, heart full.`,
-        photoCaption: "Child looking proud",
-        imagePromptHint:
-          "Watercolor celebration of kindness with [Role] [Name] at the castle, children's book style, no text",
-      },
-      {
-        page: 11,
-        title: "The End",
+        title: "Brave Kindness",
         staticScene: "kindness-quest/end",
-        useSessionPhoto: false,
-        text: `That night [Role] [Name] prayed a simple thank-you for every open door.
+        text: `"You didn't just say kind words," the King told [Role] [Name]. "You crossed the broken bridge. You conquered the dark with love in action."
 
-And so, [Role] [Name] lived bravely ever after,
-knowing [Name] is strong, kind, and deeply loved.
+[Name] looked at the glowing tower and the open doors and felt the truth settle deep:
+
+Be kind to one another, tenderhearted… — Ephesians 4:32
 
 The End.`,
-        photoCaption: "Final portrait",
-        imagePromptHint:
-          "Watercolor closing scene of [Role] [Name] with soft golden light, children's book illustration, no text",
+        photoCaption: "The end",
+        useSessionPhoto: false,
+        imagePromptHint: "hero peaceful after lantern run village glowing watercolor no text",
       },
     ],
   },
   {
     id: "light-treasure",
     option: 6,
-    label: "Find the Treasure",
-    title: "The Treasure Hunt",
+    label: "Treasure Gauntlet",
+    title: "The Treasure Gauntlet",
     description:
-      "An old map. Hidden clues. Real treasure waiting to be found — and shared with the whole kingdom.",
+      "Follow the map through traps, tunnels, and a final leap to the hidden chest — then share it.",
     bibleVerse: "Matthew 5:14",
     bibleVerseText: "You are the light of the world. A city set on a hill cannot be hidden.",
     aiTheme:
-      `${BIBLICAL_STORY_GUARDRAILS} Classic treasure hunt: map, clues, chest of gold/jewels found through courage and honesty. Child FINDS real treasure (coins, gems, chest) — not only abstract "light." Theme: you are the light of the world — share what you find, do not hide goodness (Matthew 5:14). No magic spells; map/lantern/chest are ordinary adventure props. Treasure is discovered and shared, never stolen greedily.`,
-    bookTitleTemplate: "[Role] [Name] and the Great Treasure Hunt",
+      `${BIBLICAL_STORY_GUARDRAILS} ONE QUEST: treasure gauntlet path. ACTION: map clues, swinging vine gap, dark tunnel, pressure-plate puzzle, final leap to chest of real gold/gems. Hero CONQUERS obstacles and SHARES treasure. No dull kingdom tour. Matthew 5:14.`,
+    bookTitleTemplate: "[Role] [Name] and the Treasure Gauntlet",
     pages: [
       {
         page: 1,
-        title: "Title Page",
-        text: "[Role] [Name]\nand the Great Treasure Hunt",
-        photoCaption: "Royal portrait of the child",
+        title: "The Treasure Gauntlet",
         staticScene: "light-treasure/title",
+        text: `[Role] [Name]
+and the Treasure Gauntlet`,
+        photoCaption: "Map in hand",
         useSessionPhoto: false,
-        imagePromptHint:
-          "COVER PORTRAIT: [Role] [Name] holding an old rolled treasure map, soft gold coins motif, castle garden backdrop, children's book watercolor, NO text NO wand",
+        imagePromptHint: "cover hero with treasure map and lantern excited watercolor no text",
       },
       {
         page: 2,
-        title: "The Kingdom of Light",
-        staticScene: "kingdom-map",
-        text: `Welcome to the Kingdom of Light — a bright realm of living forests, royal gardens, and ancient castles.\n\nEvery path leads to adventure. Every adventure begins with a brave heart.\n\nYour kingdom awaits, [Role] [Name].\n\nYou are the light of the world. A city set on a hill cannot be hidden. — Matthew 5:14`,
-        photoCaption: "Map of the Kingdom",
+        title: "X Marks Trouble",
+        staticScene: "light-treasure/call",
+        text: `The old map did not show a gentle stroll. It showed a gauntlet: vine gap, whisper tunnel, stone teeth, and a chest under a hill door.
+
+"Find it," the King said. "Then share it. Treasure hidden forever helps no one."
+
+[Role] [Name] rolled the map tight. "I will run the gauntlet."`,
+        photoCaption: "Accepting the map",
         useSessionPhoto: false,
-        imagePromptHint:
-          "watercolor kingdom map overview with paths to forest garden and castle, warm gold light, no text",
+        imagePromptHint: "hero with old treasure map castle library determined watercolor no text",
       },
       {
         page: 3,
-        staticScene: "light-treasure/call",
-        title: "The Call",
-        text: `One bright morning, a dusty old chest of drawers in the castle library rattled open by itself — and out tumbled a rolled parchment tied with red ribbon.\n\n[Role] [Name] unrolled it carefully. It was a treasure map.\n\nX marked a place beyond the Royal Forest. Little drawings showed a lantern tree, a rose arch, and a stone hill with a door.\n\nThe King smiled. "Our ancestors hid a treasure for the one brave enough to find it — and kind enough to share it. Will you go, [Name]?"\n\n[Role] [Name] held the map tight. "I will find the treasure."`,
-        photoCaption: "The map is found",
-        imagePromptHint:
-          "THE CALL: [Role] [Name] unrolling an old treasure map in a sunlit castle library, excited pose, DIFFERENT from cover, no wand, watercolor, no text",
+        title: "The Vine Gap",
+        text: `First mark on the map: a canyon with vines hanging like ropes.
+
+[Role] [Name] backed up, ran, jumped—
+
+Caught the vine. Swung. Missed the ledge by a toe. Swung again harder and rolled onto safe grass, laughing.
+
+"One obstacle down."`,
+        photoCaption: "Swinging the vine gap",
+        useSessionPhoto: false,
+        imagePromptHint: "hero swinging on vine across canyon gap watercolor no text",
       },
       {
         page: 4,
-        title: "The Royal Throne",
-        text: `In the Throne Room, [Role] [Name] stood before the marble steps with the map in hand.\n\nBanners of crimson and gold hung from the ceiling. The King placed a small brass compass in [Name]'s palm.\n\n"Treasure is easy to want," the King said gently. "Harder to share. Find the chest — then bring its light home for everyone."\n\n[Role] [Name] nodded. "I promise."\n\n[Name] sat for one quiet moment on the great oak throne, straightened [Name]'s back, and whispered, "I am ready."`,
-        photoCaption: "Portrait from the Throne Room",
-        photoSet: "Throne Room",
-        useSessionPhoto: true,
-        imagePromptHint:
-          "throne room: [Role] [Name] with treasure map and brass compass, marble and gold banners, full body, watercolor, no text",
+        title: "Whisper Tunnel",
+        text: `The tunnel tried to scare [Role] [Name] with drips and echoes and shadows that looked bigger than they were.
+
+[Name] held the lantern high and walked faster. "I hear you. I am still coming."
+
+At the far mouth, daylight slapped [Name]'s face like a high-five.`,
+        photoCaption: "Through the tunnel",
+        useSessionPhoto: false,
+        imagePromptHint: "hero in dark tunnel with lantern determined watercolor no text",
       },
       {
         page: 5,
-        title: "Clue One: The Lantern Path",
-        text: `The map's first mark led into the Royal Forest, where lanterns glowed along a mossy path.\n\n[Role] [Name] counted seven lanterns, just as the parchment said. At the seventh tree, something winked in the roots — a small golden key on a blue ribbon.\n\n"Clue one," [Name] said, lifting it carefully. "The key to the treasure."\n\nBirds chirped as if cheering. The forest felt friendlier already.`,
-        photoCaption: "Portrait in the Royal Forest",
-        photoSet: "Royal Forest",
-        useSessionPhoto: true,
-        imagePromptHint:
-          "royal forest path: [Role] [Name] finding a small golden key at lantern tree roots, treasure hunt, full body, watercolor, no text no wand",
+        title: "Stone Teeth Puzzle",
+        text: `A hallway of stone "teeth" slammed open and shut in a pattern. Wait… wait… NOW!
+
+[Role] [Name] dashed between the gaps, rolled under the last tooth, and skidded into a golden chamber, map crumpled but spirit on fire.`,
+        photoCaption: "Dodging stone traps",
+        useSessionPhoto: false,
+        imagePromptHint: "hero dashing through slamming stone trap hallway watercolor no text",
       },
       {
         page: 6,
-        title: "Clue Two: The Rose Arch",
-        text: `Next the map pointed to the Royal Garden.\n\nUnder a climbing rose arch, [Role] [Name] found a second clue: a round medallion carved with a sun. When [Name] held it up, sunlight flashed on a stone path toward the hills.\n\nButterflies drifted past. The air smelled of honey and earth.\n\n"Clue two," [Name] smiled. "We're getting closer."`,
-        photoCaption: "Portrait in the Royal Garden",
-        photoSet: "Royal Garden",
-        useSessionPhoto: true,
-        imagePromptHint:
-          "royal garden rose arch: [Role] [Name] holding a sun medallion clue, treasure hunt, full body, watercolor, no text",
+        title: "The Final Leap",
+        staticScene: "light-treasure/find",
+        text: `Across a black pit sat the treasure chest on a stone island. The jump looked too far.
+
+[Role] [Name] breathed once, twice, then sprinted and leapt with everything in [Name]'s royal heart.
+
+Boots hit stone. Hands hit wood. The chest lid flew open — gold coins, gems, light spilling like sunrise.
+
+"[Name] found it!" [Name] whooped to the empty chamber — then quieter: "Now I share it."`,
+        photoCaption: "Treasure found",
+        useSessionPhoto: false,
+        imagePromptHint: "hero leaping to stone island opening treasure chest gold light watercolor no text",
       },
       {
         page: 7,
-        title: "The Hidden Door",
-        text: `At the Courage Quest hills, [Role] [Name] found a stone door half-covered in ivy — the X on the map.\n\nThe golden key fit. Click.\n\nInside was a quiet cave lit by soft daylight from cracks above. In the center sat a wooden treasure chest bound with iron, waiting.\n\n[Name]'s heart beat fast — not from fear, but from wonder.`,
-        photoCaption: "The hidden door",
+        title: "Carry the Light Out",
+        text: `The gauntlet felt different on the way back — still hard, but [Role] [Name] knew every trap now. Chest strapped tight. Lantern bright.
+
+Obstacles that once felt impossible became a path [Name] had already conquered.`,
+        photoCaption: "Leaving with treasure",
         useSessionPhoto: false,
-        imagePromptHint:
-          "stone hill door with ivy, [Role] [Name] turning a golden key, treasure hunt entrance, full body, watercolor, no text no wand",
+        imagePromptHint: "hero carrying glowing treasure chest out of cave watercolor no text",
       },
       {
         page: 8,
-        title: "Treasure Found!",
-        staticScene: "light-treasure/discovery",
-        text: `[Role] [Name] opened the chest.\n\nGold coins spilled like sunshine. Jewels sparkled — ruby red, sapphire blue, emerald green. A small crown of simple gold rested on top, and a letter in the lid read:\n\n"To the finder with a true heart: this treasure belongs to the whole kingdom. Share it, and you will be richer than gold."\n\n[Name] laughed with joy. "We found it! Real treasure!"\n\n[Name] did not stuff pockets full. [Name] closed the chest gently, locked it again, and prepared to carry it home — for everyone.`,
-        photoCaption: "The treasure chest",
-        useSessionPhoto: false,
-        imagePromptHint:
-          "TREASURE FOUND: open wooden chest full of gold coins and colorful jewels, [Role] [Name] kneeling in wonder, cave soft daylight, joyful, full body, watercolor children's book, no text no wand",
-      },
-      {
-        page: 9,
-        title: "The Climb Home",
-        text: `Carrying treasure is hard work — even for a [Role].\n\n[Role] [Name] pulled the chest onto a little wooden cart from the cave wall and wheeled it carefully down the path. The compass spun happily. The map was finished.\n\nHalfway home, [Name] stopped to rest and look at the kingdom below — green forests, pink gardens, white castle walls.\n\n"This is why we share," [Name] whispered. "So the whole kingdom shines."`,
-        photoCaption: "Photo from Courage Quest",
-        photoSet: "Chastle",
-        useSessionPhoto: true,
-        imagePromptHint:
-          "hill overlook: [Role] [Name] with small cart and treasure chest, kingdom vista below, full body, watercolor, no text",
-      },
-      {
-        page: 10,
-        title: "Shared with All",
-        text: `When [Role] [Name] rolled the chest into the courtyard, the people gasped — then cheered.\n\nCoins and jewels were counted fairly. Some went to repair the village bridge. Some bought bread for families in need. Some sparkled in the castle hall so children could see that goodness finds a way.\n\nThe King placed a hand on [Name]'s shoulder.\n\n"You found the treasure," he said. "And you found something rarer — a heart that shares. That is the light of the world."`,
-        photoCaption: "The kingdom shares the treasure",
-        useSessionPhoto: false,
-        imagePromptHint:
-          "castle courtyard celebration: [Role] [Name] beside open treasure chest, villagers joyful, gold coins shared kindly, watercolor, no text",
-      },
-      {
-        page: 11,
-        title: "A Light on the Hill",
+        title: "Treasure for Everyone",
         staticScene: "light-treasure/end",
-        text: `That night [Role] [Name] sat by the window. Far below, cottage lamps glowed. The castle tower shone like a city on a hill.\n\n[Name] thought of the map, the key, the rose arch, and the chest of real treasure — and of the greater treasure: bringing home something beautiful for others.\n\nYou are the light of the world. — Matthew 5:14\n\nAnd so, [Role] [Name] lived bravely ever after, knowing [Name] is strong, kind, and deeply loved.\n\nThe End.`,
-        photoCaption: "Final portrait",
+        text: `In the square [Role] [Name] opened the chest for the whole kingdom — coins for repairs, gems for the light-tower, joy for every open hand.
+
+"You ran the gauntlet," the King said. "You conquered fear. And you did not hide the light."
+
+You are the light of the world… — Matthew 5:14
+
+The End.`,
+        photoCaption: "The end",
         useSessionPhoto: false,
-        imagePromptHint:
-          "night window ending: [Role] [Name] looking at glowing kingdom lights, peaceful, soft gold, watercolor, no text",
+        imagePromptHint: "hero sharing treasure chest with village celebration watercolor no text",
       },
     ],
   },
-];
+];;
