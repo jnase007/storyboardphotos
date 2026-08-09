@@ -183,60 +183,63 @@ async function drawCoverPageAsync(
     bookType
   );
   const threeLine = Boolean(line3);
-  const plaqueH = threeLine ? PAGE_H * 0.22 : PAGE_H * 0.16;
+  // Title lives at the BOTTOM so long quest names never cover the child's face/crown.
+  const plaqueH = threeLine ? PAGE_H * 0.2 : PAGE_H * 0.15;
+  const plaqueY = PAGE_H - plaqueH - PAGE_H * 0.045;
+  const brandY = plaqueY - PAGE_H * 0.04;
 
-  // Soft cream title plaque at top (readable, matches watercolor books)
+  // Tiny brand chip above title (doesn't touch face)
   doc.setFillColor(248, 244, 236);
-  doc.setGState(doc.GState({ opacity: 0.92 }));
-  doc.roundedRect(PAGE_W * 0.1, PAGE_H * 0.035, PAGE_W * 0.8, plaqueH, 10, 10, "F");
+  doc.setGState(doc.GState({ opacity: 0.9 }));
+  doc.roundedRect(PAGE_W * 0.28, brandY, PAGE_W * 0.44, PAGE_H * 0.032, 6, 6, "F");
+  doc.setGState(doc.GState({ opacity: 1 }));
+  doc.setFont("times", "normal");
+  doc.setFontSize(9);
+  doc.setTextColor(...ROYAL_BLUE);
+  doc.text("Storybook Photos · Kingdom Quests", PAGE_W / 2, brandY + PAGE_H * 0.022, {
+    align: "center",
+  });
+
+  // Soft cream title plaque at BOTTOM (face-safe)
+  doc.setFillColor(248, 244, 236);
+  doc.setGState(doc.GState({ opacity: 0.94 }));
+  doc.roundedRect(PAGE_W * 0.08, plaqueY, PAGE_W * 0.84, plaqueH, 12, 12, "F");
   doc.setGState(doc.GState({ opacity: 1 }));
   doc.setDrawColor(...GOLD);
-  doc.setLineWidth(1.5);
-  doc.roundedRect(PAGE_W * 0.1, PAGE_H * 0.035, PAGE_W * 0.8, plaqueH, 10, 10, "S");
+  doc.setLineWidth(1.75);
+  doc.roundedRect(PAGE_W * 0.08, plaqueY, PAGE_W * 0.84, plaqueH, 12, 12, "S");
 
   // Hero line: Queen River
+  const t1 = plaqueY + plaqueH * (threeLine ? 0.32 : 0.4);
+  const t2 = plaqueY + plaqueH * (threeLine ? 0.55 : 0.72);
+  const t3 = plaqueY + plaqueH * 0.8;
+
   doc.setFont("times", "bold");
-  doc.setFontSize(line1.length > 22 ? 22 : 26);
+  doc.setFontSize(line1.length > 24 ? 20 : 24);
   doc.setTextColor(...ROYAL_BLUE);
-  doc.text(line1, PAGE_W / 2, PAGE_H * (threeLine ? 0.09 : 0.1), {
+  doc.text(line1, PAGE_W / 2, t1, {
     align: "center",
-    maxWidth: PAGE_W * 0.72,
+    maxWidth: PAGE_W * 0.76,
   });
 
   // and the / quest
   doc.setFont("times", "italic");
-  doc.setFontSize(16);
+  doc.setFontSize(14);
   doc.setTextColor(...GOLD_DARK);
-  doc.text(line2, PAGE_W / 2, PAGE_H * (threeLine ? 0.135 : 0.155), {
+  doc.text(line2, PAGE_W / 2, t2, {
     align: "center",
-    maxWidth: PAGE_W * 0.72,
+    maxWidth: PAGE_W * 0.76,
   });
 
   if (line3) {
     doc.setFont("times", "bold");
-    doc.setFontSize(line3.length > 28 ? 18 : 22);
+    doc.setFontSize(line3.length > 30 ? 16 : 20);
     doc.setTextColor(...ROYAL_BLUE);
-    doc.text(line3, PAGE_W / 2, PAGE_H * 0.19, {
+    doc.text(line3, PAGE_W / 2, t3, {
       align: "center",
-      maxWidth: PAGE_W * 0.72,
+      maxWidth: PAGE_W * 0.76,
     });
   }
-
-  // Soft cream footer plaque — no heavy navy bar
-  doc.setFillColor(248, 244, 236);
-  doc.setGState(doc.GState({ opacity: 0.92 }));
-  doc.roundedRect(PAGE_W * 0.18, PAGE_H * 0.88, PAGE_W * 0.64, PAGE_H * 0.08, 8, 8, "F");
-  doc.setGState(doc.GState({ opacity: 1 }));
-  doc.setDrawColor(...GOLD);
-  doc.setLineWidth(1);
-  doc.roundedRect(PAGE_W * 0.18, PAGE_H * 0.88, PAGE_W * 0.64, PAGE_H * 0.08, 8, 8, "S");
-
-  doc.setFont("times", "normal");
-  doc.setFontSize(11);
-  doc.setTextColor(...ROYAL_BLUE);
-  doc.text("Storybook Photos · Kingdom Quests", PAGE_W / 2, PAGE_H * 0.93, {
-    align: "center",
-  });
 }
 
 function drawFallbackCover(doc: jsPDF): void {
