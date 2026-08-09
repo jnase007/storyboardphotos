@@ -25,7 +25,9 @@ export const maxDuration = 800;
 type Params = { params: Promise<{ id: string }> };
 
 const bodySchema = z.object({
-  package: z.enum(["teaser", "full"]).default("full"),
+  package: z.enum(["teaser", "full"]).default("teaser"),
+  /** draft=cheap still-hold (DEFAULT); fast=Seedance Fast 720p; premium=Seedance 1080p final only */
+  quality: z.enum(["draft", "fast", "premium"]).default("draft"),
   force: z.boolean().optional(),
   generateNarrationIfMissing: z.boolean().optional().default(true),
   /** async (default): return immediately + Domino tracker; sync: wait for MP4 */
@@ -61,10 +63,11 @@ async function writeTracker(
 async function runRenderJob(options: {
   id: string;
   packageKind: "teaser" | "full";
+  quality: "draft" | "fast" | "premium";
   force?: boolean;
   generateNarrationIfMissing: boolean;
 }) {
-  const { id, packageKind, generateNarrationIfMissing } = options;
+  const { id, packageKind, quality, generateNarrationIfMissing } = options;
   const supabase = createServiceClient();
   const startedAt = new Date().toISOString();
 
@@ -91,7 +94,7 @@ async function runRenderJob(options: {
     await writeTracker(supabase, id, state, {
       video_status: status,
       video_url: step === "done" ? extra?.videoUrl ?? null : undefined,
-      video_package: packageKind,
+      video_package: `${quality}:${packageKind}`,
     });
     return state;
   };
@@ -177,6 +180,7 @@ async function runRenderJob(options: {
       pages,
       narrationUrl,
       package: packageKind,
+      quality,
       coverImageUrl,
       onProgress: (p) => {
         void (async () => {
@@ -231,7 +235,7 @@ async function runRenderJob(options: {
         video_notes: human,
         video_url: publicUrl,
         video_status: "ready",
-        video_package: packageKind,
+        video_package: `${quality}:${packageKind}`,
         video_delivered_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
@@ -244,8 +248,10 @@ async function runRenderJob(options: {
 }
 
 /**
- * Admin: start premium MP4 render.
+ * Admin: start movie render.
+ * Default quality = draft (cheap still-hold). Premium is opt-in only.
  * Default async = Domino's tracker (returns immediately, work continues).
+ * NOTE: Vercel after() is unreliable for long Seedance jobs — prefer draft/fast or local worker.
  */
 export async function POST(request: NextRequest, { params }: Params) {
   const denied = assertAdminAccess(request);
@@ -304,13 +310,14 @@ export async function POST(request: NextRequest, { params }: Params) {
     });
     await writeTracker(supabase, id, queued, {
       video_status: "in_production",
-      video_package: parsed.data.package,
+      video_package: `${parsed.data.quality}:${parsed.data.package}`,
     });
 
     if (parsed.data.mode === "sync") {
       await runRenderJob({
         id,
         packageKind: parsed.data.package,
+        quality: parsed.data.quality,
         force: parsed.data.force,
         generateNarrationIfMissing: parsed.data.generateNarrationIfMissing,
       });
@@ -324,7 +331,7 @@ export async function POST(request: NextRequest, { params }: Params) {
       return NextResponse.json({
         ...done,
         message: done?.video_url
-          ? "Premium MP4 ready"
+          ? "MP4 ready"
           : "Render finished without URL — check tracker notes",
       });
     }
@@ -334,6 +341,7 @@ export async function POST(request: NextRequest, { params }: Params) {
       runRenderJob({
         id,
         packageKind: parsed.data.package,
+        quality: parsed.data.quality,
         force: parsed.data.force,
         generateNarrationIfMissing: parsed.data.generateNarrationIfMissing,
       })

@@ -34,7 +34,7 @@ export const MOVIE_TRACKER_STEPS: Array<{
 }> = [
   { id: "queued", title: "Order in", blurb: "Movie request received" },
   { id: "prep", title: "Prep", blurb: "Bedtime narration + page lineup" },
-  { id: "oven", title: "In the oven", blurb: "Animating each page (Seedance)" },
+  { id: "oven", title: "In the oven", blurb: "Building page clips (draft or motion)" },
   { id: "quality", title: "Quality check", blurb: "Stitching cinematic clips" },
   { id: "delivery", title: "Out for delivery", blurb: "Mixing audio + packaging MP4" },
   { id: "done", title: "Delivered", blurb: "Ready to watch & download" },

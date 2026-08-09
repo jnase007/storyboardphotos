@@ -1,11 +1,16 @@
 /**
- * Premium animated storybook movie engine.
- * Target: $2–3k gift-quality mini-movie parents can download as MP4.
+ * Storybook movie engine — cost-tiered.
+ *
+ * Quality tiers:
+ * - draft   (DEFAULT): still-hold slideshow via fal ffmpeg images-to-video
+ *            pennies, good enough to review pacing + narration + end card
+ * - fast    : Seedance 2.0 Fast @ 720p, short clips — mid-cost motion preview
+ * - premium : Seedance 2.0 full @ 1080p — $2–3k heirloom final ONLY
  *
  * Pipeline:
- * 1) Page stills → Seedance 2.0 image-to-video (cinematic motion, no fake speech)
+ * 1) Page stills → motion clips (tier-dependent)
  * 2) Clip stitch via fal FFmpeg compose
- * 3) Bedtime narration (ElevenLabs URL) merged as audio track
+ * 3) Optional bedtime narration merge
  * 4) Optional upload to Supabase public storage
  */
 
@@ -13,7 +18,8 @@ import type { StoryPage } from "./types";
 import { stripRedundantTitlePages } from "./adventure-paths";
 
 const FAL_QUEUE = "https://queue.fal.run";
-const SEEDANCE_MODEL = "bytedance/seedance-2.0/image-to-video";
+const SEEDANCE_PREMIUM = "bytedance/seedance-2.0/image-to-video";
+const SEEDANCE_FAST = "bytedance/seedance-2.0/fast/image-to-video";
 const COMPOSE_MODEL = "fal-ai/ffmpeg-api/compose";
 const MERGE_AV_MODEL = "fal-ai/ffmpeg-api/merge-audio-video";
 const STILL_MODEL = "fal-ai/ffmpeg-api/images-to-video";
@@ -23,6 +29,9 @@ const MOVIE_END_CARD_URL =
   process.env.MOVIE_END_CARD_URL ||
   "https://www.storybookphotos.com/brand/movie-end-card-v3.png";
 const END_CARD_DURATION_SEC = 4;
+
+export type MovieQuality = "draft" | "fast" | "premium";
+export type MoviePackage = "teaser" | "full";
 
 function falKey(): string | null {
   return process.env.FAL_KEY ?? process.env.FAL_API_KEY ?? null;
@@ -65,7 +74,6 @@ async function falQueueResult(
   };
   const requestId = submitted.request_id;
   if (!requestId) {
-    // Some endpoints return the result inline
     if ((submitted as { video?: { url?: string } }).video?.url) {
       return submitted as Record<string, unknown>;
     }
@@ -108,6 +116,13 @@ function isHttpUrl(u?: string | null): u is string {
   return Boolean(u && /^https?:\/\//i.test(u));
 }
 
+function extractVideoUrl(result: Record<string, unknown>): string | null {
+  const url =
+    (result as { video?: { url?: string } }).video?.url ||
+    (result as { video_url?: string }).video_url;
+  return typeof url === "string" && url ? url : null;
+}
+
 /** Motion direction per page — gentle storybook cinema, face-safe. */
 export function buildMotionPrompt(
   page: StoryPage,
@@ -128,12 +143,93 @@ export function buildMotionPrompt(
   ].join(" ");
 }
 
-function pageDurationSec(page: StoryPage, packageKind: "teaser" | "full"): number {
+function pageDurationSec(
+  page: StoryPage,
+  packageKind: MoviePackage,
+  quality: MovieQuality
+): number {
   const words = (page.text || "").trim().split(/\s+/).filter(Boolean).length;
-  // ~130 wpm narration + breathing room for cinematic holds
+  // ~130 wpm narration + breathing room
   const fromWords = Math.ceil((words / 130) * 60) + 2;
+
+  if (quality === "draft") {
+    const base = packageKind === "teaser" ? 4 : 5;
+    return Math.min(8, Math.max(base, Math.min(fromWords, 7)));
+  }
+  if (quality === "fast") {
+    const base = packageKind === "teaser" ? 4 : 5;
+    return Math.min(8, Math.max(base, Math.min(fromWords, 7)));
+  }
+  // premium
   const base = packageKind === "teaser" ? 6 : 8;
   return Math.min(12, Math.max(base, fromWords));
+}
+
+function selectPages(
+  all: StoryPage[],
+  packageKind: MoviePackage,
+  quality: MovieQuality,
+  notes: string[]
+): StoryPage[] {
+  let pages = all;
+
+  if (quality === "draft") {
+    // Cheap review cut: max 6 beats
+    if (packageKind === "teaser" || pages.length > 6) {
+      const max = packageKind === "teaser" ? 5 : 6;
+      if (pages.length > max) {
+        const idxs = [
+          0,
+          Math.floor(pages.length * 0.25),
+          Math.floor(pages.length * 0.5),
+          Math.floor(pages.length * 0.75),
+          pages.length - 1,
+        ];
+        if (max >= 6) idxs.splice(3, 0, Math.floor(pages.length * 0.62));
+        const uniq = [...new Set(idxs)].sort((a, b) => a - b).slice(0, max);
+        pages = uniq.map((i) => pages[i]);
+        notes.push(`Draft package: ${pages.length} still-hold beats (cheap)`);
+      }
+    }
+    return pages;
+  }
+
+  if (quality === "fast") {
+    if (packageKind === "teaser" && pages.length > 5) {
+      const idxs = [
+        0,
+        Math.floor(pages.length * 0.3),
+        Math.floor(pages.length * 0.55),
+        Math.floor(pages.length * 0.8),
+        pages.length - 1,
+      ];
+      const uniq = [...new Set(idxs)].sort((a, b) => a - b);
+      pages = uniq.map((i) => pages[i]);
+      notes.push(`Fast teaser: ${pages.length} motion beats @ 720p`);
+    } else if (pages.length > 8) {
+      pages = pages.slice(0, 8);
+      notes.push("Fast full capped at 8 animated pages");
+    }
+    return pages;
+  }
+
+  // premium
+  if (packageKind === "teaser" && pages.length > 5) {
+    const idxs = [
+      0,
+      Math.floor(pages.length * 0.3),
+      Math.floor(pages.length * 0.55),
+      Math.floor(pages.length * 0.8),
+      pages.length - 1,
+    ];
+    const uniq = [...new Set(idxs)].sort((a, b) => a - b);
+    pages = uniq.map((i) => pages[i]);
+    notes.push(`Premium teaser: ${pages.length} hero beats`);
+  } else if (pages.length > 10) {
+    pages = pages.slice(0, 10);
+    notes.push("Premium full capped at 10 animated pages for runtime");
+  }
+  return pages;
 }
 
 export type RenderMovieProgress = {
@@ -149,30 +245,132 @@ export type RenderMovieResult = {
   silentVideoUrl?: string;
   pagesUsed: number;
   provider: string;
+  quality: MovieQuality;
   notes: string[];
 };
 
+async function stillHoldClip(
+  imageUrl: string,
+  durationSec: number
+): Promise<string> {
+  const still = await falQueueResult(
+    STILL_MODEL,
+    {
+      fps: 24,
+      images: [
+        {
+          url: imageUrl,
+          frames: Math.round(durationSec * 24),
+        },
+      ],
+    },
+    { timeoutMs: 5 * 60_000 }
+  );
+  const url = extractVideoUrl(still);
+  if (!url) throw new Error("still hold missing url");
+  return url;
+}
+
+async function animatePage(options: {
+  page: StoryPage;
+  childName: string;
+  role: "King" | "Queen";
+  duration: number;
+  quality: MovieQuality;
+  notes: string[];
+  index: number;
+}): Promise<string | null> {
+  const { page, childName, role, duration, quality, notes, index } = options;
+
+  // DRAFT: still-hold only (pennies)
+  if (quality === "draft") {
+    try {
+      const url = await stillHoldClip(page.imageUrl!, duration);
+      notes.push(`clip ${index + 1}: draft still-hold (${duration}s)`);
+      return url;
+    } catch (err) {
+      notes.push(
+        `clip ${index + 1} draft failed: ${err instanceof Error ? err.message : String(err)}`
+      );
+      return null;
+    }
+  }
+
+  const model = quality === "fast" ? SEEDANCE_FAST : SEEDANCE_PREMIUM;
+  const prompt = buildMotionPrompt(page, childName, role);
+  const resolution = quality === "fast" ? "720p" : "1080p";
+
+  try {
+    const input: Record<string, unknown> = {
+      prompt,
+      image_url: page.imageUrl,
+      resolution,
+      duration: String(Math.min(12, Math.max(4, duration))),
+      aspect_ratio: "16:9",
+      generate_audio: false,
+      bitrate_mode: quality === "premium" ? "high" : "standard",
+    };
+
+    const result = await falQueueResult(model, input, {
+      timeoutMs: quality === "premium" ? 15 * 60_000 : 10 * 60_000,
+      pollMs: 3000,
+    });
+    const url = extractVideoUrl(result);
+    if (!url) throw new Error(`No video url for page ${index + 1}`);
+    notes.push(
+      `clip ${index + 1}: ${quality === "fast" ? "Seedance Fast" : "Seedance"} ok (${duration}s ${resolution})`
+    );
+    return url;
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    notes.push(
+      `clip ${index + 1} ${quality} failed → still hold: ${msg.slice(0, 120)}`
+    );
+    try {
+      const url = await stillHoldClip(page.imageUrl!, duration);
+      notes.push(`clip ${index + 1}: still-hold fallback (${duration}s)`);
+      return url;
+    } catch (e2) {
+      notes.push(
+        `clip ${index + 1} dropped: ${e2 instanceof Error ? e2.message : String(e2)}`
+      );
+      return null;
+    }
+  }
+}
+
 /**
  * Render a downloadable MP4 from storybook pages.
- * Uses Seedance 2.0 per page + FFmpeg stitch + optional narration merge.
+ * Default quality = draft (cheap still-hold). Premium is opt-in only.
  */
 export async function renderPremiumStoryMovie(options: {
   childName: string;
   gender: string;
   pages: StoryPage[];
   narrationUrl?: string | null;
-  package?: "teaser" | "full";
+  package?: MoviePackage;
+  /** draft (default) | fast | premium */
+  quality?: MovieQuality;
   coverImageUrl?: string | null;
   onProgress?: (p: RenderMovieProgress) => void;
 }): Promise<RenderMovieResult> {
   const key = falKey();
   if (!key) {
-    throw new Error("FAL_KEY / FAL_API_KEY required for premium movie render");
+    throw new Error("FAL_KEY / FAL_API_KEY required for movie render");
   }
 
   const role = options.gender === "girl" ? "Queen" : "King";
-  const packageKind = options.package ?? "full";
-  const notes: string[] = [];
+  const packageKind = options.package ?? "teaser";
+  const quality: MovieQuality = options.quality ?? "draft";
+  const notes: string[] = [
+    `quality=${quality}`,
+    `package=${packageKind}`,
+    quality === "draft"
+      ? "COST MODE: still-hold draft (cheap). Not Seedance."
+      : quality === "fast"
+        ? "COST MODE: Seedance Fast 720p mid-tier."
+        : "COST MODE: Seedance 2.0 1080p PREMIUM — expensive final only.",
+  ];
 
   let pages = stripRedundantTitlePages(options.pages || []).filter((p) =>
     isHttpUrl(p.imageUrl)
@@ -182,30 +380,19 @@ export async function renderPremiumStoryMovie(options: {
     throw new Error("No page images available to animate");
   }
 
-  // Teaser = first + middle + climax + ending (max 5)
-  if (packageKind === "teaser" && pages.length > 5) {
-    const idxs = [
-      0,
-      Math.floor(pages.length * 0.3),
-      Math.floor(pages.length * 0.55),
-      Math.floor(pages.length * 0.8),
-      pages.length - 1,
-    ];
-    const uniq = [...new Set(idxs)].sort((a, b) => a - b);
-    pages = uniq.map((i) => pages[i]);
-    notes.push(`Teaser package: ${pages.length} hero beats`);
-  }
-
-  // Soft cap full movie cost/time (still premium length)
-  if (packageKind === "full" && pages.length > 10) {
-    pages = pages.slice(0, 10);
-    notes.push("Full package capped at 10 animated pages for runtime");
-  }
+  pages = selectPages(pages, packageKind, quality, notes);
 
   const onProgress = options.onProgress ?? (() => undefined);
+  const motionLabel =
+    quality === "draft"
+      ? "still-hold draft"
+      : quality === "fast"
+        ? "Seedance Fast"
+        : "Seedance premium";
+
   onProgress({
     stage: "animating",
-    detail: `Seedance motion on ${pages.length} pages`,
+    detail: `${motionLabel} on ${pages.length} pages`,
     clipsDone: 0,
     clipsTotal: pages.length,
   });
@@ -213,74 +400,30 @@ export async function renderPremiumStoryMovie(options: {
   const clipUrls: string[] = [];
   const clipDurationsMs: number[] = [];
 
-  // Animate pages sequentially for stability (Seedance is heavy)
   for (let i = 0; i < pages.length; i++) {
     const page = pages[i];
-    const duration = pageDurationSec(page, packageKind);
-    const prompt = buildMotionPrompt(page, options.childName, role);
+    const duration = pageDurationSec(page, packageKind, quality);
 
     onProgress({
       stage: "animating",
-      detail: `Page ${i + 1}/${pages.length}: ${page.title || "scene"}`,
+      detail: `Page ${i + 1}/${pages.length}: ${page.title || "scene"} (${quality})`,
       clipsDone: i,
       clipsTotal: pages.length,
     });
 
-    try {
-      const result = await falQueueResult(
-        SEEDANCE_MODEL,
-        {
-          prompt,
-          image_url: page.imageUrl,
-          resolution: "1080p",
-          duration: String(Math.min(12, Math.max(5, duration))),
-          aspect_ratio: "16:9",
-          // Narration is separate ElevenLabs track — avoid model speech
-          generate_audio: false,
-          bitrate_mode: "high",
-        },
-        { timeoutMs: 15 * 60_000, pollMs: 3000 }
-      );
+    const url = await animatePage({
+      page,
+      childName: options.childName,
+      role,
+      duration,
+      quality,
+      notes,
+      index: i,
+    });
 
-      const url =
-        (result as { video?: { url?: string } }).video?.url ||
-        (result as { video_url?: string }).video_url;
-
-      if (!url || typeof url !== "string") {
-        throw new Error(`No video url for page ${i + 1}`);
-      }
+    if (url) {
       clipUrls.push(url);
       clipDurationsMs.push(duration * 1000);
-      notes.push(`clip ${i + 1}: Seedance ok (${duration}s)`);
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      notes.push(`clip ${i + 1} Seedance failed → still hold: ${msg.slice(0, 120)}`);
-      // Fallback: hold still as single-frame clip via images-to-video
-      try {
-        const still = await falQueueResult(
-          STILL_MODEL,
-          {
-            fps: 24,
-            images: [
-              {
-                url: page.imageUrl,
-                frames: Math.round(duration * 24),
-              },
-            ],
-          },
-          { timeoutMs: 5 * 60_000 }
-        );
-        const stillUrl =
-          (still as { video?: { url?: string } }).video?.url ||
-          (still as { video_url?: string }).video_url;
-        if (!stillUrl) throw new Error("still fallback missing url");
-        clipUrls.push(stillUrl);
-        clipDurationsMs.push(duration * 1000);
-      } catch (e2) {
-        notes.push(
-          `clip ${i + 1} dropped: ${e2 instanceof Error ? e2.message : String(e2)}`
-        );
-      }
     }
 
     onProgress({
@@ -303,29 +446,10 @@ export async function renderPremiumStoryMovie(options: {
       clipsDone: clipUrls.length,
       clipsTotal: pages.length + 1,
     });
-    const endStill = await falQueueResult(
-      STILL_MODEL,
-      {
-        fps: 24,
-        images: [
-          {
-            url: MOVIE_END_CARD_URL,
-            frames: Math.round(END_CARD_DURATION_SEC * 24),
-          },
-        ],
-      },
-      { timeoutMs: 5 * 60_000 }
-    );
-    const endUrl =
-      (endStill as { video?: { url?: string } }).video?.url ||
-      (endStill as { video_url?: string }).video_url;
-    if (endUrl && typeof endUrl === "string") {
-      clipUrls.push(endUrl);
-      clipDurationsMs.push(END_CARD_DURATION_SEC * 1000);
-      notes.push(`end card: Storybook Photos logo (${END_CARD_DURATION_SEC}s)`);
-    } else {
-      notes.push("end card skipped: no still url");
-    }
+    const endUrl = await stillHoldClip(MOVIE_END_CARD_URL, END_CARD_DURATION_SEC);
+    clipUrls.push(endUrl);
+    clipDurationsMs.push(END_CARD_DURATION_SEC * 1000);
+    notes.push(`end card: Storybook Photos logo (${END_CARD_DURATION_SEC}s)`);
   } catch (err) {
     notes.push(
       `end card skipped: ${err instanceof Error ? err.message : String(err)}`
@@ -334,7 +458,6 @@ export async function renderPremiumStoryMovie(options: {
 
   onProgress({ stage: "stitching", detail: `Composing ${clipUrls.length} clips` });
 
-  // Compose video track from clips (sequential keyframes)
   let timestamp = 0;
   const videoKeyframes = clipUrls.map((url, i) => {
     const duration = clipDurationsMs[i] ?? 8000;
@@ -355,7 +478,6 @@ export async function renderPremiumStoryMovie(options: {
     },
   ];
 
-  // If narration exists, lay it under the full timeline
   if (isHttpUrl(options.narrationUrl)) {
     tracks.push({
       id: "narration",
@@ -378,10 +500,7 @@ export async function renderPremiumStoryMovie(options: {
       { tracks },
       { timeoutMs: 10 * 60_000, pollMs: 2500 }
     );
-    silentOrFullUrl =
-      (composed as { video_url?: string }).video_url ||
-      (composed as { video?: { url?: string } }).video?.url ||
-      null;
+    silentOrFullUrl = extractVideoUrl(composed);
     if (!silentOrFullUrl) {
       throw new Error("compose returned no video_url");
     }
@@ -389,17 +508,15 @@ export async function renderPremiumStoryMovie(options: {
     notes.push(
       `compose failed: ${err instanceof Error ? err.message : String(err)}`
     );
-    // Fallback: return first clip if compose fails
     silentOrFullUrl = clipUrls[0];
   }
 
   let finalUrl = silentOrFullUrl;
 
-  // If compose didn't take audio (or audio failed), try explicit merge
   if (
     isHttpUrl(options.narrationUrl) &&
     finalUrl &&
-    !notes.some((n) => n.includes("Narration track included") && !n.includes("failed"))
+    !notes.some((n) => n.includes("Narration track included"))
   ) {
     try {
       onProgress({ stage: "audio", detail: "Merging bedtime narration" });
@@ -411,9 +528,7 @@ export async function renderPremiumStoryMovie(options: {
         },
         { timeoutMs: 8 * 60_000 }
       );
-      const murl =
-        (merged as { video?: { url?: string } }).video?.url ||
-        (merged as { video_url?: string }).video_url;
+      const murl = extractVideoUrl(merged);
       if (murl) {
         finalUrl = murl;
         notes.push("Narration merged via merge-audio-video");
@@ -431,12 +546,20 @@ export async function renderPremiumStoryMovie(options: {
 
   onProgress({ stage: "done", detail: finalUrl });
 
+  const provider =
+    quality === "draft"
+      ? "draft-still-hold+ffmpeg"
+      : quality === "fast"
+        ? "seedance-fast-720p+ffmpeg"
+        : "seedance-2.0-1080p+ffmpeg";
+
   return {
     videoUrl: finalUrl,
     clipUrls,
     silentVideoUrl: silentOrFullUrl || undefined,
     pagesUsed: pages.length,
-    provider: "seedance-2.0+ffmpeg",
+    provider,
+    quality,
     notes,
   };
 }

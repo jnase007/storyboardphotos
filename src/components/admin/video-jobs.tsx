@@ -3,15 +3,15 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
-  Copy,
   ExternalLink,
   Film,
   Loader2,
-  Mic,
   RefreshCw,
-  Save,
   Sparkles,
   Trash2,
+  AlertTriangle,
+  Play,
+  CheckCircle2,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -39,120 +39,88 @@ type Job = {
   page_count: number;
   page_images: string[];
   preview_image?: string | null;
+  updated_at?: string | null;
 };
 
-function DominoTracker({ tracker }: { tracker: MovieTrackerState }) {
+type Quality = "draft" | "fast" | "premium";
+
+function minutesAgo(iso?: string | null): number | null {
+  if (!iso) return null;
+  const t = new Date(iso).getTime();
+  if (Number.isNaN(t)) return null;
+  return Math.floor((Date.now() - t) / 60000);
+}
+
+function jobState(job: Job): {
+  kind: "ready" | "cooking" | "stuck" | "queued" | "other";
+  label: string;
+  color: string;
+} {
+  if (job.video_url || job.video_status === "ready" || job.video_status === "delivered") {
+    return { kind: "ready", label: "Ready to watch", color: "#047857" };
+  }
+  if (job.video_status === "in_production") {
+    const tracker = parseMovieTracker(job.video_notes);
+    const age =
+      minutesAgo(tracker?.updatedAt) ??
+      minutesAgo(tracker?.startedAt) ??
+      minutesAgo(job.video_requested_at) ??
+      minutesAgo(job.updated_at);
+    // Vercel after() dies often — treat long cooks with no URL as stuck
+    if (age != null && age >= 25) {
+      return {
+        kind: "stuck",
+        label: `Stuck · ${age}m (server timed out)`,
+        color: "#b91c1c",
+      };
+    }
+    return {
+      kind: "cooking",
+      label: age != null ? `Making movie · ${age}m` : "Making movie…",
+      color: "#B98A19",
+    };
+  }
+  if (job.video_status === "requested" || job.video_status === "paid") {
+    return { kind: "queued", label: "Waiting for movie", color: "#1d4ed8" };
+  }
+  return { kind: "other", label: job.video_status || "—", color: "#6b7280" };
+}
+
+function SimpleTracker({ tracker }: { tracker: MovieTrackerState }) {
   const failed = tracker.step === "failed";
-  const activeIdx = MOVIE_TRACKER_STEPS.findIndex((s) => s.id === tracker.step);
-  const idx = failed ? -1 : activeIdx < 0 ? 0 : activeIdx;
-
   return (
-    <div
-      className="mt-4 rounded-2xl border p-4"
-      style={{
-        borderColor: failed ? "#fecaca" : "#f5e6c8",
-        background: failed
-          ? "linear-gradient(135deg,#fff5f5,#fff)"
-          : "linear-gradient(135deg,#fffaf0,#ffffff)",
-      }}
-    >
-      <div className="flex items-center justify-between gap-3 mb-3">
-        <div>
-          <p className="text-sm font-bold text-gray-900">
-            🍕 Pizza Tracker · {failed ? "Kitchen issue" : tracker.label}
-          </p>
-          <p className="text-xs text-gray-500 mt-0.5">
-            {tracker.detail ||
-              (failed
-                ? tracker.error || "Render failed"
-                : "Your kingdom movie is cooking…")}
-            {typeof tracker.clipsDone === "number" &&
-            typeof tracker.clipsTotal === "number" &&
-            tracker.clipsTotal > 0
-              ? ` · page ${tracker.clipsDone}/${tracker.clipsTotal}`
-              : ""}
-          </p>
-        </div>
-        <div className="text-right shrink-0">
-          <p
-            className="text-2xl font-black tabular-nums"
-            style={{ color: failed ? "#b91c1c" : "#B98A19" }}
-          >
-            {failed ? "—" : `${tracker.pct}%`}
-          </p>
-          <p className="text-[10px] uppercase tracking-wide text-gray-400">
-            complete
-          </p>
-        </div>
+    <div className="mt-3 rounded-xl border border-amber-100 bg-amber-50/60 px-3 py-2">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-sm font-semibold text-gray-800">
+          {failed ? "Failed" : tracker.label}
+          {tracker.detail ? ` · ${tracker.detail}` : ""}
+        </p>
+        <p className="text-sm font-black tabular-nums" style={{ color: "#B98A19" }}>
+          {failed ? "—" : `${tracker.pct}%`}
+        </p>
       </div>
-
-      <div className="h-2.5 rounded-full bg-gray-100 overflow-hidden mb-4">
+      <div className="mt-2 h-2 rounded-full bg-white overflow-hidden">
         <div
-          className="h-full rounded-full transition-all duration-700"
+          className="h-full rounded-full"
           style={{
             width: `${failed ? 100 : Math.max(4, tracker.pct)}%`,
             background: failed
-              ? "linear-gradient(90deg,#ef4444,#f97316)"
-              : "linear-gradient(90deg,#B98A19,#e8c56a,#B98A19)",
+              ? "#ef4444"
+              : "linear-gradient(90deg,#B98A19,#e8c56a)",
           }}
         />
-      </div>
-
-      <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-        {MOVIE_TRACKER_STEPS.map((s, i) => {
-          const done = !failed && (tracker.step === "done" || i < idx);
-          const current = !failed && i === idx;
-          return (
-            <div key={s.id} className="text-center">
-              <div
-                className="mx-auto w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border-2 mb-1"
-                style={{
-                  borderColor: done || current ? "#B98A19" : "#e5e7eb",
-                  background: done
-                    ? "#B98A19"
-                    : current
-                      ? "#fff7e6"
-                      : "#fff",
-                  color: done ? "#fff" : current ? "#B98A19" : "#9ca3af",
-                  boxShadow: current ? "0 0 0 4px rgba(185,138,25,0.15)" : undefined,
-                }}
-              >
-                {done ? "✓" : i + 1}
-              </div>
-              <p
-                className="text-[10px] font-semibold leading-tight"
-                style={{ color: done || current ? "#0A1628" : "#9ca3af" }}
-              >
-                {s.title}
-              </p>
-            </div>
-          );
-        })}
       </div>
     </div>
   );
 }
 
-const STATUSES = [
-  "requested",
-  "paid",
-  "in_production",
-  "ready",
-  "delivered",
-  "cancelled",
-] as const;
-
 export function VideoJobsPanel() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [savingId, setSavingId] = useState<string | null>(null);
-  const [narratingId, setNarratingId] = useState<string | null>(null);
-  const [renderingId, setRenderingId] = useState<string | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [drafts, setDrafts] = useState<
-    Record<string, { status: string; url: string; notes: string }>
-  >({});
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [showAdvanced, setShowAdvanced] = useState<Record<string, boolean>>({});
+  const [urlDrafts, setUrlDrafts] = useState<Record<string, string>>({});
 
   async function load() {
     setLoading(true);
@@ -165,16 +133,9 @@ export function VideoJobsPanel() {
       if (!res.ok) throw new Error(data.error || "Failed to load");
       const list = (data.jobs ?? []) as Job[];
       setJobs(list);
-      const next: typeof drafts = {};
-      for (const j of list) {
-        next[j.id] = {
-          status: j.video_status || "requested",
-          url: j.video_url || "",
-          notes: j.video_notes || "",
-        };
-      }
-      setDrafts(next);
-      if (data.hint) toast.message(data.hint);
+      const next: Record<string, string> = {};
+      for (const j of list) next[j.id] = j.video_url || "";
+      setUrlDrafts(next);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Load failed");
     } finally {
@@ -186,120 +147,39 @@ export function VideoJobsPanel() {
     load();
   }, []);
 
-  // Domino's-style auto refresh while anything is in the oven
   const cooking = useMemo(
-    () => jobs.some((j) => j.video_status === "in_production"),
+    () => jobs.some((j) => j.video_status === "in_production" && !j.video_url),
     [jobs]
   );
   useEffect(() => {
     if (!cooking) return;
     const t = setInterval(() => {
       void load();
-    }, 8000);
+    }, 10000);
     return () => clearInterval(t);
   }, [cooking]);
 
-  async function saveJob(id: string) {
-    const d = drafts[id];
-    if (!d) return;
-    setSavingId(id);
-    try {
-      const res = await fetch(`/api/storybooks/${id}/video`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          "x-admin-code": ADMIN_CODE,
-        },
-        body: JSON.stringify({
-          video_status: d.status,
-          video_url: d.url || null,
-          video_notes: d.notes || null,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Save failed");
-      toast.success("Saved");
-      await load();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Save failed");
-    } finally {
-      setSavingId(null);
-    }
-  }
+  async function makeMovie(id: string, quality: Quality, force = false) {
+    const labels: Record<Quality, string> = {
+      draft: "Cheap preview (pennies)",
+      fast: "Better motion (~$ few)",
+      premium: "Premium final (EXPENSIVE)",
+    };
 
-  async function generateNarration(id: string) {
-    setNarratingId(id);
-    try {
-      const res = await fetch(`/api/storybooks/${id}/narrate`, {
-        method: "POST",
-        headers: { "x-admin-code": ADMIN_CODE },
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || data.hint || "Narration failed");
-      toast.success("Narration ready");
-      await load();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Narration failed");
-    } finally {
-      setNarratingId(null);
-    }
-  }
-
-  async function deleteJob(job: Job, mode: "queue" | "book" = "queue") {
-    const role = job.gender === "boy" ? "King" : "Queen";
-    const label = `${role} ${job.child_name}`;
-    if (mode === "book") {
+    if (quality === "premium") {
       const ok = window.confirm(
-        `Delete entire storybook for ${label}?\n\nThis removes the book + movie job forever.`
+        "Premium Seedance 1080p is EXPENSIVE.\n\nOnly use this for a sold $2–3k movie.\n\nContinue?"
       );
       if (!ok) return;
-    } else {
+    } else if (quality === "fast") {
       const ok = window.confirm(
-        `Remove ${label} from the Movie Queue?\n\nBook stays — only the movie job is cleared.`
+        "Seedance Fast costs real money (less than premium).\n\nUse for a nicer sample, not endless testing.\n\nContinue?"
       );
       if (!ok) return;
     }
 
-    setDeletingId(job.id);
-    try {
-      if (mode === "book") {
-        const res = await fetch(`/api/admin/storybooks/${job.id}`, {
-          method: "DELETE",
-          headers: { "x-admin-code": ADMIN_CODE },
-        });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data.error || "Delete failed");
-        toast.success(`Deleted ${label}`);
-      } else {
-        // Soft-remove from queue only
-        const res = await fetch(`/api/storybooks/${job.id}/video`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            "x-admin-code": ADMIN_CODE,
-          },
-          body: JSON.stringify({
-            video_status: "none",
-            video_url: null,
-            video_notes: null,
-            video_package: null,
-          }),
-        });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data.error || "Could not clear queue item");
-        toast.success(`Removed ${label} from queue`);
-      }
-      await load();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Delete failed");
-    } finally {
-      setDeletingId(null);
-    }
-  }
-
-  async function renderPremiumMovie(id: string, force = false) {
-    setRenderingId(id);
-    toast.message("Order in 🍕 Domino tracker starting…");
+    setBusyId(id);
+    toast.message(`Starting ${labels[quality]}…`);
     try {
       const res = await fetch(`/api/admin/storybooks/${id}/render-movie`, {
         method: "POST",
@@ -308,9 +188,11 @@ export function VideoJobsPanel() {
           "x-admin-code": ADMIN_CODE,
         },
         body: JSON.stringify({
-          package: "full",
+          package: quality === "draft" ? "teaser" : "teaser",
+          quality,
           force,
-          generateNarrationIfMissing: true,
+          // narration off for draft to avoid ElevenLabs 401 blocking cheap path
+          generateNarrationIfMissing: quality !== "draft",
           mode: "async",
         }),
       });
@@ -320,47 +202,125 @@ export function VideoJobsPanel() {
       }
       if (data.reused) toast.success("Movie already ready");
       else if (data.video_url) toast.success("MP4 ready");
-      else toast.success("In the oven — watch the pizza tracker");
+      else toast.success("Cooking — this page will refresh");
       await load();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Render failed");
       await load();
     } finally {
-      setRenderingId(null);
+      setBusyId(null);
     }
   }
 
-  function copyImages(job: Job) {
-    const text = job.page_images.join("\n");
-    navigator.clipboard.writeText(text || "(no images)");
-    toast.success("Page image URLs copied");
+  async function markStuckFailed(job: Job) {
+    setBusyId(job.id);
+    try {
+      const res = await fetch(`/api/storybooks/${job.id}/video`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-code": ADMIN_CODE,
+        },
+        body: JSON.stringify({
+          video_status: "requested",
+          video_notes:
+            "STUCK cleared — previous Vercel render died mid-job. Make a cheap preview again.",
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Could not clear stuck job");
+      toast.success("Unstuck — ready to try again");
+      await load();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Clear failed");
+    } finally {
+      setBusyId(null);
+    }
   }
 
-  function copyScript(job: Job) {
-    navigator.clipboard.writeText(job.narration_script || "");
-    toast.success("Narration script copied");
+  async function removeFromQueue(job: Job) {
+    const role = job.gender === "boy" ? "King" : "Queen";
+    const ok = window.confirm(
+      `Remove ${role} ${job.child_name} from the movie queue?\n\nBook stays.`
+    );
+    if (!ok) return;
+    setBusyId(job.id);
+    try {
+      const res = await fetch(`/api/storybooks/${job.id}/video`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-code": ADMIN_CODE,
+        },
+        body: JSON.stringify({
+          video_status: "none",
+          video_url: null,
+          video_notes: null,
+          video_package: null,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Could not remove");
+      toast.success("Removed from queue");
+      await load();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Remove failed");
+    } finally {
+      setBusyId(null);
+    }
   }
+
+  async function saveManualUrl(job: Job) {
+    const url = (urlDrafts[job.id] || "").trim();
+    if (!url) {
+      toast.error("Paste an MP4 URL first");
+      return;
+    }
+    setBusyId(job.id);
+    try {
+      const res = await fetch(`/api/storybooks/${job.id}/video`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-code": ADMIN_CODE,
+        },
+        body: JSON.stringify({
+          video_status: "ready",
+          video_url: url,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Save failed");
+      toast.success("Movie marked ready");
+      await load();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Save failed");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  const stuckCount = jobs.filter((j) => jobState(j).kind === "stuck").length;
 
   return (
-    <div className="min-h-screen px-6 pb-10 pt-24 md:pt-28" style={{ background: "#F8F4EC" }}>
-      <div className="max-w-5xl mx-auto">
-        <div className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-start sm:justify-between">
-          <div className="min-w-0 flex-1">
+    <div
+      className="min-h-screen px-6 pb-10 pt-24 md:pt-28"
+      style={{ background: "#F8F4EC" }}
+    >
+      <div className="max-w-3xl mx-auto">
+        <div className="flex items-start justify-between gap-4 mb-6">
+          <div>
             <h1 className="text-3xl font-bold" style={{ color: "#0A1628" }}>
-              🎬 Animated Movie Queue
+              Movies
             </h1>
-            <p className="text-gray-500 mt-1">
-              Premium movie ($2–3k gift tier): Seedance animates each page → stitch
-              → ElevenLabs narration → downloadable MP4.
-            </p>
-            <p className="text-xs text-emerald-800 mt-1 max-w-xl">
-              Tap <strong>Render premium MP4</strong> on a job (10–25 min). Or paste
-              a Final MP4 URL manually. Slideshow is only a temporary preview.
+            <p className="text-gray-600 mt-1 text-sm max-w-md">
+              Simple path: make a <strong>cheap preview</strong> first. Only use
+              better/premium when you love the book.
             </p>
           </div>
           <button
             onClick={load}
-            className="inline-flex shrink-0 self-start items-center gap-2 px-4 py-2 rounded-lg text-white font-semibold shadow-sm"
+            className="inline-flex shrink-0 items-center gap-2 px-4 py-2 rounded-lg text-white font-semibold shadow-sm"
             style={{ background: "linear-gradient(135deg, #B98A19, #d4a843)" }}
           >
             <RefreshCw className="w-4 h-4" />
@@ -368,78 +328,68 @@ export function VideoJobsPanel() {
           </button>
         </div>
 
+        {stuckCount > 0 ? (
+          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 flex gap-3 items-start">
+            <AlertTriangle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-bold text-red-800">
+                {stuckCount} movie{stuckCount > 1 ? "s" : ""} stuck
+              </p>
+              <p className="text-sm text-red-700">
+                Server died mid-render (common on long Seedance jobs). Tap{" "}
+                <strong>Unstick</strong>, then <strong>Cheap preview</strong>.
+              </p>
+            </div>
+          </div>
+        ) : null}
+
+        <div className="mb-6 rounded-xl border border-emerald-100 bg-white px-4 py-3 text-sm text-gray-700">
+          <p className="font-semibold text-gray-900 mb-1">How to use</p>
+          <ol className="list-decimal ml-5 space-y-1">
+            <li>
+              <strong>Cheap preview</strong> — still slideshow + end logo (~pennies)
+            </li>
+            <li>
+              <strong>Better motion</strong> — short Seedance Fast sample (costs $)
+            </li>
+            <li>
+              <strong>Premium final</strong> — only for paid $2–3k movies
+            </li>
+          </ol>
+        </div>
+
         {loading ? (
           <div className="text-center py-20 text-gray-400 flex flex-col items-center gap-3">
             <Loader2 className="w-6 h-6 animate-spin" />
-            Loading jobs…
+            Loading…
           </div>
         ) : error ? (
-          <div className="text-center py-16 max-w-2xl mx-auto">
+          <div className="text-center py-16">
             <p className="text-red-500 mb-2">{error}</p>
-            <p className="text-sm text-gray-600 mb-3">
-              One-time Supabase setup needed. Open SQL Editor and run the migration
-              below (adds video + narration columns).
-            </p>
-            <a
-              href="https://supabase.com/dashboard/project/cpnnztrqgbxledbikpqt/sql/new"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold text-white mb-3"
-              style={{ background: "#0A1628" }}
-            >
-              Open Supabase SQL Editor
-            </a>
-            <button
-              onClick={() => {
-                const sql = `ALTER TABLE public.storybooks ADD COLUMN IF NOT EXISTS video_status TEXT NOT NULL DEFAULT 'none';
-ALTER TABLE public.storybooks ADD COLUMN IF NOT EXISTS video_url TEXT;
-ALTER TABLE public.storybooks ADD COLUMN IF NOT EXISTS video_requested_at TIMESTAMPTZ;
-ALTER TABLE public.storybooks ADD COLUMN IF NOT EXISTS video_delivered_at TIMESTAMPTZ;
-ALTER TABLE public.storybooks ADD COLUMN IF NOT EXISTS video_package TEXT;
-ALTER TABLE public.storybooks ADD COLUMN IF NOT EXISTS video_notes TEXT;
-ALTER TABLE public.storybooks ADD COLUMN IF NOT EXISTS video_contact_email TEXT;
-ALTER TABLE public.storybooks ADD COLUMN IF NOT EXISTS video_contact_name TEXT;
-ALTER TABLE public.storybooks ADD COLUMN IF NOT EXISTS narration_url TEXT;
-ALTER TABLE public.storybooks ADD COLUMN IF NOT EXISTS narration_script TEXT;
-CREATE INDEX IF NOT EXISTS idx_storybooks_video_status ON public.storybooks(video_status);`;
-                navigator.clipboard.writeText(sql);
-                toast.success("SQL copied — paste in Supabase SQL Editor");
-              }}
-              className="block mx-auto text-amber-700 font-semibold mb-2"
-            >
-              Copy SQL migration
-            </button>
-            <button onClick={load} className="text-gray-500 text-sm hover:underline">
-              Try again after running SQL
+            <button onClick={load} className="text-sm text-gray-600 underline">
+              Try again
             </button>
           </div>
         ) : jobs.length === 0 ? (
           <div className="text-center py-20 text-gray-500">
             <Film className="w-12 h-12 mx-auto mb-3 opacity-40" />
-            No movie requests yet. Parents tap “Animate my book” on a share
-            link.
+            No movie requests yet.
           </div>
         ) : (
           <div className="grid gap-4">
             {jobs.map((job) => {
               const role = job.gender === "boy" ? "King" : "Queen";
-              const d = drafts[job.id] || {
-                status: job.video_status,
-                url: job.video_url || "",
-                notes: "",
-              };
+              const state = jobState(job);
               const tracker = parseMovieTracker(job.video_notes);
-              const showTracker =
-                Boolean(tracker) &&
-                (job.video_status === "in_production" ||
-                  tracker?.step === "failed" ||
-                  (tracker?.step === "done" && !job.video_url));
+              const busy = busyId === job.id;
+              const advanced = Boolean(showAdvanced[job.id]);
+
               return (
                 <div
                   key={job.id}
                   className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5"
                 >
-                  <div className="flex gap-4 items-start">
+                  <div className="flex gap-4">
                     <div
                       className="w-16 h-20 rounded-lg overflow-hidden shrink-0"
                       style={{ background: "#0A1628" }}
@@ -457,205 +407,217 @@ CREATE INDEX IF NOT EXISTS idx_storybooks_video_status ON public.storybooks(vide
                         </div>
                       )}
                     </div>
+
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-lg text-gray-900">
-                        {role} {job.child_name}
-                      </h3>
-                      <p className="text-sm text-gray-500">
-                        Age {job.child_age} · {job.page_count} pages ·{" "}
-                        {job.video_package || "full"}
-                        {job.video_requested_at
-                          ? ` · requested ${new Date(
-                              job.video_requested_at
-                            ).toLocaleString()}`
-                          : ""}
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="font-bold text-lg text-gray-900">
+                          {role} {job.child_name}
+                        </h3>
+                        <span
+                          className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold text-white"
+                          style={{ background: state.color }}
+                        >
+                          {state.kind === "ready" ? (
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                          ) : state.kind === "stuck" ? (
+                            <AlertTriangle className="w-3.5 h-3.5" />
+                          ) : null}
+                          {state.label}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-500 mt-0.5">
+                        Age {job.child_age} · {job.page_count} pages
+                        {job.video_package ? ` · ${job.video_package}` : ""}
                       </p>
-                      {(job.video_contact_email || job.video_contact_name) && (
-                        <p className="text-xs text-gray-400 mt-1">
-                          {job.video_contact_name} {job.video_contact_email}
-                        </p>
-                      )}
-                      {showTracker && tracker ? (
-                        <DominoTracker tracker={tracker} />
+
+                      {state.kind === "cooking" && tracker ? (
+                        <SimpleTracker tracker={tracker} />
                       ) : null}
-                      {job.video_status === "in_production" && !tracker ? (
-                        <div className="mt-3 text-xs font-semibold text-amber-800 flex items-center gap-2">
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          In the oven — tracker warming up…
+
+                      {state.kind === "stuck" ? (
+                        <div className="mt-3 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+                          This one died on the server. Unstick it, then run{" "}
+                          <strong>Cheap preview</strong> (not premium).
                         </div>
                       ) : null}
-                      <div className="flex flex-wrap gap-2 mt-3">
-                        <Link
-                          href={`/book/${job.id}`}
-                          target="_blank"
-                          className="inline-flex items-center gap-1 text-xs font-semibold text-amber-700 hover:underline"
-                        >
-                          <ExternalLink className="w-3.5 h-3.5" /> Open book
-                        </Link>
-                        <Link
-                          href={`/book/${job.id}?play=1`}
-                          target="_blank"
-                          className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 hover:underline"
-                        >
-                          <ExternalLink className="w-3.5 h-3.5" /> Play slideshow now
-                        </Link>
+
+                      {/* Primary actions */}
+                      <div className="mt-4 flex flex-col gap-2">
                         {job.video_url ? (
                           <a
                             href={job.video_url}
                             target="_blank"
                             rel="noreferrer"
-                            className="inline-flex items-center gap-1 text-xs font-bold text-emerald-800 hover:underline"
+                            className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-white"
+                            style={{
+                              background:
+                                "linear-gradient(135deg, #047857, #10b981)",
+                            }}
                           >
-                            <Film className="w-3.5 h-3.5" /> Watch delivered MP4
+                            <Play className="w-4 h-4" />
+                            Watch movie
                           </a>
                         ) : null}
-                        <button
-                          onClick={() => copyImages(job)}
-                          className="inline-flex items-center gap-1 text-xs font-semibold text-blue-700 hover:underline"
-                        >
-                          <Copy className="w-3.5 h-3.5" /> Copy page images
-                        </button>
-                        {job.narration_script ? (
+
+                        {state.kind === "stuck" ? (
                           <button
-                            onClick={() => copyScript(job)}
-                            className="inline-flex items-center gap-1 text-xs font-semibold text-purple-700 hover:underline"
+                            onClick={() => markStuckFailed(job)}
+                            disabled={busy}
+                            className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-white bg-red-600 disabled:opacity-60"
                           >
-                            <Copy className="w-3.5 h-3.5" /> Copy script
+                            {busy ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <AlertTriangle className="w-4 h-4" />
+                            )}
+                            Unstick
                           </button>
                         ) : null}
-                        <button
-                          onClick={() => deleteJob(job, "queue")}
-                          disabled={deletingId === job.id}
-                          className="inline-flex items-center gap-1 text-xs font-semibold text-gray-600 hover:underline disabled:opacity-50"
-                          title="Clear movie job — keep the book"
+
+                        {state.kind === "cooking" ? (
+                          <p className="text-xs text-amber-800 font-medium">
+                            Cooking… page auto-refreshes. If this sits over ~25
+                            min, it will show as stuck.
+                          </p>
+                        ) : (
+                          <>
+                            <button
+                              onClick={() =>
+                                makeMovie(
+                                  job.id,
+                                  "draft",
+                                  Boolean(job.video_url) || state.kind === "stuck"
+                                )
+                              }
+                              disabled={busy}
+                              className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-white disabled:opacity-60"
+                              style={{
+                                background:
+                                  "linear-gradient(135deg, #0A1628, #2D1B4E)",
+                              }}
+                            >
+                              {busy ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                <Sparkles className="w-4 h-4" />
+                              )}
+                              {job.video_url
+                                ? "Remake cheap preview"
+                                : "Make cheap preview"}
+                            </button>
+
+                            <div className="grid grid-cols-2 gap-2">
+                              <button
+                                onClick={() =>
+                                  makeMovie(job.id, "fast", Boolean(job.video_url))
+                                }
+                                disabled={busy}
+                                className="inline-flex items-center justify-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs font-bold text-amber-900 disabled:opacity-60"
+                              >
+                                Better motion ($)
+                              </button>
+                              <button
+                                onClick={() =>
+                                  makeMovie(
+                                    job.id,
+                                    "premium",
+                                    Boolean(job.video_url)
+                                  )
+                                }
+                                disabled={busy}
+                                className="inline-flex items-center justify-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2.5 text-xs font-bold text-rose-800 disabled:opacity-60"
+                              >
+                                Premium final ($$$)
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </div>
+
+                      {/* Secondary links */}
+                      <div className="mt-3 flex flex-wrap gap-3 text-xs font-semibold">
+                        <Link
+                          href={`/book/${job.id}`}
+                          target="_blank"
+                          className="inline-flex items-center gap-1 text-amber-800 hover:underline"
                         >
-                          {deletingId === job.id ? (
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          ) : (
-                            <Trash2 className="w-3.5 h-3.5" />
-                          )}
-                          Remove from queue
-                        </button>
+                          <ExternalLink className="w-3.5 h-3.5" />
+                          Open book
+                        </Link>
+                        <Link
+                          href={`/book/${job.id}?play=1`}
+                          target="_blank"
+                          className="inline-flex items-center gap-1 text-emerald-800 hover:underline"
+                        >
+                          Play slideshow
+                        </Link>
                         <button
-                          onClick={() => deleteJob(job, "book")}
-                          disabled={deletingId === job.id}
-                          className="inline-flex items-center gap-1 text-xs font-bold text-red-700 hover:underline disabled:opacity-50"
-                          title="Permanently delete this storybook"
+                          onClick={() => removeFromQueue(job)}
+                          disabled={busy}
+                          className="inline-flex items-center gap-1 text-gray-500 hover:underline disabled:opacity-50"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
-                          Delete book
+                          Remove
                         </button>
                         <button
                           onClick={() =>
-                            renderPremiumMovie(job.id, Boolean(job.video_url))
-                          }
-                          disabled={renderingId === job.id}
-                          className="inline-flex items-center gap-1 text-xs font-bold text-rose-700 hover:underline disabled:opacity-50"
-                          title="Seedance + stitch + narration → real MP4"
-                        >
-                          {renderingId === job.id ? (
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          ) : (
-                            <Sparkles className="w-3.5 h-3.5" />
-                          )}
-                          {renderingId === job.id
-                            ? "Rendering MP4…"
-                            : job.video_url
-                              ? "Re-render premium MP4"
-                              : "Render premium MP4"}
-                        </button>
-                        <button
-                          onClick={() => generateNarration(job.id)}
-                          disabled={narratingId === job.id}
-                          className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 hover:underline disabled:opacity-50"
-                        >
-                          {narratingId === job.id ? (
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          ) : (
-                            <Mic className="w-3.5 h-3.5" />
-                          )}
-                          {job.narration_url
-                            ? "Regen narration"
-                            : "Generate narration"}
-                        </button>
-                        {job.narration_url ? (
-                          <a
-                            href={job.narration_url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-xs font-semibold text-gray-600 hover:underline"
-                          >
-                            Play narration
-                          </a>
-                        ) : null}
-                      </div>
-
-                      <div className="grid sm:grid-cols-3 gap-2 mt-4">
-                        <label className="text-xs text-gray-500">
-                          Status
-                          <select
-                            value={d.status}
-                            onChange={(e) =>
-                              setDrafts((prev) => ({
-                                ...prev,
-                                [job.id]: { ...d, status: e.target.value },
-                              }))
-                            }
-                            className="mt-1 w-full rounded-lg border border-gray-200 px-2 py-2 text-sm"
-                          >
-                            {STATUSES.map((s) => (
-                              <option key={s} value={s}>
-                                {s}
-                              </option>
-                            ))}
-                          </select>
-                        </label>
-                        <label className="text-xs text-gray-500 sm:col-span-2">
-                          Final MP4 URL
-                          <input
-                            value={d.url}
-                            onChange={(e) =>
-                              setDrafts((prev) => ({
-                                ...prev,
-                                [job.id]: { ...d, url: e.target.value },
-                              }))
-                            }
-                            placeholder="https://…/movie.mp4"
-                            className="mt-1 w-full rounded-lg border border-gray-200 px-2 py-2 text-sm"
-                          />
-                        </label>
-                      </div>
-                      <label className="block text-xs text-gray-500 mt-2">
-                        Production notes
-                        <textarea
-                          value={d.notes}
-                          onChange={(e) =>
-                            setDrafts((prev) => ({
-                              ...prev,
-                              [job.id]: { ...d, notes: e.target.value },
+                            setShowAdvanced((p) => ({
+                              ...p,
+                              [job.id]: !p[job.id],
                             }))
                           }
-                          rows={2}
-                          className="mt-1 w-full rounded-lg border border-gray-200 px-2 py-2 text-sm"
-                          placeholder="Higgsfield / Seedance notes…"
-                        />
-                      </label>
-                      <button
-                        onClick={() => saveJob(job.id)}
-                        disabled={savingId === job.id}
-                        className="mt-3 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold text-white disabled:opacity-60"
-                        style={{
-                          background:
-                            "linear-gradient(135deg, #0A1628, #2D1B4E)",
-                        }}
-                      >
-                        {savingId === job.id ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Save className="w-4 h-4" />
-                        )}
-                        Save / deliver
-                      </button>
+                          className="text-gray-400 hover:underline"
+                        >
+                          {advanced ? "Hide advanced" : "Advanced"}
+                        </button>
+                      </div>
+
+                      {advanced ? (
+                        <div className="mt-3 rounded-xl border border-gray-100 bg-gray-50 p-3 space-y-2">
+                          <label className="block text-xs text-gray-500">
+                            Paste final MP4 URL (manual deliver)
+                            <div className="mt-1 flex gap-2">
+                              <input
+                                value={urlDrafts[job.id] || ""}
+                                onChange={(e) =>
+                                  setUrlDrafts((p) => ({
+                                    ...p,
+                                    [job.id]: e.target.value,
+                                  }))
+                                }
+                                placeholder="https://…/movie.mp4"
+                                className="flex-1 rounded-lg border border-gray-200 px-2 py-2 text-sm bg-white"
+                              />
+                              <button
+                                onClick={() => saveManualUrl(job)}
+                                disabled={busy}
+                                className="rounded-lg px-3 py-2 text-xs font-bold text-white bg-gray-900 disabled:opacity-60"
+                              >
+                                Save
+                              </button>
+                            </div>
+                          </label>
+                          {job.narration_url ? (
+                            <a
+                              href={job.narration_url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-xs font-semibold text-purple-700 hover:underline"
+                            >
+                              Play narration audio
+                            </a>
+                          ) : (
+                            <p className="text-xs text-gray-400">
+                              No narration yet (draft skips it)
+                            </p>
+                          )}
+                          {job.video_notes ? (
+                            <pre className="text-[10px] text-gray-500 whitespace-pre-wrap max-h-28 overflow-auto">
+                              {job.video_notes.slice(0, 800)}
+                            </pre>
+                          ) : null}
+                        </div>
+                      ) : null}
                     </div>
                   </div>
                 </div>
@@ -663,6 +625,9 @@ CREATE INDEX IF NOT EXISTS idx_storybooks_video_status ON public.storybooks(vide
             })}
           </div>
         )}
+
+        {/* keep unused import happy if tree-shaken differently */}
+        <span className="hidden">{MOVIE_TRACKER_STEPS.length}</span>
       </div>
     </div>
   );
