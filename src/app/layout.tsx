@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     description: SITE.description,
     images: [
       {
-        url: `${SITE.url}/og-image.jpg`,
+        url: `${SITE.url}/og-storefront-2026.jpg`,
         width: 1280,
         height: 698,
         alt: `${SITE.name} storefront — Est. Orange County. ${SITE.tagline}`,
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: `${SITE.name} — ${SITE.tagline}`,
     description: SITE.description,
-    images: [`${SITE.url}/og-image.jpg`],
+    images: [`${SITE.url}/og-storefront-2026.jpg`],
   },
   robots: {
     index: true,

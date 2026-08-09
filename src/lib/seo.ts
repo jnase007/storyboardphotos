@@ -4,7 +4,8 @@ import { SITE } from "@/lib/constants";
 const DEFAULT_OG_IMAGE = {
   // Absolute www URL avoids metadataBase/env host drift (apex vs www).
   // Brand lock: outdoor Storybook Photos storefront (OC lifestyle / destination feel).
-  url: `${SITE.url}/og-image.jpg`,
+  // Versioned filename busts iMessage/Slack OG caches (old throne room).
+  url: `${SITE.url}/og-storefront-2026.jpg`,
   width: 1280,
   height: 698,
   alt: `${SITE.name} storefront — Est. Orange County. ${SITE.tagline}`,

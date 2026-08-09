@@ -342,10 +342,10 @@ export function VideoJobsPanel() {
   }
 
   return (
-    <div className="min-h-screen p-6" style={{ background: "#F8F4EC" }}>
+    <div className="min-h-screen px-6 pb-10 pt-24 md:pt-28" style={{ background: "#F8F4EC" }}>
       <div className="max-w-5xl mx-auto">
-        <div className="flex items-center justify-between mb-8 gap-3 flex-wrap">
-          <div>
+        <div className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0 flex-1">
             <h1 className="text-3xl font-bold" style={{ color: "#0A1628" }}>
               🎬 Animated Movie Queue
             </h1>
@@ -360,7 +360,7 @@ export function VideoJobsPanel() {
           </div>
           <button
             onClick={load}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white font-semibold"
+            className="inline-flex shrink-0 self-start items-center gap-2 px-4 py-2 rounded-lg text-white font-semibold shadow-sm"
             style={{ background: "linear-gradient(135deg, #B98A19, #d4a843)" }}
           >
             <RefreshCw className="w-4 h-4" />
