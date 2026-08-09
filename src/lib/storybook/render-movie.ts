@@ -797,22 +797,53 @@ export async function renderPremiumStoryMovie(options: {
       continue;
     }
 
-    // Hold picture for AT LEAST the narration length (prevents blank screen)
-    const meta = await probeMedia(url);
-    const actualClipSec = meta.durationSec || duration;
-    const holdSec = Math.max(duration, actualClipSec);
-    const durMs = Math.round(holdSec * 1000);
-    clipUrls.push(url);
-    clipDurationsMs.push(durMs);
+    // CRITICAL: keyframe duration must never exceed real media length.
+    // Longer keyframes on short MP4s = blank frames while audio keeps playing.
+    let mediaUrl = url;
+    let meta = await probeMedia(mediaUrl);
+    let mediaSec = meta.durationSec || 0;
+
+    // Physically extend/loop clip so picture covers narration need
+    if (!mediaSec || mediaSec + 0.35 < duration) {
+      mediaUrl = await extendClipToDuration(mediaUrl, duration, notes, i);
+      meta = await probeMedia(mediaUrl);
+      mediaSec = meta.durationSec || 0;
+    }
+
+    // Last resort: full still-hold of the page art for the narration length
+    if (!mediaSec || mediaSec + 0.5 < duration) {
+      try {
+        mediaUrl = await stillHoldClip(beat.page.imageUrl!, duration);
+        mediaSec = duration;
+        notes.push(
+          `clip ${i + 1}: still-hold pad to ${duration.toFixed(1)}s (media was short)`
+        );
+      } catch {
+        /* keep best effort below */
+      }
+    }
+
+    // Picture keyframe = min(needed, real media). Never invent blank time.
+    const pictureSec = Math.max(
+      1,
+      Math.min(duration, mediaSec > 0 ? mediaSec : duration)
+    );
+    // If media is longer than narration, keep the full media (no hard cut feel)
+    const holdSec =
+      mediaSec > duration ? Math.min(mediaSec, duration + 1.5) : pictureSec;
+    const pictureMs = Math.round(holdSec * 1000);
+
+    clipUrls.push(mediaUrl);
+    clipDurationsMs.push(pictureMs);
 
     if (isHttpUrl(beat.audioUrl)) {
       audioKeyframes.push({
         timestamp: timelineMs,
-        duration: durMs,
+        duration: pictureMs,
         url: beat.audioUrl,
       });
     }
-    timelineMs += durMs;
+    timelineMs += pictureMs;
 
     onProgress({
       stage: "animating",
