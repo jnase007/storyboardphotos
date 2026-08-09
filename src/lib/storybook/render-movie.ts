@@ -2,62 +2,60 @@
  * Storybook movie engine — cost-tiered for $150 video SKU.
  *
  * HARD RULES (Justin 2026-08-09):
- * - Target COGS <= $15 / video
- * - Hard max COGS = $50 / video
- * - Testing loop (30+ passes) = DRAFT only (pennies)
- * - Paid delivery = STANDARD (Seedance Fast 720p, capped clips)
- * - Premium 1080p blocked unless ALLOW_PREMIUM_MOVIE=1
+ * - Target COGS <= $15 / video (stretch) · hard max $50
+ * - Testing loop = DRAFT (still-hold)
+ * - Paid delivery = STANDARD (Seedance Fast 720p + per-page narration)
+ * - Premium blocked unless ALLOW_PREMIUM_MOVIE=1
  *
- * Tiers:
- * - draft    : still-hold slideshow (QA / feedback loop)
- * - standard : Seedance Fast 720p storybook-movie motion, capped clips (~$8-15)
- * - fast     : alias of standard
- * - premium  : blocked by default
- *
- * Animation goal (Justin):
- * Soft classic storybook adventure film energy (Winnie-the-Pooh / picture-book cinema),
- * same motion language every quest — NOT anime, NOT photoreal trailer.
+ * Product fixes (2026-08-09 feedback):
+ * 1) Movie must cover FULL narration (no 30s hard cut)
+ * 2) Narration must match the on-screen page (per-page TTS + timed holds)
+ * 3) Standard path MUST animate pages (Seedance) — no silent still fallback
+ * 4) End card full-bleed 16:9 — no black side pillars from square logo video
  */
 
 import type { StoryPage } from "./types";
 import { stripRedundantTitlePages } from "./adventure-paths";
+import { generateNarrationAudio } from "./narration";
 
 const FAL_QUEUE = "https://queue.fal.run";
 const SEEDANCE_PREMIUM = "bytedance/seedance-2.0/image-to-video";
 const SEEDANCE_FAST = "bytedance/seedance-2.0/fast/image-to-video";
 const COMPOSE_MODEL = "fal-ai/ffmpeg-api/compose";
 const MERGE_AV_MODEL = "fal-ai/ffmpeg-api/merge-audio-video";
+const MERGE_VIDEOS_MODEL = "fal-ai/ffmpeg-api/merge-videos";
+const METADATA_MODEL = "fal-ai/ffmpeg-api/metadata";
 const STILL_MODEL = "fal-ai/ffmpeg-api/images-to-video";
 
 /**
- * Closing logo bump (animated MP4) — Justin brand bumper at end of every movie.
- * Falls back to still end-card PNG if bump URL fails.
+ * Full-bleed 16:9 end card (preferred).
+ * Square animated logo MP4 causes black pillars when composed into 16:9 — avoid by default.
  */
 const MOVIE_END_BUMP_URL =
   process.env.MOVIE_END_BUMP_URL ||
   "https://www.storybookphotos.com/brand/movie-end-bump.mp4";
-/** Fallback still if video bump cannot be fetched by compose. */
 const MOVIE_END_CARD_URL =
   process.env.MOVIE_END_CARD_URL ||
-  "https://www.storybookphotos.com/brand/movie-end-card-v3.png";
-/** Known length of brand logo bump (seconds). */
-const END_BUMP_DURATION_SEC = Number(process.env.MOVIE_END_BUMP_SEC || 10);
-const END_CARD_DURATION_SEC = 4;
+  "https://www.storybookphotos.com/brand/movie-end-card-16x9.png";
+const FORCE_END_BUMP = process.env.FORCE_END_BUMP === "1";
+const END_CARD_DURATION_SEC = Number(process.env.MOVIE_END_CARD_SEC || 5);
+const MOVIE_WIDTH = 1280;
+const MOVIE_HEIGHT = 720;
 
 export type MovieQuality = "draft" | "fast" | "standard" | "premium";
 export type MoviePackage = "teaser" | "full";
 
-/** Target COGS for $150 video product. */
 export const VIDEO_COGS_TARGET_USD = 15;
-/** Hard fail above this estimated motion+stitch COGS. */
 export const VIDEO_COGS_MAX_USD = 50;
 
-const SEEDANCE_FAST_USD_PER_SEC = 0.242; // fal Seedance Fast 720p
-const SEEDANCE_PREMIUM_USD_PER_SEC = 0.68; // too expensive for $150 SKU
+const SEEDANCE_FAST_USD_PER_SEC = 0.242;
+const SEEDANCE_PREMIUM_USD_PER_SEC = 0.68;
 
-/** Paid $150 shape: stays near $15 target, under $50 hard cap. */
-export const STANDARD_MAX_CLIPS = 6;
-export const STANDARD_SEC_PER_CLIP = 5;
+/** More beats so story + narration can finish. */
+export const STANDARD_MAX_CLIPS = 10;
+export const STANDARD_SEC_PER_CLIP = 6;
+export const STANDARD_MIN_SEC_PER_CLIP = 5;
+export const STANDARD_MAX_SEC_PER_CLIP = 10;
 
 export function estimateMotionCostUsd(opts: {
   quality: MovieQuality;
@@ -66,8 +64,8 @@ export function estimateMotionCostUsd(opts: {
 }): number {
   const q = opts.quality === "fast" ? "standard" : opts.quality;
   const secs = Math.max(0, opts.clips) * Math.max(0, opts.secPerClip);
-  if (q === "draft") return 0.4; // still-hold + stitch
-  if (q === "standard") return secs * SEEDANCE_FAST_USD_PER_SEC + 1.5;
+  if (q === "draft") return 0.5;
+  if (q === "standard") return secs * SEEDANCE_FAST_USD_PER_SEC + 2;
   return secs * SEEDANCE_PREMIUM_USD_PER_SEC + 2;
 }
 
@@ -76,7 +74,9 @@ export function assertUnderBudget(opts: {
   clips: number;
   secPerClip: number;
   allowPremium?: boolean;
-}): { ok: true; estimate: number } | { ok: false; estimate: number; reason: string } {
+}):
+  | { ok: true; estimate: number }
+  | { ok: false; estimate: number; reason: string } {
   const q = opts.quality === "fast" ? "standard" : opts.quality;
   if (q === "premium" && !opts.allowPremium) {
     const estimate = estimateMotionCostUsd({ ...opts, quality: "premium" });
@@ -133,7 +133,9 @@ async function falQueueResult(
 
   if (!submit.ok) {
     const t = await submit.text();
-    throw new Error(`fal submit ${model} failed: ${submit.status} ${t.slice(0, 400)}`);
+    throw new Error(
+      `fal submit ${model} failed: ${submit.status} ${t.slice(0, 400)}`
+    );
   }
 
   const submitted = (await submit.json()) as {
@@ -150,7 +152,8 @@ async function falQueueResult(
   }
 
   const statusUrl =
-    submitted.status_url || `${FAL_QUEUE}/${model}/requests/${requestId}/status`;
+    submitted.status_url ||
+    `${FAL_QUEUE}/${model}/requests/${requestId}/status`;
   const resultUrl =
     submitted.response_url || `${FAL_QUEUE}/${model}/requests/${requestId}`;
 
@@ -168,12 +171,16 @@ async function falQueueResult(
         headers: { Authorization: `Key ${key}` },
       });
       if (!res.ok) {
-        throw new Error(`fal result ${model}: ${res.status} ${await res.text()}`);
+        throw new Error(
+          `fal result ${model}: ${res.status} ${await res.text()}`
+        );
       }
       return (await res.json()) as Record<string, unknown>;
     }
     if (status.status === "FAILED" || status.status === "ERROR") {
-      throw new Error(`fal ${model} failed: ${JSON.stringify(status).slice(0, 500)}`);
+      throw new Error(
+        `fal ${model} failed: ${JSON.stringify(status).slice(0, 500)}`
+      );
     }
     await sleep(pollMs);
   }
@@ -192,11 +199,70 @@ function extractVideoUrl(result: Record<string, unknown>): string | null {
   return typeof url === "string" && url ? url : null;
 }
 
-/**
- * Shared movie animation language for EVERY quest.
- * Target feel: classic soft storybook adventure film (Winnie-the-Pooh / picture-book cinema),
- * NOT anime speed lines, NOT photoreal Seedance trailer energy.
- */
+async function probeMedia(url: string): Promise<{
+  durationSec?: number;
+  width?: number;
+  height?: number;
+  aspectRatio?: string;
+}> {
+  try {
+    const result = await falQueueResult(
+      METADATA_MODEL,
+      { media_url: url },
+      { timeoutMs: 90_000, pollMs: 1200 }
+    );
+    const media =
+      (result as { media?: Record<string, unknown> }).media || result;
+    const duration =
+      typeof (media as { duration?: number }).duration === "number"
+        ? (media as { duration: number }).duration
+        : undefined;
+    const res = (
+      media as {
+        resolution?: {
+          width?: number;
+          height?: number;
+          aspect_ratio?: string;
+        };
+      }
+    ).resolution;
+    return {
+      durationSec: duration,
+      width: res?.width,
+      height: res?.height,
+      aspectRatio: res?.aspect_ratio,
+    };
+  } catch {
+    return {};
+  }
+}
+
+function estimateNarrationSec(text: string): number {
+  const words = text.trim().split(/\s+/).filter(Boolean).length;
+  // ~130 wpm bedtime + breath
+  return Math.max(4, Math.min(18, words / 2.15 + 1.4));
+}
+
+/** One short line per page so voice matches the picture. */
+export function buildPageNarrationLine(
+  page: StoryPage,
+  childName: string,
+  role: "King" | "Queen"
+): string {
+  const title = (page.title || "").trim();
+  let body = (page.text || "").trim().replace(/\s+/g, " ");
+  // Drop pure title-page duplicates
+  if (!body || /^title page$/i.test(title)) {
+    return `${role} ${childName} continues the adventure.`;
+  }
+  // Keep TTS short enough for a single shot
+  if (body.length > 380) body = body.slice(0, 360).replace(/\s+\S*$/, "") + ".";
+  if (title && !body.toLowerCase().startsWith(title.toLowerCase()) && title.length < 48) {
+    return `${title}. ${body}`;
+  }
+  return body;
+}
+
 export const STORYBOOK_MOVIE_MOTION_BIBLE = [
   "STYLE LOCK: 2D watercolor children's storybook illustration coming gently alive.",
   "Same animation language on every quest / every page — consistent movie engine.",
@@ -211,9 +277,9 @@ export const STORYBOOK_MOVIE_MOTION_BIBLE = [
   "Keep bold outlines sharp and colors stable. No realistic skin pores, no cinematic CGI lighting.",
   "No text, letters, subtitles, watermark, logo, or UI.",
   "Wholesome bedtime adventure energy — magical but safe.",
+  "Output must feel ANIMATED, not a frozen still photo.",
 ].join(" ");
 
-/** Motion direction per page — shared engine + page beat. */
 export function buildMotionPrompt(
   page: StoryPage,
   childName: string,
@@ -224,23 +290,8 @@ export function buildMotionPrompt(
     STORYBOOK_MOVIE_MOTION_BIBLE,
     `Hero is ${role} ${childName} — keep likeness and locked royal outfit stable.`,
     `This shot beat: ${beat}.`,
-    `Animate this single storybook frame into a short continuous movie moment.`,
+    `Animate this single storybook frame into a short continuous movie moment with clear gentle motion.`,
   ].join(" ");
-}
-
-function pageDurationSec(
-  _page: StoryPage,
-  packageKind: MoviePackage,
-  quality: MovieQuality
-): number {
-  if (quality === "draft") {
-    return packageKind === "teaser" ? 4 : 5;
-  }
-  // standard/fast: fixed 5s to hit ~$15 target
-  if (quality === "fast" || quality === "standard") {
-    return STANDARD_SEC_PER_CLIP;
-  }
-  return 6; // premium override only
 }
 
 function selectPages(
@@ -252,66 +303,39 @@ function selectPages(
   let pages = all;
 
   if (quality === "draft") {
-    // Cheap review cut: max 6 beats
-    if (packageKind === "teaser" || pages.length > 6) {
-      const max = packageKind === "teaser" ? 5 : 6;
-      if (pages.length > max) {
-        const idxs = [
-          0,
-          Math.floor(pages.length * 0.25),
-          Math.floor(pages.length * 0.5),
-          Math.floor(pages.length * 0.75),
-          pages.length - 1,
-        ];
-        if (max >= 6) idxs.splice(3, 0, Math.floor(pages.length * 0.62));
-        const uniq = [...new Set(idxs)].sort((a, b) => a - b).slice(0, max);
-        pages = uniq.map((i) => pages[i]);
-        notes.push(`Draft package: ${pages.length} still-hold beats (cheap)`);
-      }
-    }
-    return pages;
-  }
-
-  if (quality === "fast" || quality === "standard") {
-    const max = STANDARD_MAX_CLIPS;
+    const max = packageKind === "teaser" ? 5 : 8;
     if (pages.length > max) {
-      const idxs = [
-        0,
-        Math.floor(pages.length * 0.2),
-        Math.floor(pages.length * 0.4),
-        Math.floor(pages.length * 0.6),
-        Math.floor(pages.length * 0.8),
-        pages.length - 1,
-      ];
-      const uniq = [...new Set(idxs)].sort((a, b) => a - b).slice(0, max);
-      pages = uniq.map((i) => pages[i]);
+      const idxs = evenlyPick(pages.length, max);
+      pages = idxs.map((i) => pages[i]);
+      notes.push(`Draft package: ${pages.length} still-hold beats (cheap)`);
     }
-    const est = estimateMotionCostUsd({
-      quality: "standard",
-      clips: pages.length,
-      secPerClip: STANDARD_SEC_PER_CLIP,
-    });
-    notes.push(
-      `Standard $150 movie: ${pages.length}x${STANDARD_SEC_PER_CLIP}s Fast 720p (est $${est.toFixed(0)}, target $${VIDEO_COGS_TARGET_USD}, max $${VIDEO_COGS_MAX_USD})`
-    );
     return pages;
   }
 
-  // premium override — still clamp
-  if (pages.length > STANDARD_MAX_CLIPS) {
-    const idxs = [
-      0,
-      Math.floor(pages.length * 0.2),
-      Math.floor(pages.length * 0.4),
-      Math.floor(pages.length * 0.6),
-      Math.floor(pages.length * 0.8),
-      pages.length - 1,
-    ];
-    const uniq = [...new Set(idxs)].sort((a, b) => a - b).slice(0, STANDARD_MAX_CLIPS);
-    pages = uniq.map((i) => pages[i]);
-    notes.push("Premium clamped to 6 beats (cost guard)");
+  const max = packageKind === "teaser" ? 6 : STANDARD_MAX_CLIPS;
+  if (pages.length > max) {
+    const idxs = evenlyPick(pages.length, max);
+    pages = idxs.map((i) => pages[i]);
   }
+  const est = estimateMotionCostUsd({
+    quality: quality === "premium" ? "premium" : "standard",
+    clips: pages.length,
+    secPerClip: STANDARD_SEC_PER_CLIP,
+  });
+  notes.push(
+    `${quality} movie: ${pages.length} animated beats (est motion ~$${est.toFixed(0)}, target $${VIDEO_COGS_TARGET_USD}, max $${VIDEO_COGS_MAX_USD})`
+  );
   return pages;
+}
+
+function evenlyPick(n: number, k: number): number[] {
+  if (k >= n) return Array.from({ length: n }, (_, i) => i);
+  if (k <= 1) return [0];
+  const out: number[] = [];
+  for (let i = 0; i < k; i++) {
+    out.push(Math.round((i * (n - 1)) / (k - 1)));
+  }
+  return [...new Set(out)].sort((a, b) => a - b);
 }
 
 export type RenderMovieProgress = {
@@ -329,6 +353,7 @@ export type RenderMovieResult = {
   provider: string;
   quality: MovieQuality;
   notes: string[];
+  totalDurationSec?: number;
 };
 
 async function stillHoldClip(
@@ -342,7 +367,7 @@ async function stillHoldClip(
       images: [
         {
           url: imageUrl,
-          frames: Math.round(durationSec * 24),
+          frames: Math.max(24, Math.round(durationSec * 24)),
         },
       ],
     },
@@ -351,6 +376,48 @@ async function stillHoldClip(
   const url = extractVideoUrl(still);
   if (!url) throw new Error("still hold missing url");
   return url;
+}
+
+/** Stretch/pad a short clip so picture holds while narration finishes. */
+async function extendClipToDuration(
+  clipUrl: string,
+  targetSec: number,
+  notes: string[],
+  index: number
+): Promise<string> {
+  const meta = await probeMedia(clipUrl);
+  const have = meta.durationSec || 0;
+  if (have >= targetSec - 0.35) return clipUrl;
+
+  // Loop the short animated clip to cover narration length (keeps motion, no freeze-only)
+  const loops = Math.min(4, Math.max(2, Math.ceil(targetSec / Math.max(have, 1))));
+  try {
+    const urls = Array.from({ length: loops }, () => clipUrl);
+    const merged = await falQueueResult(
+      MERGE_VIDEOS_MODEL,
+      {
+        video_urls: urls,
+        target_fps: 24,
+        resolution: { width: MOVIE_WIDTH, height: MOVIE_HEIGHT },
+      },
+      { timeoutMs: 6 * 60_000 }
+    );
+    const url = extractVideoUrl(merged);
+    if (!url) throw new Error("loop merge missing url");
+    // If still short/long, compose will cut by keyframe duration
+    notes.push(
+      `clip ${index + 1}: looped ${loops}x to cover ~${targetSec.toFixed(1)}s narration (base ${have.toFixed(1)}s)`
+    );
+    return url;
+  } catch (err) {
+    notes.push(
+      `clip ${index + 1}: loop extend failed, using base clip (${err instanceof Error ? err.message : String(err)})`.slice(
+        0,
+        160
+      )
+    );
+    return clipUrl;
+  }
 }
 
 async function animatePage(options: {
@@ -364,7 +431,6 @@ async function animatePage(options: {
 }): Promise<string | null> {
   const { page, childName, role, duration, quality, notes, index } = options;
 
-  // DRAFT: still-hold only (pennies)
   if (quality === "draft") {
     try {
       const url = await stillHoldClip(page.imageUrl!, duration);
@@ -381,20 +447,20 @@ async function animatePage(options: {
   const usePremium = quality === "premium";
   const model = usePremium ? SEEDANCE_PREMIUM : SEEDANCE_FAST;
   const prompt = buildMotionPrompt(page, childName, role);
-  const resolution = "720p"; // never 1080p on $150 path
+  // Seedance Fast supports short clips; aim 5–8s then loop if narration longer
+  const seedanceSec = Math.min(
+    usePremium ? 8 : 8,
+    Math.max(5, Math.min(STANDARD_MAX_SEC_PER_CLIP, Math.round(duration)))
+  );
 
   try {
-    // Seedance image-to-video — prompt is the animation director for every quest
     const input: Record<string, unknown> = {
       prompt,
       image_url: page.imageUrl,
-      resolution,
-      duration: String(
-        Math.min(usePremium ? 8 : STANDARD_SEC_PER_CLIP, Math.max(4, duration))
-      ),
+      resolution: "720p",
+      duration: String(seedanceSec),
       aspect_ratio: "16:9",
       generate_audio: false,
-      // Prefer calmer motion; narration carries the story energy
       camera_fixed: false,
       bitrate_mode: "standard",
     };
@@ -403,17 +469,54 @@ async function animatePage(options: {
       timeoutMs: 10 * 60_000,
       pollMs: 3000,
     });
-    const url = extractVideoUrl(result);
+    let url = extractVideoUrl(result);
     if (!url) throw new Error(`No video url for page ${index + 1}`);
     notes.push(
-      `clip ${index + 1}: ${usePremium ? "Seedance premium" : "Seedance Fast"} ok (${duration}s ${resolution})`
+      `clip ${index + 1}: ${usePremium ? "Seedance premium" : "Seedance Fast"} animated (${seedanceSec}s 720p)`
     );
+
+    if (duration > seedanceSec + 0.5) {
+      url = await extendClipToDuration(url, duration, notes, index);
+    }
     return url;
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    notes.push(
-      `clip ${index + 1} ${quality} failed → still hold: ${msg.slice(0, 120)}`
-    );
+    // Standard customer movies must animate — retry once with simpler prompt
+    if (quality === "standard" || quality === "premium") {
+      try {
+        notes.push(
+          `clip ${index + 1} animate retry after: ${msg.slice(0, 100)}`
+        );
+        const retry = await falQueueResult(
+          SEEDANCE_FAST,
+          {
+            prompt: `${STORYBOOK_MOVIE_MOTION_BIBLE} Gentle storybook motion on this page. Hero ${role} ${childName}.`,
+            image_url: page.imageUrl,
+            resolution: "720p",
+            duration: "5",
+            aspect_ratio: "16:9",
+            generate_audio: false,
+          },
+          { timeoutMs: 10 * 60_000, pollMs: 3000 }
+        );
+        let url = extractVideoUrl(retry);
+        if (!url) throw new Error("retry missing url");
+        if (duration > 5.5) {
+          url = await extendClipToDuration(url, duration, notes, index);
+        }
+        notes.push(`clip ${index + 1}: Seedance Fast retry ok`);
+        return url;
+      } catch (e2) {
+        notes.push(
+          `clip ${index + 1} ANIMATION FAILED (no still fallback on standard): ${
+            e2 instanceof Error ? e2.message : String(e2)
+          }`.slice(0, 180)
+        );
+        return null;
+      }
+    }
+
+    // Draft-only still fallback
     try {
       const url = await stillHoldClip(page.imageUrl!, duration);
       notes.push(`clip ${index + 1}: still-hold fallback (${duration}s)`);
@@ -427,19 +530,55 @@ async function animatePage(options: {
   }
 }
 
+async function makeFullBleedEndCard(notes: string[]): Promise<{
+  url: string;
+  durationMs: number;
+}> {
+  // Product rule: end card must be full-width 16:9 (no black pillars).
+  // Square logo spin MP4 letterboxes inside 16:9 compose — skip unless forced AND proven 16:9.
+  if (FORCE_END_BUMP && isHttpUrl(MOVIE_END_BUMP_URL)) {
+    const meta = await probeMedia(MOVIE_END_BUMP_URL);
+    const w = meta.width || 0;
+    const h = meta.height || 0;
+    const ar = w && h ? w / h : 0;
+    if (ar >= 1.6 && ar <= 1.9) {
+      notes.push(
+        `end bump: 16:9 logo video accepted (${w}x${h}, ~${(meta.durationSec || 10).toFixed(1)}s)`
+      );
+      return {
+        url: MOVIE_END_BUMP_URL,
+        durationMs: Math.max(3, meta.durationSec || 10) * 1000,
+      };
+    }
+    notes.push(
+      `end bump skipped (not 16:9 — would pillarbox). Using full-bleed still card.`
+    );
+  } else {
+    notes.push(
+      "end card: full-bleed 16:9 logo still (no black side bars)"
+    );
+  }
+
+  const endUrl = await stillHoldClip(MOVIE_END_CARD_URL, END_CARD_DURATION_SEC);
+  return { url: endUrl, durationMs: END_CARD_DURATION_SEC * 1000 };
+}
+
 /**
  * Render a downloadable MP4 from storybook pages.
- * Default quality = draft (cheap still-hold). Premium is opt-in only.
+ * Standard = animated Seedance + per-page narration sync + full-bleed end card.
  */
 export async function renderPremiumStoryMovie(options: {
   childName: string;
   gender: string;
   pages: StoryPage[];
   narrationUrl?: string | null;
+  /** Optional whole-book script (used only if per-page fails). */
+  narrationScript?: string | null;
   package?: MoviePackage;
-  /** draft (default) | fast | premium */
   quality?: MovieQuality;
   coverImageUrl?: string | null;
+  /** Upload data: / binary narration so fal can fetch HTTPS URLs. */
+  uploadAudio?: (bytes: Buffer, filename: string) => Promise<string | null>;
   onProgress?: (p: RenderMovieProgress) => void;
 }): Promise<RenderMovieResult> {
   const key = falKey();
@@ -448,8 +587,8 @@ export async function renderPremiumStoryMovie(options: {
   }
 
   const role = options.gender === "girl" ? "Queen" : "King";
-  const packageKind = options.package ?? "teaser";
-  let quality: MovieQuality = options.quality ?? "draft";
+  const packageKind = options.package ?? "full";
+  let quality: MovieQuality = options.quality ?? "standard";
   if (quality === "fast") quality = "standard";
 
   const allowPremium =
@@ -458,76 +597,162 @@ export async function renderPremiumStoryMovie(options: {
 
   if (quality === "premium" && !allowPremium) {
     throw new Error(
-      "Premium disabled. For testing use draft (pennies). For $150 delivery use standard (≤$15 target, $50 max). Set ALLOW_PREMIUM_MOVIE=1 only to override."
+      "Premium disabled. For testing use draft. For $150 delivery use standard."
     );
   }
 
   const notes: string[] = [
     `quality=${quality}`,
     `package=${packageKind}`,
+    `canvas=${MOVIE_WIDTH}x${MOVIE_HEIGHT}`,
     `cogs_target_usd=${VIDEO_COGS_TARGET_USD}`,
     `cogs_max_usd=${VIDEO_COGS_MAX_USD}`,
-    quality === "draft"
-      ? "COST MODE: DRAFT for QA/feedback loop (pennies). Use this for ~30 test videos."
-      : quality === "standard"
-        ? `COST MODE: STANDARD $150 delivery — Fast 720p, ≤${STANDARD_MAX_CLIPS}x${STANDARD_SEC_PER_CLIP}s, target $${VIDEO_COGS_TARGET_USD}.`
-        : "COST MODE: PREMIUM override only.",
   ];
 
   let pages = stripRedundantTitlePages(options.pages || []).filter((p) =>
     isHttpUrl(p.imageUrl)
   );
-
   if (!pages.length) {
     throw new Error("No page images available to animate");
   }
-
   pages = selectPages(pages, packageKind, quality, notes);
 
-  const secPerClip =
-    quality === "draft" ? 5 : quality === "premium" ? 6 : STANDARD_SEC_PER_CLIP;
+  // Budget against average clip length
   const budget = assertUnderBudget({
     quality,
     clips: pages.length,
-    secPerClip,
+    secPerClip: STANDARD_SEC_PER_CLIP,
     allowPremium,
   });
   notes.push(`cost_estimate_usd≈${budget.estimate.toFixed(2)}`);
-  if (!budget.ok) {
-    throw new Error(budget.reason);
-  }
+  if (!budget.ok) throw new Error(budget.reason);
 
   const onProgress = options.onProgress ?? (() => undefined);
-  const motionLabel =
-    quality === "draft"
-      ? "still-hold draft"
-      : quality === "standard"
-        ? "Seedance Fast coloring-book motion (≤$15 target)"
-        : "Seedance premium override";
+
+  // ── Per-page narration (sync voice to picture) ──────────────────────────
+  type Beat = {
+    page: StoryPage;
+    text: string;
+    audioUrl?: string;
+    targetSec: number;
+  };
+  const beats: Beat[] = pages.map((page) => {
+    const text = buildPageNarrationLine(page, options.childName, role);
+    return {
+      page,
+      text,
+      targetSec:
+        quality === "draft"
+          ? 5
+          : Math.min(
+              STANDARD_MAX_SEC_PER_CLIP,
+              Math.max(STANDARD_MIN_SEC_PER_CLIP, estimateNarrationSec(text))
+            ),
+    };
+  });
+
+  const requireSound = quality === "standard" || quality === "premium";
+  if (requireSound || quality === "draft") {
+    onProgress({
+      stage: "audio",
+      detail: "Recording per-page bedtime narration…",
+      clipsDone: 0,
+      clipsTotal: beats.length,
+    });
+    for (let i = 0; i < beats.length; i++) {
+      const beat = beats[i];
+      try {
+        const audio = await generateNarrationAudio({
+          text: beat.text,
+          filename: `${options.childName}-p${i + 1}.mp3`,
+        });
+        let publicAudio: string | null = null;
+        if (audio.audioUrl && isHttpUrl(audio.audioUrl)) {
+          publicAudio = audio.audioUrl;
+        } else if (
+          audio.audioUrl?.startsWith("data:audio") &&
+          options.uploadAudio
+        ) {
+          const base64 = audio.audioUrl.split(",")[1] ?? "";
+          const bytes = Buffer.from(base64, "base64");
+          publicAudio = await options.uploadAudio(
+            bytes,
+            `${options.childName.replace(/\s+/g, "-").toLowerCase()}-p${i + 1}-${Date.now()}.mp3`
+          );
+        }
+        if (publicAudio && isHttpUrl(publicAudio)) {
+          beat.audioUrl = publicAudio;
+          const meta = await probeMedia(publicAudio);
+          if (meta.durationSec && meta.durationSec > 2) {
+            beat.targetSec = Math.min(
+              STANDARD_MAX_SEC_PER_CLIP + 2,
+              Math.max(STANDARD_MIN_SEC_PER_CLIP, meta.durationSec + 0.6)
+            );
+          }
+          notes.push(
+            `narration page ${i + 1}: ok ~${beat.targetSec.toFixed(1)}s (${audio.provider})`
+          );
+        } else {
+          notes.push(
+            `narration page ${i + 1} failed: ${audio.error || "no public url"}`
+          );
+        }
+      } catch (err) {
+        notes.push(
+          `narration page ${i + 1} error: ${err instanceof Error ? err.message : String(err)}`.slice(
+            0,
+            140
+          )
+        );
+      }
+      onProgress({
+        stage: "audio",
+        detail: `Narration ${i + 1}/${beats.length}`,
+        clipsDone: i + 1,
+        clipsTotal: beats.length,
+      });
+    }
+  }
+
+  const pageAudioCount = beats.filter((b) => isHttpUrl(b.audioUrl)).length;
+  if (requireSound && pageAudioCount === 0 && !isHttpUrl(options.narrationUrl)) {
+    throw new Error(
+      "No per-page narration produced — refusing silent/unsynced customer movie"
+    );
+  }
+  notes.push(
+    `narration_sync: ${pageAudioCount}/${beats.length} pages with timed voice`
+  );
 
   onProgress({
     stage: "animating",
-    detail: `${motionLabel} on ${pages.length} pages`,
+    detail: `Animating ${beats.length} storybook pages…`,
     clipsDone: 0,
-    clipsTotal: pages.length,
+    clipsTotal: beats.length,
   });
 
   const clipUrls: string[] = [];
   const clipDurationsMs: number[] = [];
+  const audioKeyframes: Array<{
+    timestamp: number;
+    duration: number;
+    url: string;
+  }> = [];
+  let timelineMs = 0;
 
-  for (let i = 0; i < pages.length; i++) {
-    const page = pages[i];
-    const duration = pageDurationSec(page, packageKind, quality);
+  for (let i = 0; i < beats.length; i++) {
+    const beat = beats[i];
+    const duration = beat.targetSec;
 
     onProgress({
       stage: "animating",
-      detail: `Page ${i + 1}/${pages.length}: ${page.title || "scene"} (${quality})`,
+      detail: `Page ${i + 1}/${beats.length}: ${beat.page.title || "scene"}`,
       clipsDone: i,
-      clipsTotal: pages.length,
+      clipsTotal: beats.length,
     });
 
     const url = await animatePage({
-      page,
+      page: beat.page,
       childName: options.childName,
       role,
       duration,
@@ -536,16 +761,33 @@ export async function renderPremiumStoryMovie(options: {
       index: i,
     });
 
-    if (url) {
-      clipUrls.push(url);
-      clipDurationsMs.push(duration * 1000);
+    if (!url) {
+      if (requireSound) {
+        // skip failed page rather than inserting still on standard
+        notes.push(`clip ${i + 1}: skipped after animation failure`);
+        continue;
+      }
+      continue;
     }
+
+    const durMs = Math.round(duration * 1000);
+    clipUrls.push(url);
+    clipDurationsMs.push(durMs);
+
+    if (isHttpUrl(beat.audioUrl)) {
+      audioKeyframes.push({
+        timestamp: timelineMs,
+        duration: durMs,
+        url: beat.audioUrl,
+      });
+    }
+    timelineMs += durMs;
 
     onProgress({
       stage: "animating",
-      detail: `Finished page ${i + 1}/${pages.length}`,
+      detail: `Finished page ${i + 1}/${beats.length}`,
       clipsDone: i + 1,
-      clipsTotal: pages.length,
+      clipsTotal: beats.length,
     });
   }
 
@@ -553,53 +795,30 @@ export async function renderPremiumStoryMovie(options: {
     throw new Error("All page animations failed — cannot build movie");
   }
 
-  // Closing slate: animated Storybook Photos logo bump (preferred), still card fallback
+  // End card full-bleed
   try {
     onProgress({
       stage: "stitching",
-      detail: "Adding Storybook Photos logo bump…",
+      detail: "Adding full-width logo end card…",
       clipsDone: clipUrls.length,
-      clipsTotal: pages.length + 1,
+      clipsTotal: beats.length + 1,
     });
-    // Use the real MP4 bumper directly in the compose timeline (no re-encode needed)
-    if (isHttpUrl(MOVIE_END_BUMP_URL)) {
-      clipUrls.push(MOVIE_END_BUMP_URL);
-      clipDurationsMs.push(Math.max(3, END_BUMP_DURATION_SEC) * 1000);
-      notes.push(
-        `end bump: logo video ${MOVIE_END_BUMP_URL} (~${END_BUMP_DURATION_SEC}s)`
-      );
-    } else {
-      const endUrl = await stillHoldClip(
-        MOVIE_END_CARD_URL,
-        END_CARD_DURATION_SEC
-      );
-      clipUrls.push(endUrl);
-      clipDurationsMs.push(END_CARD_DURATION_SEC * 1000);
-      notes.push(`end card: still logo fallback (${END_CARD_DURATION_SEC}s)`);
-    }
+    const end = await makeFullBleedEndCard(notes);
+    clipUrls.push(end.url);
+    clipDurationsMs.push(end.durationMs);
+    timelineMs += end.durationMs;
   } catch (err) {
     notes.push(
-      `end bump failed, trying still: ${err instanceof Error ? err.message : String(err)}`
+      `end card failed: ${err instanceof Error ? err.message : String(err)}`
     );
-    try {
-      const endUrl = await stillHoldClip(
-        MOVIE_END_CARD_URL,
-        END_CARD_DURATION_SEC
-      );
-      clipUrls.push(endUrl);
-      clipDurationsMs.push(END_CARD_DURATION_SEC * 1000);
-      notes.push(`end card: still logo fallback (${END_CARD_DURATION_SEC}s)`);
-    } catch (e2) {
-      notes.push(
-        `end card skipped: ${e2 instanceof Error ? e2.message : String(e2)}`
-      );
-    }
   }
 
-  onProgress({ stage: "stitching", detail: `Composing ${clipUrls.length} clips` });
+  onProgress({
+    stage: "stitching",
+    detail: `Composing ${clipUrls.length} clips (~${Math.round(timelineMs / 1000)}s)`,
+  });
 
-  // Build silent picture track first (reliable), then ALWAYS merge narration as a second step.
-  // fal compose audio tracks are flaky; merge-audio-video is the sound path that matters.
+  // Build picture track
   let timestamp = 0;
   const videoKeyframes = clipUrls.map((url, i) => {
     const duration = clipDurationsMs[i] ?? 8000;
@@ -608,7 +827,7 @@ export async function renderPremiumStoryMovie(options: {
     return kf;
   });
 
-  const videoOnlyTracks = [
+  const tracks: Array<Record<string, unknown>> = [
     {
       id: "video",
       type: "video",
@@ -616,71 +835,109 @@ export async function renderPremiumStoryMovie(options: {
     },
   ];
 
-  let silentOrFullUrl: string | null = null;
+  // Prefer timed per-page audio in compose (true sync). Fallback = whole-book merge.
+  if (audioKeyframes.length > 0) {
+    tracks.push({
+      id: "narration",
+      type: "audio",
+      keyframes: audioKeyframes,
+    });
+    notes.push(
+      `compose audio: ${audioKeyframes.length} timed narration keyframes`
+    );
+  }
+
+  let composedUrl: string | null = null;
   try {
     const composed = await falQueueResult(
       COMPOSE_MODEL,
-      { tracks: videoOnlyTracks },
-      { timeoutMs: 10 * 60_000, pollMs: 2500 }
+      { tracks },
+      { timeoutMs: 12 * 60_000, pollMs: 2500 }
     );
-    silentOrFullUrl = extractVideoUrl(composed);
-    if (!silentOrFullUrl) {
-      throw new Error("compose returned no video_url");
-    }
-    notes.push(`silent compose ok (${Math.round(timestamp / 1000)}s picture)`);
+    composedUrl = extractVideoUrl(composed);
+    if (!composedUrl) throw new Error("compose returned no video_url");
+    notes.push(
+      `compose ok (${Math.round(timestamp / 1000)}s picture${
+        audioKeyframes.length ? " + synced narration" : ""
+      })`
+    );
   } catch (err) {
     notes.push(
       `compose failed: ${err instanceof Error ? err.message : String(err)}`
     );
-    silentOrFullUrl = clipUrls[0];
+    // Fallback: merge-videos then optional whole narration
+    try {
+      const merged = await falQueueResult(
+        MERGE_VIDEOS_MODEL,
+        {
+          video_urls: clipUrls,
+          target_fps: 24,
+          resolution: { width: MOVIE_WIDTH, height: MOVIE_HEIGHT },
+        },
+        { timeoutMs: 10 * 60_000 }
+      );
+      composedUrl = extractVideoUrl(merged);
+      notes.push("fallback merge-videos ok");
+    } catch (e2) {
+      composedUrl = clipUrls[0];
+      notes.push(
+        `merge-videos failed: ${e2 instanceof Error ? e2.message : String(e2)}`
+      );
+    }
   }
 
-  let finalUrl = silentOrFullUrl;
-  const narrationUrl = options.narrationUrl;
+  let finalUrl = composedUrl;
 
-  if (isHttpUrl(narrationUrl) && finalUrl) {
+  // If timed audio didn't land in compose, merge whole-book narration (legacy path)
+  const needWholeMerge =
+    Boolean(finalUrl) &&
+    audioKeyframes.length === 0 &&
+    isHttpUrl(options.narrationUrl);
+
+  if (needWholeMerge) {
     try {
       onProgress({
         stage: "audio",
-        detail: "Adding bedtime story narration…",
+        detail: "Merging full bedtime narration…",
       });
       const merged = await falQueueResult(
         MERGE_AV_MODEL,
         {
           video_url: finalUrl,
-          audio_url: narrationUrl,
+          audio_url: options.narrationUrl,
         },
         { timeoutMs: 8 * 60_000 }
       );
       const murl = extractVideoUrl(merged);
-      if (!murl) {
-        throw new Error("merge-audio-video returned no url");
-      }
+      if (!murl) throw new Error("merge-audio-video returned no url");
       finalUrl = murl;
-      notes.push("SOUND: bedtime narration merged into MP4");
+      notes.push(
+        "SOUND: whole-book narration merged (prefer per-page next run)"
+      );
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       notes.push(`SOUND FAILED: ${msg.slice(0, 180)}`);
-      // Customer videos should not silently ship mute if narration was expected
-      if (quality === "standard" || quality === "premium") {
+      if (requireSound) {
         throw new Error(
           `Narration merge failed — refusing silent customer video. ${msg.slice(0, 160)}`
         );
       }
     }
-  } else if (!narrationUrl) {
-    notes.push("SOUND: no narrationUrl provided (silent video)");
-  } else if (narrationUrl.startsWith("data:")) {
-    notes.push(
-      "SOUND FAILED: narration is still a data: URL — must upload to public https first"
-    );
-    if (quality === "standard" || quality === "premium") {
-      throw new Error(
-        "Narration audio is not a public URL. Upload ElevenLabs MP3 to storage first."
-      );
+  } else if (audioKeyframes.length === 0 && !options.narrationUrl) {
+    notes.push("SOUND: no narration provided");
+  }
+
+  // Safety: if composed video is shorter than ~sum of beats and we have whole narration, extend note
+  if (finalUrl) {
+    const meta = await probeMedia(finalUrl);
+    if (meta.durationSec) {
+      notes.push(`final_duration_sec=${meta.durationSec.toFixed(1)}`);
+      if (meta.durationSec < 40 && requireSound) {
+        notes.push(
+          "WARN: final under 40s — check page count / narration length"
+        );
+      }
     }
-  } else {
-    notes.push(`SOUND FAILED: invalid narration url ${String(narrationUrl).slice(0, 80)}`);
   }
 
   if (!finalUrl) {
@@ -693,17 +950,18 @@ export async function renderPremiumStoryMovie(options: {
     quality === "draft"
       ? "draft-still-hold+ffmpeg"
       : quality === "standard"
-        ? "standard-seedance-fast-720p+ffmpeg"
+        ? "standard-seedance-fast-720p+per-page-narration+ffmpeg"
         : "premium-override+ffmpeg";
 
   return {
     videoUrl: finalUrl,
     clipUrls,
-    silentVideoUrl: silentOrFullUrl || undefined,
+    silentVideoUrl: composedUrl || undefined,
     pagesUsed: pages.length,
     provider,
     quality,
     notes,
+    totalDurationSec: timestamp / 1000,
   };
 }
 

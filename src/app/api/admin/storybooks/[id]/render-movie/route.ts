@@ -9,10 +9,7 @@ import {
   renderPremiumStoryMovie,
 } from "@/lib/storybook/render-movie";
 import type { StoryPage } from "@/lib/storybook/types";
-import {
-  buildNarrationScript,
-  generateNarrationAudio,
-} from "@/lib/storybook/narration";
+import { buildNarrationScript } from "@/lib/storybook/narration";
 import { TITLE_ROLE } from "@/lib/storybook/adventure-paths";
 import {
   buildTracker,
@@ -131,94 +128,31 @@ async function runRenderJob(options: {
       return;
     }
 
-    await bump("prep", "Recording bedtime narration…");
-
+    // Engine now builds PER-PAGE narration timed to each animated shot.
+    // Optional whole-book URL kept only as emergency fallback merge.
     let narrationUrl = book.narration_url as string | null;
-    // data: URLs cannot be merged by fal — force regenerate/upload
-    if (narrationUrl && narrationUrl.startsWith("data:")) {
-      narrationUrl = null;
-    }
+    if (narrationUrl && narrationUrl.startsWith("data:")) narrationUrl = null;
 
-    // Product requirement: animated movies MUST have bedtime narration sound.
     const requireSound = quality === "standard" || quality === "premium";
-    const wantsSound = generateNarrationIfMissing || requireSound || quality === "draft";
+    await bump(
+      "prep",
+      "Per-page narration + Seedance animation (voice matches each picture)…"
+    );
 
-    if ((!narrationUrl || !/^https?:\/\//i.test(narrationUrl)) && wantsSound) {
-      const gender = (book.gender === "girl" ? "girl" : "boy") as "boy" | "girl";
-      const role = TITLE_ROLE[gender];
-      const script =
-        (book.narration_script as string) ||
-        buildNarrationScript(book.child_name, role, pages);
-      await bump("prep", "Calling ElevenLabs for bedtime narration…");
-      const audio = await generateNarrationAudio({
-        text: script,
-        filename: `${book.child_name}-narration.mp3`,
-      });
-      if (!audio.audioUrl) {
-        const msg = audio.error || "ElevenLabs narration failed";
-        if (requireSound) {
-          await bump("failed", `SOUND BLOCKED: ${msg}`, { error: msg });
-          return;
-        }
-        await bump("prep", `Narration failed (draft continues silent): ${msg}`);
-        narrationUrl = null;
-      } else {
-        // Always persist to public HTTPS — fal merge cannot use data: URLs
-        let publicUrl: string | null = null;
-        if (audio.audioUrl.startsWith("data:audio")) {
-          const base64 = audio.audioUrl.split(",")[1] ?? "";
-          const bytes = Buffer.from(base64, "base64");
-          const path = `narration/${id}-${Date.now()}.mp3`;
-          const { error: upErr } = await supabase.storage
-            .from("storybook-assets")
-            .upload(path, bytes, { contentType: "audio/mpeg", upsert: true });
-          if (upErr) {
-            const msg = `Narration storage upload failed: ${upErr.message}`;
-            if (requireSound) {
-              await bump("failed", `SOUND BLOCKED: ${msg}`, { error: msg });
-              return;
-            }
-            narrationUrl = null;
-          } else {
-            const { data: pub } = supabase.storage
-              .from("storybook-assets")
-              .getPublicUrl(path);
-            publicUrl = pub.publicUrl;
-          }
-        } else if (/^https?:\/\//i.test(audio.audioUrl)) {
-          publicUrl = audio.audioUrl;
-        }
-
-        if (!publicUrl || !/^https?:\/\//i.test(publicUrl)) {
-          const msg = "Narration did not produce a public HTTPS URL";
-          if (requireSound) {
-            await bump("failed", `SOUND BLOCKED: ${msg}`, { error: msg });
-            return;
-          }
-          narrationUrl = null;
-        } else {
-          narrationUrl = publicUrl;
-          await supabase
-            .from("storybooks")
-            .update({
-              narration_url: narrationUrl,
-              narration_script: script,
-              updated_at: new Date().toISOString(),
-            })
-            .eq("id", id);
-          await bump(
-            "prep",
-            `Narration ready (${audio.bytes || "?"} bytes) — building picture…`
-          );
-        }
+    const uploadAudio = async (bytes: Buffer, filename: string) => {
+      const path = `narration/${id}/${filename}`;
+      const { error: upErr } = await supabase.storage
+        .from("storybook-assets")
+        .upload(path, bytes, { contentType: "audio/mpeg", upsert: true });
+      if (upErr) {
+        console.error("narration upload", upErr.message);
+        return null;
       }
-    }
-
-    if (requireSound && (!narrationUrl || !/^https?:\/\//i.test(narrationUrl))) {
-      const msg = "Refusing animated movie without public narration URL";
-      await bump("failed", `SOUND BLOCKED: ${msg}`, { error: msg });
-      return;
-    }
+      const { data: pub } = supabase.storage
+        .from("storybook-assets")
+        .getPublicUrl(path);
+      return pub.publicUrl || null;
+    };
 
     await bump("oven", "Pages going into the oven…", {
       clipsDone: 0,
@@ -226,15 +160,22 @@ async function runRenderJob(options: {
     });
 
     const coverImageUrl = pages.find((p) => p.imageUrl)?.imageUrl ?? null;
+    const gender = (book.gender === "girl" ? "girl" : "boy") as "boy" | "girl";
+    const role = TITLE_ROLE[gender];
+    const wholeScript =
+      (book.narration_script as string) ||
+      buildNarrationScript(book.child_name, role, pages);
 
     const rendered = await renderPremiumStoryMovie({
       childName: book.child_name,
       gender: book.gender,
       pages,
       narrationUrl,
+      narrationScript: wholeScript,
       package: packageKind,
       quality,
       coverImageUrl,
+      uploadAudio,
       onProgress: (p) => {
         void (async () => {
           if (p.stage === "animating") {
