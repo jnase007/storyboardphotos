@@ -19,6 +19,7 @@ import {
   parseMovieTracker,
   type MovieTrackerState,
 } from "@/lib/storybook/movie-tracker";
+import { PageShell } from "@/components/layout/page-shell";
 
 const ADMIN_CODE = "3121";
 
@@ -304,10 +305,11 @@ export function VideoJobsPanel() {
   const stuckCount = jobs.filter((j) => jobState(j).kind === "stuck").length;
 
   return (
-    <div
-      className="min-h-screen px-6 pb-10 pt-24 md:pt-28"
-      style={{ background: "#F8F4EC" }}
-    >
+    <PageShell>
+      <div
+        className="min-h-screen px-6 pb-10"
+        style={{ background: "#F8F4EC" }}
+      >
       <div className="max-w-3xl mx-auto">
         <div className="flex items-start justify-between gap-4 mb-6">
           <div>
@@ -606,7 +608,7 @@ export function VideoJobsPanel() {
                             </a>
                           ) : (
                             <p className="text-xs text-gray-400">
-                              No narration yet (draft skips it)
+                              No narration yet — next render will add bedtime sound
                             </p>
                           )}
                           {job.video_notes ? (
@@ -627,6 +629,7 @@ export function VideoJobsPanel() {
         {/* keep unused import happy if tree-shaken differently */}
         <span className="hidden">{MOVIE_TRACKER_STEPS.length}</span>
       </div>
-    </div>
+      </div>
+    </PageShell>
   );
 }
