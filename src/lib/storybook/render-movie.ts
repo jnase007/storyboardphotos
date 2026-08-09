@@ -8,10 +8,11 @@
  * - Premium blocked unless ALLOW_PREMIUM_MOVIE=1
  *
  * Product fixes (2026-08-09 feedback):
- * 1) Movie must cover FULL narration (no 30s hard cut)
+ * 1) Movie must cover FULL narration (no 30s hard cut / blank tail)
  * 2) Narration must match the on-screen page (per-page TTS + timed holds)
- * 3) Standard path MUST animate pages (Seedance) — no silent still fallback
- * 4) End card full-bleed 16:9 — no black side pillars from square logo video
+ * 3) Standard tries Seedance every page; if it fails, still-hold keeps art on screen
+ * 4) End bump/card full-bleed 16:9 — no black side pillars
+ * 5) Keyframe duration NEVER exceeds real media length (blank-frame root cause)
  */
 
 import type { StoryPage } from "./types";
