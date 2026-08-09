@@ -48,9 +48,9 @@ const ADVENTURES = [
   },
   {
     id: "light-treasure",
-    title: "The Light Treasure",
+    title: "The Great Treasure Hunt",
     label: "Find the Treasure",
-    description: "Recover the treasure of hope and share the glow with the whole kingdom. Matthew 5:14",
+    description: "Follow the map, find the clues, open the real treasure chest — then share it with the kingdom. Matthew 5:14",
     image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/light-treasure.jpg",
     color: "#a78bfa",
   },

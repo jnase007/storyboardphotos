@@ -40,7 +40,8 @@ function resolvePath(input: StoryInput): AdventurePath {
  */
 export function buildStoryPrompts(input: StoryInput) {
   const role = TITLE_ROLE[input.gender];
-  const pages = Math.min(12, Math.max(8, input.pageCount ?? 8));
+  // Print sides ≈ leaves×2; target a fuller bedtime book (~14–16 sides / ~7–8 leaves after title strip)
+  const pages = Math.min(16, Math.max(11, input.pageCount ?? 14));
   const notes = input.notes?.trim()
     ? `Staff notes about the child: ${input.notes.trim()}`
     : "No extra notes.";
@@ -75,8 +76,8 @@ Rules:
 - Pages 1–2: title / call to adventure (photoSet null or portrait; useSessionPhoto true ok).
 - Include each of the four kingdom sets on distinct pages with useSessionPhoto true.
 - Final 1–2 pages: return + The End.
-- imagePrompt: short WATERCOLOR STORYBOOK illustration prompt (full-bleed 4:3 landscape, soft sepia ink outlines, soft pastel watercolor washes, faith-friendly fairytale look, warm golden light, edge-to-edge scene with NO vine border and NO white side margins, full body in frame with headroom above crown, no cropped heads, no empty line-art coloring page, NO wands, NO glowing staffs, NO spell casting, no text). Each page MUST describe a DIFFERENT location/pose than other pages. Mention ${role} ${input.childName}, age ${input.childAge}.
-- Each page text: 2–5 short paragraphs, suitable for a printed spread and read-aloud narration.
+- imagePrompt: short WATERCOLOR STORYBOOK illustration prompt (full-bleed 4:3 landscape, soft sepia ink outlines, soft pastel watercolor washes, faith-friendly fairytale look, warm golden light, edge-to-edge scene with NO vine border and NO white side margins, full body in frame with headroom above crown, no cropped heads, no empty line-art coloring page, NO wands, NO glowing staffs, NO spell casting, no text). Each page MUST describe a DIFFERENT location/pose than other pages, but the hero MUST wear the SAME locked royal outfit on every page (do not describe clothing changes). Mention ${role} ${input.childName}, age ${input.childAge}.
+- Each page text: 3–6 short paragraphs (fuller bedtime read-aloud — not one-liners), suitable for a printed spread.
 - Never graphic violence; keep dragon/conflict age-appropriate and hopeful.`;
 
   const user = `Write an ${pages}-page personalized story for ${role} ${input.childName}, age ${input.childAge}, gender ${input.gender}.

@@ -19,21 +19,45 @@ export async function POST(request: NextRequest) {
       character_photo,
       storybook_id,
       page_index,
+      gender,
     } = body as {
       imagePrompt?: string;
       pageTitle?: string;
       character_photo?: string | null;
       storybook_id?: string;
       page_index?: number;
+      gender?: string | null;
     };
 
+    let resolvedGender = gender ?? null;
+    // Prefer gender stored on the book so regenerates keep the same locked outfit
+    if (
+      !resolvedGender &&
+      hasRealSupabase() &&
+      storybook_id &&
+      !String(storybook_id).startsWith("local-")
+    ) {
+      try {
+        const supabase = createServiceClient();
+        const { data: row } = await supabase
+          .from("storybooks")
+          .select("gender")
+          .eq("id", storybook_id)
+          .single();
+        if (row?.gender) resolvedGender = String(row.gender);
+      } catch {
+        /* ignore */
+      }
+    }
+
     const scene = imagePrompt || pageTitle || "An enchanted kingdom watercolor scene";
-    const prompt = `${scene}. ONE full-bleed 4:3 landscape watercolor children's storybook illustration only — not a diptych, not two panels, not a double-page spread. Soft sepia ink outlines, pastel watercolor washes. FILL entire canvas edge-to-edge. NO vine border, NO floral frame, NO white side margins. Full figure with headroom, never crop the head, no text, no watermark.`;
+    const prompt = `${scene}. ONE full-bleed 4:3 landscape watercolor children's storybook illustration only — not a diptych, not two panels, not a double-page spread. Soft sepia ink outlines, pastel watercolor washes. FILL entire canvas edge-to-edge. NO vine border, NO floral frame, NO white side margins. Full figure with headroom, never crop the head, no text, no watermark. Keep the locked royal outfit identical to the rest of the book.`;
 
     const result = await generateStoryIllustration({
       prompt,
       referenceImageUrl: null,
       characterPhotoUrl: character_photo ?? null,
+      gender: resolvedGender,
     });
 
     // Persist into storybook pages when we have an id + index

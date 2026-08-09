@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
       childAge: child_age,
       gender,
       notes: notes ?? undefined,
-      pageCount: 11,
+      pageCount: 14,
       adventurePath: adventure_path,
       // Server resolves full path if client script is partial / passthrough
       adventureScript: adventure_script as never,
@@ -130,6 +130,7 @@ export async function POST(request: NextRequest) {
       photoUrls: flatUrls,
       photosBySet: photos_by_set,
       characterPhoto: character_photo ?? undefined,
+      gender,
     });
 
     if (storybookId && hasRealSupabase()) {

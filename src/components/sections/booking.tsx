@@ -12,7 +12,7 @@ const QUESTS = [
   { id: "lost-crown", num: 3, title: "Find the Crown", desc: "The royal crown is missing! Follow clues across the kingdom and return it with a true heart. (Proverbs 4:23)", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/lost-crown.jpg" },
   { id: "forest-guardian", num: 4, title: "Forest Guardian", desc: "God's green world needs a protector. Care for the creatures and restore light to the trees. (Genesis 2:15)", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/forest-guardian.jpg" },
   { id: "kindness-quest", num: 5, title: "Kindness Quest", desc: "A lonely corner of the kingdom needs warmth. Heal hearts with courage and kindness. (Ephesians 4:32)", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/kindness-quest.jpg" },
-  { id: "light-treasure", num: 6, title: "Treasure of Light", desc: "The kingdom's light has dimmed! Recover the treasure of hope and share the glow. (Matthew 5:14)", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/light-treasure.jpg" },
+  { id: "light-treasure", num: 6, title: "Find the Treasure", desc: "An old map, hidden clues, and a real treasure chest to find — then share with the kingdom. (Matthew 5:14)", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/light-treasure.jpg" },
 ];
 
 export function BookingSection() {
