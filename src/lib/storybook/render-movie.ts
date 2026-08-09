@@ -16,6 +16,13 @@ const FAL_QUEUE = "https://queue.fal.run";
 const SEEDANCE_MODEL = "bytedance/seedance-2.0/image-to-video";
 const COMPOSE_MODEL = "fal-ai/ffmpeg-api/compose";
 const MERGE_AV_MODEL = "fal-ai/ffmpeg-api/merge-audio-video";
+const STILL_MODEL = "fal-ai/ffmpeg-api/images-to-video";
+
+/** Public end slate with Storybook Photos branding (logo lockup). */
+const MOVIE_END_CARD_URL =
+  process.env.MOVIE_END_CARD_URL ||
+  "https://www.storybookphotos.com/brand/movie-end-card.png";
+const END_CARD_DURATION_SEC = 4;
 
 function falKey(): string | null {
   return process.env.FAL_KEY ?? process.env.FAL_API_KEY ?? null;
@@ -251,7 +258,7 @@ export async function renderPremiumStoryMovie(options: {
       // Fallback: hold still as single-frame clip via images-to-video
       try {
         const still = await falQueueResult(
-          "fal-ai/ffmpeg-api/images-to-video",
+          STILL_MODEL,
           {
             fps: 24,
             images: [
@@ -286,6 +293,43 @@ export async function renderPremiumStoryMovie(options: {
 
   if (!clipUrls.length) {
     throw new Error("All page animations failed — cannot build movie");
+  }
+
+  // Closing slate: Storybook Photos logo end card
+  try {
+    onProgress({
+      stage: "stitching",
+      detail: "Adding Storybook Photos end logo…",
+      clipsDone: clipUrls.length,
+      clipsTotal: pages.length + 1,
+    });
+    const endStill = await falQueueResult(
+      STILL_MODEL,
+      {
+        fps: 24,
+        images: [
+          {
+            url: MOVIE_END_CARD_URL,
+            frames: Math.round(END_CARD_DURATION_SEC * 24),
+          },
+        ],
+      },
+      { timeoutMs: 5 * 60_000 }
+    );
+    const endUrl =
+      (endStill as { video?: { url?: string } }).video?.url ||
+      (endStill as { video_url?: string }).video_url;
+    if (endUrl && typeof endUrl === "string") {
+      clipUrls.push(endUrl);
+      clipDurationsMs.push(END_CARD_DURATION_SEC * 1000);
+      notes.push(`end card: Storybook Photos logo (${END_CARD_DURATION_SEC}s)`);
+    } else {
+      notes.push("end card skipped: no still url");
+    }
+  } catch (err) {
+    notes.push(
+      `end card skipped: ${err instanceof Error ? err.message : String(err)}`
+    );
   }
 
   onProgress({ stage: "stitching", detail: `Composing ${clipUrls.length} clips` });
