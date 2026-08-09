@@ -43,7 +43,7 @@ export function Navbar() {
         <div className="flex h-24 lg:h-28 items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group" aria-label={SITE.name}>
             <Image
-              src="/brand/storybook-photos-logo-white.png?v=5"
+              src="/brand/storybook-photos-logo-white.png?v=6"
               alt={SITE.name}
               width={460}
               height={302}
