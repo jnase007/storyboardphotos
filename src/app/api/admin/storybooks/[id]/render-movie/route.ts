@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { after } from "next/server";
 import { z } from "zod";
 import { createServiceClient } from "@/lib/supabase/admin";
 import { hasRealSupabase } from "@/lib/storybook/supabase-helpers";
@@ -13,6 +14,11 @@ import {
   generateNarrationAudio,
 } from "@/lib/storybook/narration";
 import { TITLE_ROLE } from "@/lib/storybook/adventure-paths";
+import {
+  buildTracker,
+  encodeMovieTracker,
+  type MovieTrackerState,
+} from "@/lib/storybook/movie-tracker";
 
 export const maxDuration = 800;
 
@@ -22,33 +28,75 @@ const bodySchema = z.object({
   package: z.enum(["teaser", "full"]).default("full"),
   force: z.boolean().optional(),
   generateNarrationIfMissing: z.boolean().optional().default(true),
+  /** async (default): return immediately + Domino tracker; sync: wait for MP4 */
+  mode: z.enum(["async", "sync"]).default("async"),
 });
 
-/**
- * Admin: render a real downloadable premium MP4
- * (Seedance motion per page → stitch → ElevenLabs narration).
- */
-export async function POST(request: NextRequest, { params }: Params) {
-  const denied = assertAdminAccess(request);
-  if (denied) return denied;
-
-  const { id } = await params;
-
-  if (!hasRealSupabase() || id.startsWith("local-")) {
-    return NextResponse.json({ error: "Book not found" }, { status: 404 });
+async function writeTracker(
+  supabase: ReturnType<typeof createServiceClient>,
+  id: string,
+  state: MovieTrackerState,
+  extra?: { video_status?: string; video_url?: string | null; video_package?: string }
+) {
+  const patch: {
+    video_notes: string;
+    updated_at: string;
+    video_status?: string;
+    video_url?: string | null;
+    video_package?: string;
+    video_delivered_at?: string;
+  } = {
+    video_notes: encodeMovieTracker(state),
+    updated_at: new Date().toISOString(),
+  };
+  if (extra?.video_status) patch.video_status = extra.video_status;
+  if (extra?.video_url !== undefined) patch.video_url = extra.video_url;
+  if (extra?.video_package) patch.video_package = extra.video_package;
+  if (state.step === "done" && state.videoUrl) {
+    patch.video_delivered_at = new Date().toISOString();
   }
+  await supabase.from("storybooks").update(patch).eq("id", id);
+}
+
+async function runRenderJob(options: {
+  id: string;
+  packageKind: "teaser" | "full";
+  force?: boolean;
+  generateNarrationIfMissing: boolean;
+}) {
+  const { id, packageKind, generateNarrationIfMissing } = options;
+  const supabase = createServiceClient();
+  const startedAt = new Date().toISOString();
+
+  const bump = async (
+    step: Parameters<typeof buildTracker>[0]["step"],
+    detail?: string,
+    extra?: { clipsDone?: number; clipsTotal?: number; videoUrl?: string; error?: string }
+  ) => {
+    const state = buildTracker({
+      step,
+      detail,
+      startedAt,
+      clipsDone: extra?.clipsDone,
+      clipsTotal: extra?.clipsTotal,
+      videoUrl: extra?.videoUrl,
+      error: extra?.error,
+    });
+    const status =
+      step === "done"
+        ? "ready"
+        : step === "failed"
+          ? "requested"
+          : "in_production";
+    await writeTracker(supabase, id, state, {
+      video_status: status,
+      video_url: step === "done" ? extra?.videoUrl ?? null : undefined,
+      video_package: packageKind,
+    });
+    return state;
+  };
 
   try {
-    const raw = await request.json().catch(() => ({}));
-    const parsed = bodySchema.safeParse(raw);
-    if (!parsed.success) {
-      return NextResponse.json(
-        { error: "Invalid body", details: parsed.error.flatten() },
-        { status: 400 }
-      );
-    }
-
-    const supabase = createServiceClient();
     const { data: book, error } = await supabase
       .from("storybooks")
       .select(
@@ -58,41 +106,28 @@ export async function POST(request: NextRequest, { params }: Params) {
       .single();
 
     if (error || !book) {
-      return NextResponse.json({ error: "Book not found" }, { status: 404 });
+      await bump("failed", "Book not found", { error: "Book not found" });
+      return;
     }
 
-    if (book.video_url && !parsed.data.force) {
-      return NextResponse.json({
-        id: book.id,
-        video_url: book.video_url,
-        video_status: book.video_status || "ready",
-        message: "Movie already ready (pass force:true to re-render)",
-        reused: true,
-      });
+    if (book.video_url && !options.force) {
+      await bump("done", "Movie already ready", { videoUrl: book.video_url });
+      return;
     }
 
     const pages = (book.pages || []) as StoryPage[];
     if (!pages.some((p) => p?.imageUrl)) {
-      return NextResponse.json(
-        { error: "Book has no illustrated pages to animate" },
-        { status: 400 }
-      );
+      await bump("failed", "No illustrated pages", {
+        error: "Book has no illustrated pages to animate",
+      });
+      return;
     }
 
-    // Mark in production early so UI reflects work
-    await supabase
-      .from("storybooks")
-      .update({
-        video_status: "in_production",
-        video_package: parsed.data.package,
-        video_notes: "Premium Seedance render started…",
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", id);
+    await bump("prep", "Warming up narration + page lineup…");
 
     let narrationUrl = book.narration_url as string | null;
 
-    if (!narrationUrl && parsed.data.generateNarrationIfMissing) {
+    if (!narrationUrl && generateNarrationIfMissing) {
       const gender = (book.gender === "girl" ? "girl" : "boy") as "boy" | "girl";
       const role = TITLE_ROLE[gender];
       const script =
@@ -129,17 +164,39 @@ export async function POST(request: NextRequest, { params }: Params) {
       }
     }
 
-    const coverImageUrl =
-      pages.find((p) => p.imageUrl)?.imageUrl ?? null;
+    await bump("oven", "Pages going into the oven…", {
+      clipsDone: 0,
+      clipsTotal: pages.filter((p) => p.imageUrl).length,
+    });
+
+    const coverImageUrl = pages.find((p) => p.imageUrl)?.imageUrl ?? null;
 
     const rendered = await renderPremiumStoryMovie({
       childName: book.child_name,
       gender: book.gender,
       pages,
       narrationUrl,
-      package: parsed.data.package,
+      package: packageKind,
       coverImageUrl,
+      onProgress: (p) => {
+        void (async () => {
+          if (p.stage === "animating") {
+            await bump("oven", p.detail, {
+              clipsDone: p.clipsDone,
+              clipsTotal: p.clipsTotal,
+            });
+          } else if (p.stage === "stitching") {
+            await bump("quality", p.detail || "Stitching clips…");
+          } else if (p.stage === "audio") {
+            await bump("delivery", p.detail || "Mixing narration…");
+          } else if (p.stage === "done") {
+            await bump("delivery", "Packaging MP4…");
+          }
+        })();
+      },
     });
+
+    await bump("delivery", "Boxing up the MP4…");
 
     const publicUrl = await persistMovieToStorage({
       supabase,
@@ -147,67 +204,156 @@ export async function POST(request: NextRequest, { params }: Params) {
       videoUrl: rendered.videoUrl,
     });
 
-    const now = new Date().toISOString();
-    const notes = [
-      `Premium render ${rendered.provider}`,
-      `${rendered.pagesUsed} pages animated`,
+    await bump("done", `Ready · ${rendered.pagesUsed} pages animated`, {
+      videoUrl: publicUrl,
+      clipsDone: rendered.clipUrls.length,
+      clipsTotal: rendered.pagesUsed,
+    });
+
+    // Append human notes after tracker so ops can still read provider logs
+    const tracker = buildTracker({
+      step: "done",
+      detail: `Ready · ${rendered.pagesUsed} pages animated`,
+      startedAt,
+      videoUrl: publicUrl,
+      clipsDone: rendered.clipUrls.length,
+      clipsTotal: rendered.pagesUsed,
+    });
+    const human = [
+      encodeMovieTracker(tracker),
+      "",
+      `provider=${rendered.provider}`,
       ...rendered.notes.slice(0, 12),
     ].join("\n");
-
-    const { data: updated, error: updErr } = await supabase
+    await supabase
       .from("storybooks")
       .update({
+        video_notes: human,
         video_url: publicUrl,
         video_status: "ready",
-        video_package: parsed.data.package,
-        video_notes: notes,
-        video_delivered_at: now,
-        updated_at: now,
+        video_package: packageKind,
+        video_delivered_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
       })
+      .eq("id", id);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Render failed";
+    console.error("render-movie job:", err);
+    await bump("failed", message.slice(0, 200), { error: message.slice(0, 500) });
+  }
+}
+
+/**
+ * Admin: start premium MP4 render.
+ * Default async = Domino's tracker (returns immediately, work continues).
+ */
+export async function POST(request: NextRequest, { params }: Params) {
+  const denied = assertAdminAccess(request);
+  if (denied) return denied;
+
+  const { id } = await params;
+
+  if (!hasRealSupabase() || id.startsWith("local-")) {
+    return NextResponse.json({ error: "Book not found" }, { status: 404 });
+  }
+
+  try {
+    const raw = await request.json().catch(() => ({}));
+    const parsed = bodySchema.safeParse(raw);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Invalid body", details: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    const supabase = createServiceClient();
+    const { data: book, error } = await supabase
+      .from("storybooks")
+      .select("id, child_name, video_url, video_status, pages")
       .eq("id", id)
-      .select(
-        "id, child_name, video_status, video_url, video_package, video_notes, narration_url"
-      )
       .single();
 
-    if (updErr) {
+    if (error || !book) {
+      return NextResponse.json({ error: "Book not found" }, { status: 404 });
+    }
+
+    if (book.video_url && !parsed.data.force) {
       return NextResponse.json({
-        id,
-        video_url: publicUrl,
-        video_status: "ready",
-        clip_count: rendered.clipUrls.length,
-        notes: rendered.notes,
-        persisted: false,
-        warning: updErr.message,
+        id: book.id,
+        video_url: book.video_url,
+        video_status: book.video_status || "ready",
+        message: "Movie already ready (pass force:true to re-render)",
+        reused: true,
       });
     }
 
-    return NextResponse.json({
-      ...updated,
-      clip_count: rendered.clipUrls.length,
-      pages_used: rendered.pagesUsed,
-      provider: rendered.provider,
-      notes: rendered.notes,
-      message: "Premium MP4 ready — parents can Watch / Download movie",
-    });
-  } catch (err) {
-    console.error("render-movie error:", err);
-    const message = err instanceof Error ? err.message : "Render failed";
-
-    try {
-      const supabase = createServiceClient();
-      await supabase
-        .from("storybooks")
-        .update({
-          video_status: "requested",
-          video_notes: `Render failed: ${message.slice(0, 500)}`,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", id);
-    } catch {
-      /* ignore */
+    const pages = (book.pages || []) as StoryPage[];
+    if (!pages.some((p) => p?.imageUrl)) {
+      return NextResponse.json(
+        { error: "Book has no illustrated pages to animate" },
+        { status: 400 }
+      );
     }
 
+    const startedAt = new Date().toISOString();
+    const queued = buildTracker({
+      step: "queued",
+      detail: "Order received — starting the kitchen…",
+      startedAt,
+    });
+    await writeTracker(supabase, id, queued, {
+      video_status: "in_production",
+      video_package: parsed.data.package,
+    });
+
+    if (parsed.data.mode === "sync") {
+      await runRenderJob({
+        id,
+        packageKind: parsed.data.package,
+        force: parsed.data.force,
+        generateNarrationIfMissing: parsed.data.generateNarrationIfMissing,
+      });
+      const { data: done } = await supabase
+        .from("storybooks")
+        .select(
+          "id, child_name, video_status, video_url, video_package, video_notes, narration_url"
+        )
+        .eq("id", id)
+        .single();
+      return NextResponse.json({
+        ...done,
+        message: done?.video_url
+          ? "Premium MP4 ready"
+          : "Render finished without URL — check tracker notes",
+      });
+    }
+
+    // Async Domino mode — return now, keep cooking
+    after(() =>
+      runRenderJob({
+        id,
+        packageKind: parsed.data.package,
+        force: parsed.data.force,
+        generateNarrationIfMissing: parsed.data.generateNarrationIfMissing,
+      })
+    );
+
+    return NextResponse.json(
+      {
+        id: book.id,
+        child_name: book.child_name,
+        video_status: "in_production",
+        tracker: queued,
+        message:
+          "Pizza’s in the oven 🍕 Domino tracker live — refresh Movie Queue for progress.",
+        poll: `/api/storybooks/${id}/video`,
+      },
+      { status: 202 }
+    );
+  } catch (err) {
+    console.error("render-movie start error:", err);
+    const message = err instanceof Error ? err.message : "Render failed";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

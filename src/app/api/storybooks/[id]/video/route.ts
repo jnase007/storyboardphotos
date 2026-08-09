@@ -203,7 +203,7 @@ export async function GET(_request: NextRequest, { params }: Params) {
   const { data, error } = await supabase
     .from("storybooks")
     .select(
-      "id, child_name, video_status, video_url, video_package, narration_url"
+      "id, child_name, video_status, video_url, video_package, narration_url, video_notes"
     )
     .eq("id", id)
     .single();
@@ -212,5 +212,16 @@ export async function GET(_request: NextRequest, { params }: Params) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  return NextResponse.json(data);
+  // Domino's-style tracker (parsed from video_notes when present)
+  let tracker: unknown = null;
+  try {
+    const { parseMovieTracker } = await import(
+      "@/lib/storybook/movie-tracker"
+    );
+    tracker = parseMovieTracker(data.video_notes);
+  } catch {
+    tracker = null;
+  }
+
+  return NextResponse.json({ ...data, tracker });
 }

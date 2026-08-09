@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   Copy,
@@ -13,6 +13,11 @@ import {
   Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
+import {
+  MOVIE_TRACKER_STEPS,
+  parseMovieTracker,
+  type MovieTrackerState,
+} from "@/lib/storybook/movie-tracker";
 
 const ADMIN_CODE = "3121";
 
@@ -34,6 +39,98 @@ type Job = {
   page_images: string[];
   preview_image?: string | null;
 };
+
+function DominoTracker({ tracker }: { tracker: MovieTrackerState }) {
+  const failed = tracker.step === "failed";
+  const activeIdx = MOVIE_TRACKER_STEPS.findIndex((s) => s.id === tracker.step);
+  const idx = failed ? -1 : activeIdx < 0 ? 0 : activeIdx;
+
+  return (
+    <div
+      className="mt-4 rounded-2xl border p-4"
+      style={{
+        borderColor: failed ? "#fecaca" : "#f5e6c8",
+        background: failed
+          ? "linear-gradient(135deg,#fff5f5,#fff)"
+          : "linear-gradient(135deg,#fffaf0,#ffffff)",
+      }}
+    >
+      <div className="flex items-center justify-between gap-3 mb-3">
+        <div>
+          <p className="text-sm font-bold text-gray-900">
+            🍕 Pizza Tracker · {failed ? "Kitchen issue" : tracker.label}
+          </p>
+          <p className="text-xs text-gray-500 mt-0.5">
+            {tracker.detail ||
+              (failed
+                ? tracker.error || "Render failed"
+                : "Your kingdom movie is cooking…")}
+            {typeof tracker.clipsDone === "number" &&
+            typeof tracker.clipsTotal === "number" &&
+            tracker.clipsTotal > 0
+              ? ` · page ${tracker.clipsDone}/${tracker.clipsTotal}`
+              : ""}
+          </p>
+        </div>
+        <div className="text-right shrink-0">
+          <p
+            className="text-2xl font-black tabular-nums"
+            style={{ color: failed ? "#b91c1c" : "#B98A19" }}
+          >
+            {failed ? "—" : `${tracker.pct}%`}
+          </p>
+          <p className="text-[10px] uppercase tracking-wide text-gray-400">
+            complete
+          </p>
+        </div>
+      </div>
+
+      <div className="h-2.5 rounded-full bg-gray-100 overflow-hidden mb-4">
+        <div
+          className="h-full rounded-full transition-all duration-700"
+          style={{
+            width: `${failed ? 100 : Math.max(4, tracker.pct)}%`,
+            background: failed
+              ? "linear-gradient(90deg,#ef4444,#f97316)"
+              : "linear-gradient(90deg,#B98A19,#e8c56a,#B98A19)",
+          }}
+        />
+      </div>
+
+      <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+        {MOVIE_TRACKER_STEPS.map((s, i) => {
+          const done = !failed && (tracker.step === "done" || i < idx);
+          const current = !failed && i === idx;
+          return (
+            <div key={s.id} className="text-center">
+              <div
+                className="mx-auto w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border-2 mb-1"
+                style={{
+                  borderColor: done || current ? "#B98A19" : "#e5e7eb",
+                  background: done
+                    ? "#B98A19"
+                    : current
+                      ? "#fff7e6"
+                      : "#fff",
+                  color: done ? "#fff" : current ? "#B98A19" : "#9ca3af",
+                  boxShadow: current ? "0 0 0 4px rgba(185,138,25,0.15)" : undefined,
+                }}
+              >
+                {done ? "✓" : i + 1}
+              </div>
+              <p
+                className="text-[10px] font-semibold leading-tight"
+                style={{ color: done || current ? "#0A1628" : "#9ca3af" }}
+              >
+                {s.title}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 const STATUSES = [
   "requested",
@@ -87,6 +184,19 @@ export function VideoJobsPanel() {
     load();
   }, []);
 
+  // Domino's-style auto refresh while anything is in the oven
+  const cooking = useMemo(
+    () => jobs.some((j) => j.video_status === "in_production"),
+    [jobs]
+  );
+  useEffect(() => {
+    if (!cooking) return;
+    const t = setInterval(() => {
+      void load();
+    }, 8000);
+    return () => clearInterval(t);
+  }, [cooking]);
+
   async function saveJob(id: string) {
     const d = drafts[id];
     if (!d) return;
@@ -135,9 +245,7 @@ export function VideoJobsPanel() {
 
   async function renderPremiumMovie(id: string, force = false) {
     setRenderingId(id);
-    toast.message(
-      "Rendering premium MP4 (Seedance motion + stitch + narration). Can take 10–25 min…"
-    );
+    toast.message("Order in 🍕 Domino tracker starting…");
     try {
       const res = await fetch(`/api/admin/storybooks/${id}/render-movie`, {
         method: "POST",
@@ -149,15 +257,16 @@ export function VideoJobsPanel() {
           package: "full",
           force,
           generateNarrationIfMissing: true,
+          mode: "async",
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Render failed");
-      toast.success(
-        data.reused
-          ? "Movie already ready"
-          : `MP4 ready · ${data.pages_used ?? "?"} pages animated`
-      );
+      if (!res.ok && res.status !== 202) {
+        throw new Error(data.error || "Render failed");
+      }
+      if (data.reused) toast.success("Movie already ready");
+      else if (data.video_url) toast.success("MP4 ready");
+      else toast.success("In the oven — watch the pizza tracker");
       await load();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Render failed");
@@ -265,6 +374,12 @@ CREATE INDEX IF NOT EXISTS idx_storybooks_video_status ON public.storybooks(vide
                 url: job.video_url || "",
                 notes: "",
               };
+              const tracker = parseMovieTracker(job.video_notes);
+              const showTracker =
+                Boolean(tracker) &&
+                (job.video_status === "in_production" ||
+                  tracker?.step === "failed" ||
+                  (tracker?.step === "done" && !job.video_url));
               return (
                 <div
                   key={job.id}
@@ -306,6 +421,15 @@ CREATE INDEX IF NOT EXISTS idx_storybooks_video_status ON public.storybooks(vide
                           {job.video_contact_name} {job.video_contact_email}
                         </p>
                       )}
+                      {showTracker && tracker ? (
+                        <DominoTracker tracker={tracker} />
+                      ) : null}
+                      {job.video_status === "in_production" && !tracker ? (
+                        <div className="mt-3 text-xs font-semibold text-amber-800 flex items-center gap-2">
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          In the oven — tracker warming up…
+                        </div>
+                      ) : null}
                       <div className="flex flex-wrap gap-2 mt-3">
                         <Link
                           href={`/book/${job.id}`}
