@@ -16,7 +16,7 @@ export function Footer() {
           <div className="sm:col-span-2 lg:col-span-1">
             <Link href="/" className="inline-flex items-center mb-4" aria-label={SITE.name}>
               <Image
-                src="/brand/storybook-photos-logo-white-v3.png"
+                src="/brand/storybook-photos-logo-nav.png?v=4"
                 alt={SITE.name}
                 width={280}
                 height={184}
