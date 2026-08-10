@@ -7,12 +7,12 @@ import { BookingForm } from "@/components/booking-form";
 
 
 const QUESTS = [
-  { id: "dragon-slayer", num: 1, title: "Dragon Mountain", desc: "Climb the Ember Path, face fire-gusts on the peak, and conquer Dragon Land. (Joshua 1:9)", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/dragon-slayer.jpg" },
-  { id: "rescue-mission", num: 2, title: "Broken Bridge Rescue", desc: "Race the storm, cross a shattered bridge, and pull lost friends off the cliff path. (Luke 15:4)", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/rescue-mission.jpg" },
-  { id: "lost-crown", num: 3, title: "Crown of the Cliffs", desc: "Scale the White Cliffs, outsmart the wind, and reclaim the lost crown. (Proverbs 4:23)", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/lost-crown.jpg" },
-  { id: "forest-guardian", num: 4, title: "Storm in the Forest", desc: "Race a wild storm, free the trapped river, and save the ancient trees. (Genesis 2:15)", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/forest-guardian.jpg" },
-  { id: "kindness-quest", num: 5, title: "Midnight Lantern Run", desc: "Village goes dark in a storm — race supplies across a broken footbridge before midnight. (Ephesians 4:32)", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/kindness-quest.jpg" },
-  { id: "light-treasure", num: 6, title: "Treasure Gauntlet", desc: "Map, traps, tunnels, final leap to the chest — then share the treasure. (Matthew 5:14)", image: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/light-treasure.jpg" },
+  { id: "dragon-slayer", num: 1, title: "Dragon Mountain", desc: "Climb Dragon Mountain, douse the dragon's fire-breath with river water, and open the pass. (Joshua 1:9)", image: "/adventure-cards/dragon-slayer.jpg?v=16" },
+  { id: "rescue-mission", num: 2, title: "Broken Bridge Rescue", desc: "Race the storm, cross a washed-out river bridge, and bring friends home safe. (Luke 15:4)", image: "/adventure-cards/rescue-mission.jpg?v=16" },
+  { id: "lost-crown", num: 3, title: "Sword of the Cliffs", desc: "Climb the White Cliffs and pull the King's sword from the stone. (Proverbs 4:23)", image: "/adventure-cards/lost-crown.jpg?v=16" },
+  { id: "forest-guardian", num: 4, title: "Fire in the Living Forest", desc: "Race the fire, free trapped animals, lead them to higher ground. (Genesis 2:15)", image: "/adventure-cards/forest-guardian.jpg?v=16" },
+  { id: "kindness-quest", num: 5, title: "Kingdom Race", desc: "Race hard — then stop to help a fallen friend finish. (Ecclesiastes 4:9-10)", image: "/adventure-cards/kindness-quest.jpg?v=16" },
+  { id: "light-treasure", num: 6, title: "The Treasure Chest", desc: "Follow the map, beat the path, open the chest and share it. (Matthew 5:14)", image: "/adventure-cards/light-treasure.jpg?v=16" },
 ];
 
 export function BookingSection() {

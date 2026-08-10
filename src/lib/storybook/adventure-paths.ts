@@ -69,8 +69,8 @@ export function fillPlaceholders(
     .replace(/\[Role\]/g, role);
 }
 
-/** v7 = longer action quests (cliffs/bridges/storms) + one-land focus */
-export const ADVENTURE_PATHS_STORAGE_KEY = "sbp-adventure-paths-v7";
+/** v8 = clearer challenges: trial crown, kingdom race, treasure chest names/logic */
+export const ADVENTURE_PATHS_STORAGE_KEY = "sbp-adventure-paths-v8";
 
 /** Shared AI guardrails for every quest (faith-friendly kingdom stories). */
 export const BIBLICAL_STORY_GUARDRAILS =
@@ -78,7 +78,14 @@ export const BIBLICAL_STORY_GUARDRAILS =
   "NO magic spells, NO wands, NO casting, NO witchcraft, NO sorcery, NO wizards, NO potions, NO incantations, NO fairy-godmother magic. " +
   "Wonder comes from beauty of creation, courage, prayerful heart, love, and light — never occult power. " +
   "Talking animals or dragons only as gentle fable creatures (Narnia-adjacent), not as spirits or gods. " +
-  "No pronouns — always use the child name. Boy=King, Girl=Queen only.";
+  "No pronouns — always use the child name. Boy=King, Girl=Queen only. " +
+  "STORY MUST BE BELIEVABLE for kids: clear cause-and-effect, no random nonsense (no crowns blowing off pillows). " +
+  "Every quest = HELP someone, SAVE someone, or CONQUER a real obstacle. Exciting, fun adventure read-aloud — action, humor, heart. " +
+  "No meta lines like 'challenge locked in'. Sound like a great kids book, not a lesson plan. " +
+  "Use plain kid language parents understand out loud. No place names that sound like people (not Cliff Road). " +
+  "Do NOT over-personify weather/nature as violent villains (avoid rain slapped, wind shoved/laughed). Prefer: rain was pounding, wind was blowing sideways. " +
+  "No vague poetry kids cannot picture (avoid courage push louder, shield of will, fear gets last word). Say clear actions and feelings. " +
+  "Do NOT put Bible verse text inside story pages. Verse stays metadata for back cover only.";
 
 export function getAdventurePath(id: AdventurePathId): AdventurePath {
   const path = ADVENTURE_PATHS.find((p) => p.id === id);
@@ -267,12 +274,12 @@ export const ADVENTURE_PATHS: AdventurePath[] = [
     label: "Dragon Mountain",
     title: "Dragon Mountain",
     description:
-      "Climb the Ember Path, face fire-gusts on the peak, and conquer Dragon Land.",
+      "Climb Dragon Mountain, douse the dragon's fire-breath with river water, and open the pass.",
     bibleVerse: "Joshua 1:9",
     bibleVerseText:
       "Be strong and courageous. Do not be afraid… for the Lord your God is with you wherever you go.",
     aiTheme:
-      `${BIBLICAL_STORY_GUARDRAILS} ONE LAND: Dragon Mountain only. ACTION QUEST: climb, rockfall, fire-gusts, stand ground, win the peak. Hero CONQUERS fear and frees the pass. No kingdom tour. No soft filler. Age-appropriate peril, no gore, no killing required — dragon may yield and become guardian after the win. Joshua 1:9.`,
+      `${BIBLICAL_STORY_GUARDRAILS} ONE LAND: Dragon Mountain only. ACTION QUEST: climb, rockfall, face dragon, scoop river water in a bucket, throw water into dragon's mouth to put out fire-breath, open the pass. Hero CONQUERS fear with a clear kid action (bucket of water), not vague courage poetry. No killing — dragon yields and becomes guardian after the win. Joshua 1:9.`,
     bookTitleTemplate: "[Role] [Name] and the Dragon Mountain",
     pages: [
       {
@@ -288,43 +295,41 @@ export const ADVENTURE_PATHS: AdventurePath[] = [
         page: 2,
         title: "Smoke on the Peak",
         staticScene: "dragon-slayer/call",
-        text: `Dragon Mountain smoked like a giant campfire left too long. Sparks hopped in the night sky. The valley pass was blocked. Carts stopped. Sheep stayed home. Fear sat heavy on every rooftop.
+        text: `Dragon Mountain smoked like a campfire left too long. Sparks drifted in the night sky. The valley pass was blocked. Carts stopped. Sheep stayed home. Everyone was afraid.
 
-"[Role] [Name]," the elder said, "someone must climb Dragon Mountain and take back the high pass."
+"[Role] [Name]," the King said, "someone must climb Dragon Mountain and take back the high pass."
 
-[Role] [Name] felt the fear — then felt courage push louder.
+[Role] [Name] felt afraid. Then [Name] chose to be brave anyway.
 
-"I will climb," [Name] said. "I will face the dragon. I will free the mountain."
-
-Be strong and courageous… for the Lord your God is with you. — Joshua 1:9`,
+"I will climb," [Name] said. "I will face the dragon. I will free the mountain."`,
         photoCaption: "The call",
         useSessionPhoto: false,
         imagePromptHint: "smoky dragon mountain valley people looking up watercolor no text",
       },
       {
         page: 3,
-        title: "Through the Gate of Ash",
-        text: `The Gate of Ash was black stone, warm to the touch. Hot wind slapped [Role] [Name]'s cheeks.
+        title: "Through the Mountain Gate",
+        text: `At the mountain gate, the black stone was warm to the touch. Hot wind hit [Role] [Name]'s cheeks.
 
-[Name] did not wait for perfect bravery. [Name] stepped through.
+[Name] was still a little scared. [Name] stepped through anyway.
 
-On the other side, the Ember Path glowed faintly underfoot — a road of cracked rock and orange light, climbing straight into danger.`,
-        photoCaption: "Entering Dragon Land",
+On the other side, a cracked path of rock and orange light climbed straight up into danger.`,
+        photoCaption: "Entering the mountain",
         useSessionPhoto: false,
         imagePromptHint: "hero stepping through scorched ash gate watercolor no text",
       },
       {
         page: 4,
         title: "Rockfall!",
-        text: `Halfway up, the mountain shook. Stones bounced down the cliff like angry drums.
+        text: `Halfway up, the mountain shook. Stones bounced down the slope like loud drums.
 
 "Move!" [Role] [Name] shouted to nobody but [Name]'s own feet.
 
-[Name] dashed under a stone overhang as boulders smashed the path behind. Dust filled the air. For one breath, the world was only noise.
+[Name] dashed under a big rock shelf as boulders smashed the path behind. Dust filled the air. For one breath, the world was only noise.
 
 Then quiet.
 
-[Role] [Name] crawled out, brushed ash from the royal outfit, and grinned a shaky grin. "Nice try, mountain."
+[Role] [Name] crawled out, brushed ash from the royal outfit, and smiled a shaky smile. "That was close."
 
 The climb continued — steeper now.`,
         photoCaption: "Escaping the rockfall",
@@ -333,16 +338,16 @@ The climb continued — steeper now.`,
       },
       {
         page: 5,
-        title: "The Broken Cliff Bridge",
-        text: `A rope bridge once crossed a deep ravine. Now half the boards were gone, swinging over empty air.
+        title: "The Broken Mountain Bridge",
+        text: `A rope bridge once crossed a deep drop between the rocks. Now half the boards were gone, swinging over empty air.
 
-Far below: mist and teeth of stone.
+Far below: mist and sharp rocks.
 
 [Role] [Name] tested the first rope. It held. Barely.
 
 "One board. One breath. One prayer," [Name] whispered.
 
-Step… slide… catch… step. Wind shoved hard. A board cracked and fell spinning into the mist. [Name] froze — then kept going.
+Step… slide… catch… step. A hard gust of wind pushed against [Name]. A board cracked and fell spinning into the mist. [Name] froze — then kept going.
 
 At the far side, [Role] [Name] dropped to safe rock and laughed once, wild and free. "I crossed it."`,
         photoCaption: "Crossing the broken bridge",
@@ -354,13 +359,13 @@ At the far side, [Role] [Name] dropped to safe rock and laughed once, wild and f
         title: "Cave of Echoes",
         text: `The path dove into a black cave. Every footstep roared back twice as loud.
 
-"Too small," the echoes mocked.
+"Too small," the echoes seemed to say.
 "Too scared."
 "Turn around."
 
-[Role] [Name] planted feet in the dark. "I am [Role] [Name]! Fear can talk — fear does not get the last word!"
+[Role] [Name] stood still in the dark. "I am [Role] [Name]! I am scared — but I am still going!"
 
-The cave went quiet. A thin gold crack of daylight opened ahead.
+The cave went quiet. A thin line of daylight opened ahead.
 
 [Name] ran toward it.`,
         photoCaption: "Through the cave",
@@ -373,61 +378,65 @@ The cave went quiet. A thin gold crack of daylight opened ahead.
         staticScene: "dragon-slayer/dragon",
         text: `Wings blotted the sun.
 
-The dragon exploded from the crater — storm-colored scales, amber eyes, wind like a hurricane. Fire-gusts rolled across the ledge. Sparks stung the air.
+The dragon burst up from a big hole in the mountain — dark scales, bright amber eyes, wind rushing from its wings. Hot air rolled across the ledge. Sparks filled the air.
 
 [Role] [Name] did not hide.
 
 "This mountain is not yours alone!" [Name] shouted. "The people need the pass. I came to take it back!"
 
-The dragon roared so hard the stone sang. This was the fight — courage against fear, heart against heat.`,
+The dragon opened its mouth. Fire-breath glowed inside like a furnace.
+
+[Name] looked down the slope. A cold mountain river rushed below. That gave [Name] an idea.`,
         photoCaption: "Dragon encounter",
         useSessionPhoto: false,
-        imagePromptHint: "hero facing giant dragon on mountain ledge fire wind watercolor no text",
+        imagePromptHint: "hero facing giant dragon on mountain ledge fire breath river below watercolor no text",
       },
       {
         page: 8,
-        title: "Stand in the Fire-Wind",
-        text: `Again the dragon dove. Again golden heat blasted the peak.
+        title: "The River Bucket",
+        text: `[Role] [Name] scrambled down to the river and scooped a heavy wooden bucket full of cold water. Splash. Full to the top.
 
-Most people would run. [Role] [Name] stepped forward into the fire-wind, shield of will raised high, royal outfit snapping like a banner.
+Back up the rocks [Name] climbed — arms shaking, water sloshing, boots slipping.
 
-"You will not rule by fear!" [Name] cried.
+The dragon roared and leaned in, ready to breathe fire across the pass.
 
-The dragon wheeled, shocked. [Name] advanced. Inch by inch, [Role] [Name] claimed the ledge. Roars turned shorter. Wings beat slower.
+[Name] ran forward, swung the bucket with both hands, and threw the cold river water straight into the dragon's open mouth!
 
-Courage was winning.`,
-        photoCaption: "Standing firm",
+HISSSS — steam shot up like a teapot. The fire-breath went out. The hot wind stopped.
+
+The dragon blinked. Coughed a tiny puff of smoke. And the pass was open again.`,
+        photoCaption: "Dousing the fire-breath",
         useSessionPhoto: false,
-        imagePromptHint: "hero advancing through dragon fire gust on peak watercolor no text",
+        imagePromptHint: "hero throwing bucket of river water into dragon mouth steam rising watercolor no text",
       },
       {
         page: 9,
         title: "The Peak Is Won",
         staticScene: "dragon-slayer/victory",
-        text: `[Role] [Name] reached the crown of Dragon Mountain and struck the ancient bronze victory gong.
+        text: `With its fire-breath gone, the dragon landed gently on the peak. It folded its big wings… then bowed its great head.
 
-CLANG — the sound rolled over the whole land like sunrise made of metal.
+"Thank you," [Role] [Name] said softly. "Now people can travel safely."
 
-The dragon landed hard… then folded its wings… then bowed its great head.
+[Name] walked to the old bronze bell at the top of Dragon Mountain and rang it once.
 
-"The pass is free," [Name] said. "Fear does not sit on this throne anymore."
+CLANG — the sound rolled over the whole land. Down in the valley, people saw the open pass and cheered.
 
-In that moment, [Role] [Name] conquered Dragon Mountain.`,
+In that moment, [Role] [Name] conquered Dragon Mountain — not with a sword, but with a bucket of river water and a brave heart.`,
         photoCaption: "Victory on the peak",
         useSessionPhoto: false,
-        imagePromptHint: "hero striking bronze gong on mountain peak dragon bowing watercolor no text",
+        imagePromptHint: "hero ringing bronze bell mountain peak dragon bowing gentle steam watercolor no text",
       },
       {
         page: 10,
         title: "Guardian of the Pass",
-        text: `From that day the dragon guarded the pass instead of blocking it. Wings made shade for travelers. Night-flame on the peak became a lighthouse for the valley.
+        text: `From that day the dragon guarded the pass instead of blocking it. Its wings made shade for travelers. The fire-breath stayed calm — only a gentle warm glow when nights got cold.
 
 Carts rolled again. Children pointed up and cheered: "[Role] [Name]!"
 
-[Name] had won more than a mountain. [Name] had won the road home for everyone.`,
+[Name] had put out the dragon's fire-breath, opened the pass, and opened the road home for everyone.`,
         photoCaption: "Dragon guards the pass",
         useSessionPhoto: false,
-        imagePromptHint: "dragon guarding mountain pass hero standing proud watercolor no text",
+        imagePromptHint: "dragon guarding open mountain pass carts traveling hero proud watercolor no text",
       },
       {
         page: 11,
@@ -454,12 +463,12 @@ The End.`,
     label: "Broken Bridge Rescue",
     title: "The Broken Bridge Rescue",
     description:
-      "Race the storm, cross a shattered bridge, and pull lost friends off the cliff path.",
+      "Race the storm, cross a washed-out bridge over the river, and bring lost friends home safe.",
     bibleVerse: "Luke 15:4",
     bibleVerseText:
       "What man of you, having a hundred sheep, if he has lost one of them, does not… go after the one that is lost?",
     aiTheme:
-      `${BIBLICAL_STORY_GUARDRAILS} ONE QUEST LAND: storm valley + cliff road + broken bridge. ACTION: race against weather, climb, haul rope, cross broken bridge, rescue friends from ledge. Hero CONQUERS danger to save others. No full kingdom tour. Luke 15:4.`,
+      `${BIBLICAL_STORY_GUARDRAILS} ONE QUEST LAND: storm valley + flooded river + broken bridge. NOT cliffs (cliffs belong to Sword quest). Clear kid language. ACTION: race against weather, haul rope, cross washed-out bridge over river gorge, rescue friends stuck on far bank. Hero CONQUERS danger to save others. No full kingdom tour. Luke 15:4.`,
     bookTitleTemplate: "[Role] [Name] and the Broken Bridge Rescue",
     pages: [
       {
@@ -476,25 +485,23 @@ and the Broken Bridge Rescue`,
         page: 2,
         title: "Storm Warning",
         staticScene: "rescue-mission/call",
-        text: `Thunder grumbled over the valley. A scout stumbled into the courtyard, soaked and breathless.
+        text: `Thunder grumbled over the valley. The King stood in the courtyard, cloak soaked, eyes full of worry.
 
-"Friends are stuck on Cliff Road," the scout gasped. "The bridge is breaking. The storm is faster than they are."
+"Friends are stuck on the far side of the river," the King said. "The bridge is breaking. The storm is faster than they are. [Role] [Name] — I need you to go."
 
 [Role] [Name] grabbed a rope, a lantern, and courage.
 
-"I'm going now."
-
-What man… does not go after the one that is lost? — Luke 15:4`,
+"I'm going now."`,
         photoCaption: "The urgent call",
         useSessionPhoto: false,
-        imagePromptHint: "courtyard storm messenger hero grabbing rope watercolor no text",
+        imagePromptHint: "king in courtyard storm sending hero with rope watercolor no text",
       },
       {
         page: 3,
         title: "Race the Rain",
-        text: `Rain slapped the trail. Wind shoved sideways. [Role] [Name] ran anyway — boots splashing, lantern swinging, rope coiled tight.
+        text: `The rain was pounding on the trail, and the wind was blowing everything sideways. [Role] [Name] ran anyway — boots splashing, lantern swinging, rope coiled tight.
 
-Lightning flashed white. For a second the whole valley looked like a sketch.
+Lightning flashed white across the sky.
 
 [Name] did not slow down. Someone needed [Name] on the other side of the storm.`,
         photoCaption: "Running through the storm",
@@ -503,31 +510,31 @@ Lightning flashed white. For a second the whole valley looked like a sketch.
       },
       {
         page: 4,
-        title: "Cliff Road",
-        text: `Cliff Road clung to the mountain like a skinny ribbon. One side: rock wall. Other side: empty air and roaring river far below.
+        title: "The River Path",
+        text: `The trail ran beside the swollen river. Mud sucked at [Role] [Name]'s boots. Brown water rushed past, full of sticks and foam.
 
-[Role] [Name] pressed a hand to the wet stone and edged forward.
+[Name] held the lantern high and kept running.
 
-"Hold on!" [Name] called into the wind. "I am coming!"
+"Hold on!" [Name] called across the water. "I am coming!"
 
-A tiny voice answered from ahead — scared, but alive.`,
-        photoCaption: "On the cliff path",
+A tiny voice answered from the far bank — scared, but alive.`,
+        photoCaption: "Beside the rising river",
         useSessionPhoto: false,
-        imagePromptHint: "hero on narrow cliff path storm river below watercolor no text",
+        imagePromptHint: "hero running beside flooded river in storm with lantern watercolor no text",
       },
       {
         page: 5,
         title: "The Bridge Breaks",
-        text: `There it was — the rope bridge, half-torn, boards missing, one side hanging low.
+        text: `There it was — the old wooden bridge over the river, half-torn, boards missing, one side hanging low over the flood.
 
-Two friends crouched on the far ledge. One plank snapped and spun into the mist.
+Two friends crouched on the far bank. One plank snapped and spun into the brown water.
 
 "Don't move!" [Role] [Name] shouted. "I will bring the rope!"
 
-[Name]'s heart hammered. This was the moment bravery becomes action.`,
+[Name]'s heart was beating fast. This was the moment to be brave.`,
         photoCaption: "Broken bridge ahead",
         useSessionPhoto: false,
-        imagePromptHint: "broken rope bridge cliff friends stranded hero arriving watercolor no text",
+        imagePromptHint: "broken wooden bridge over flooded river friends stranded far bank hero arriving watercolor no text",
       },
       {
         page: 6,
@@ -536,16 +543,16 @@ Two friends crouched on the far ledge. One plank snapped and spun into the mist.
 
 Miss.
 
-Wind laughed. [Name] threw again — harder.
+The wind blew the rope off course. [Name] threw again — harder.
 
 Catch! The far friend grabbed it.
 
 "Tie it around the rock!" [Name] called. "Tight!"
 
-When the line went taut, [Role] [Name] clipped courage to the rope and stepped onto the first trembling board.`,
+When the rope was tight, [Role] [Name] held on and stepped onto the first shaky board.`,
         photoCaption: "Throwing the rescue rope",
         useSessionPhoto: false,
-        imagePromptHint: "hero throwing rope across broken bridge storm watercolor no text",
+        imagePromptHint: "hero throwing rope across broken river bridge storm watercolor no text",
       },
       {
         page: 7,
@@ -556,29 +563,29 @@ A board cracked. [Role] [Name] dropped to a knee, held the rope, and breathed th
 
 "I am [Role] [Name]," [Name] said through clenched teeth. "I do not leave people behind."
 
-Across the gap [Name] went — wet, shaking, unstoppable — until boots hit solid ledge and arms wrapped the waiting friends.`,
+Across the gap [Name] went — wet, shaking, and brave — until boots hit the muddy far bank and arms wrapped the waiting friends.`,
         photoCaption: "Crossing the broken bridge",
         useSessionPhoto: false,
-        imagePromptHint: "hero crossing damaged rope bridge in rain watercolor no text",
+        imagePromptHint: "hero crossing damaged wooden bridge over flooded river in rain watercolor no text",
       },
       {
         page: 8,
         title: "Pull to Safety",
-        text: `One friend was too tired to walk. [Role] [Name] made a rope harness and guided each person back across, one at a time, body a shield against the wind.
+        text: `One friend was too tired to walk. [Role] [Name] tied the rope around them and helped each person back across, one at a time, blocking the wind with [Name]'s own body.
 
-When the last friend reached safe rock, the bridge gave a final groan and sagged even lower.
+When the last friend reached safe ground, the bridge gave a final groan and sagged even lower over the river.
 
 They had made it. Just in time.`,
         photoCaption: "Everyone safe",
         useSessionPhoto: false,
-        imagePromptHint: "hero helping friends off cliff ledge after bridge crossing watercolor no text",
+        imagePromptHint: "hero helping friends onto safe riverbank after bridge crossing watercolor no text",
       },
       {
         page: 9,
         title: "Down the Safe Trail",
         text: `On the sheltered trail below, the storm softened to a whisper. [Role] [Name] shared the lantern's warm circle and walked the friends home.
 
-No throne room tour. No garden stroll. Just the best kind of victory: people safe because someone ran toward the danger.`,
+The best win of all: people safe because someone ran to help.`,
         photoCaption: "Walking home",
         useSessionPhoto: false,
         imagePromptHint: "hero leading rescued friends down trail after storm watercolor no text",
@@ -589,7 +596,7 @@ No throne room tour. No garden stroll. Just the best kind of victory: people saf
         staticScene: "rescue-mission/end",
         text: `Village bells rang when they returned. Hugs. Blankets. Warm bread.
 
-"You crossed the broken bridge," an elder said. "You conquered the storm with love."
+"You crossed the broken bridge," the King said. "You conquered the storm with love."
 
 [Role] [Name] smiled, soaked and shining. "No one gets left behind."
 
@@ -603,85 +610,91 @@ The End.`,
   {
     id: "lost-crown",
     option: 3,
-    label: "Crown of the Cliffs",
-    title: "Crown of the Cliffs",
+    label: "Sword of the Cliffs",
+    title: "Sword of the Cliffs",
     description:
-      "Scale the White Cliffs, outsmart the wind thieves, and reclaim the lost crown.",
+      "Climb the White Cliffs, free the King's sword from the summit stone, and bring it safely home.",
     bibleVerse: "Proverbs 4:23",
     bibleVerseText: "Keep your heart with all vigilance, for from it flow the springs of life.",
     aiTheme:
-      `${BIBLICAL_STORY_GUARDRAILS} ONE LAND: White Cliffs. ACTION: climb, wind blasts, narrow ledges, tricky goats/wind-thieves (playful not evil), reclaim crown at summit. Hero CONQUERS the climb. No kingdom tour. Proverbs 4:23 — guard what matters.`,
-    bookTitleTemplate: "[Role] [Name] and the Crown of the Cliffs",
+      `${BIBLICAL_STORY_GUARDRAILS} ONE LAND: White Cliffs. CLEAR SETUP: the King left his sword stuck in the summit stone (sword-in-the-stone energy). CLEAR CHALLENGE: climb, wind, goats, chimney crack, pull sword free, careful descent. Hero CONQUERS the climb and returns the sword. Kid already wears a crown in photos — quest object is the SWORD, not a crown. No kingdom tour. Proverbs 4:23.`,
+    bookTitleTemplate: "[Role] [Name] and the Sword of the Cliffs",
     pages: [
       {
         page: 1,
-        title: "Crown of the Cliffs",
+        title: "Sword of the Cliffs",
         staticScene: "lost-crown/title",
         text: `[Role] [Name]
-and the Crown of the Cliffs`,
+and the Sword of the Cliffs`,
         photoCaption: "The cliffs await",
         useSessionPhoto: false,
-        imagePromptHint: "cover hero looking up white cliffs crown glint watercolor no text",
+        imagePromptHint: "cover hero looking up white cliffs sword stuck in summit stone watercolor no text",
       },
       {
         page: 2,
-        title: "The Crown Is Gone",
+        title: "The King's Sword",
         staticScene: "lost-crown/call",
-        text: `A wild wind ripped through the courtyard and lifted the royal crown clean off the pillow.
+        text: `The King had climbed the White Cliffs at sunrise to watch over the kingdom… and left his sword stuck in the rock at the top.
 
-Up it spun — gold flashing — until it snagged on the highest tooth of the White Cliffs.
+By afternoon, everyone knew: the royal sword was still up there, flashing in the sun like a silver star.
 
-"That crown belongs to the kingdom," the King said. "And the climb belongs to the brave."
+"I need my sword back," the King told [Role] [Name]. "It is stuck tight in the stone. I need a brave climber who will not give up."
 
-[Role] [Name] tied a climbing sash. "I will bring it home."`,
-        photoCaption: "Crown stolen by wind",
+[Name] tied a climbing belt, checked the rope, and grinned up the white wall of rock.
+
+"I will climb. I will bring your sword home."`,
+        photoCaption: "Accepting the cliff quest",
         useSessionPhoto: false,
-        imagePromptHint: "crown blown by wind toward white cliffs hero determined watercolor no text",
+        imagePromptHint: "hero at base of white cliffs looking up at distant sword in stone watercolor no text",
       },
       {
         page: 3,
         title: "Base of the White Cliffs",
-        text: `The White Cliffs rose like a wall of chalk and sunlight. Birds wheeled. Wind whistled through cracks.
+        text: `The White Cliffs rose like a tall white wall in the sunlight. Birds circled above. Wind whistled through the cracks.
+
+High above, something silver winked — the King's sword, still waiting in the stone.
 
 [Role] [Name] found the first handhold and pulled up.
 
 "One hold at a time," [Name] said. "Courage is a climb."`,
         photoCaption: "Starting the climb",
         useSessionPhoto: false,
-        imagePromptHint: "hero starting climb on tall white cliffs watercolor no text",
+        imagePromptHint: "hero starting climb on tall white cliffs sword glint above watercolor no text",
       },
       {
         page: 4,
-        title: "The Wind Shoves Back",
-        text: `Halfway up, a gust hit like a giant's push. [Role] [Name]'s foot slipped. Fingers burned on the rock.
+        title: "The Wind Pushes Back",
+        text: `Halfway up, a strong gust of wind almost knocked [Role] [Name] sideways. [Name]'s foot slipped. Fingers ached on the rock.
 
-[Name] hugged the cliff, heart pounding, and waited out the wind.
+For one scary second the whole world was wind and white stone.
 
-Then [Name] laughed — short and fierce — and kept climbing higher than the fear.`,
+[Name] hugged the cliff, heart pounding, and waited it out.
+
+Then [Name] took a breath, smiled a little, and kept climbing.`,
         photoCaption: "Holding on in the wind",
         useSessionPhoto: false,
         imagePromptHint: "hero clinging to cliff face in strong wind watercolor no text",
       },
       {
         page: 5,
-        title: "Goat Thieves of the Ledge",
-        text: `On a wide ledge, three cheeky cliff-goats blocked the path, crowns of wildflowers on their heads like tiny jokes.
+        title: "Goats on the Ledge",
+        text: `On a wide ledge, three cheeky cliff-goats blocked the path, wildflower crowns tilted on their heads like tiny jokes.
 
-They had nudged the royal crown higher with their horns for fun.
+"Excuse me," [Role] [Name] said. "I need this path. The King's sword is up there."
 
-"I need that crown," [Role] [Name] said firmly. "Not for pride — for the people."
+The goats did not move. Of course they didn't.
 
-[Name] offered the goats sweet clover from a pouch. While they munched, [Name] slipped past toward the final chimney of rock.`,
+So [Name] pulled sweet clover from a pouch. While the goats munched and made happy goat noises, [Name] slipped past toward the last narrow crack in the rock — smiling the whole way.`,
         photoCaption: "Outsmarting the goats",
         useSessionPhoto: false,
         imagePromptHint: "hero on cliff ledge with playful goats flower crowns watercolor no text",
       },
       {
         page: 6,
-        title: "The Chimney Crack",
-        text: `The last stretch was a narrow crack — a rock chimney. [Role] [Name] pressed back and feet to opposite walls and wriggled upward, inch by inch.
+        title: "The Narrow Crack",
+        text: `The last stretch was a narrow crack in the rock. [Role] [Name] pressed back and feet to opposite walls and wriggled upward, inch by inch.
 
-Sweat. Dust. A scrape on the royal sleeve (same outfit, still locked, just a little cliff-dusty).
+Sweat. Dust. Tired arms. Almost… almost…
 
 Then [Name]'s hand found open air and blue sky.`,
         photoCaption: "The hardest climb",
@@ -690,331 +703,347 @@ Then [Name]'s hand found open air and blue sky.`,
       },
       {
         page: 7,
-        title: "Crown on the Summit",
+        title: "Sword in the Stone",
         staticScene: "lost-crown/find",
-        text: `There it was — the crown — caught on a sunlit spike of stone, glittering like a captured star.
+        text: `There it was — the King's sword — stuck deep in a sunny point of stone, exactly where he had left it.
 
-[Role] [Name] crawled across the summit spine, wind roaring, and lifted the crown free with both hands.
+[Role] [Name] crawled across the top of the cliff, wind roaring, wrapped both hands around the handle, and pulled.
 
-"Got you," [Name] whispered.
+It did not move.
 
-Below, the whole kingdom looked tiny. Above, the sky felt huge. [Name] had conquered the cliffs.`,
-        photoCaption: "Crown recovered",
+[Name] planted both feet, took a deep breath, and pulled again with everything [Name] had.
+
+SHHING! The sword slid free, bright as morning.
+
+"Got you," [Name] said — then cheered so loud the echo cheered back.`,
+        photoCaption: "Sword freed",
         useSessionPhoto: false,
-        imagePromptHint: "hero on cliff summit holding crown high watercolor no text",
+        imagePromptHint: "hero on cliff summit pulling sword from stone watercolor no text",
       },
       {
         page: 8,
         title: "The Careful Way Down",
-        text: `Getting down was its own adventure. [Role] [Name] used the rope, tested every hold, and talked courage into tired arms.
+        text: `Getting down was its own adventure. A sword in hand is only half the win if you don't make it home.
 
-When boots hit grass at the bottom, [Name] raised the crown and whooped so loud the goats answered from above.`,
+[Role] [Name] strapped the sword safe, used the rope, tested every hold, and kept going even with tired arms.
+
+When boots hit grass at the bottom, [Name] raised the sword high — and the goats bleated from above like they were cheering.`,
         photoCaption: "Safe descent",
         useSessionPhoto: false,
-        imagePromptHint: "hero descending cliffs with crown secured watercolor no text",
+        imagePromptHint: "hero descending cliffs with sword secured watercolor no text",
       },
       {
         page: 9,
-        title: "Crown Restored",
+        title: "Sword Returned",
         staticScene: "lost-crown/end",
-        text: `In the courtyard [Role] [Name] set the crown back where it belonged — not as a trophy of ego, but as a promise kept.
+        text: `In the courtyard [Role] [Name] held out the King's sword — dusty, shining, earned.
 
-"You guarded what matters," the King said. "You conquered the cliffs."
+"You did not quit when the wind hit," the King said, taking it with a proud smile. "You conquered the cliffs."
 
-[Name] stood tall, dusty, victorious.
-
-Keep your heart with all vigilance… — Proverbs 4:23
+[Name] stood tall and grinned. It had been hard — and it felt great.
 
 The End.`,
         photoCaption: "The end",
         useSessionPhoto: false,
-        imagePromptHint: "hero returning crown to courtyard celebration watercolor no text",
+        imagePromptHint: "hero returning sword to king in courtyard celebration watercolor no text",
       },
     ],
   },
   {
     id: "forest-guardian",
     option: 4,
-    label: "Storm in the Forest",
-    title: "Storm in the Living Forest",
+    label: "Fire in the Forest",
+    title: "Fire in the Living Forest",
     description:
-      "Race a wild storm through the Living Forest, free the trapped river, and save the ancient trees.",
+      "Race a forest fire, rescue trapped animals, and lead them to higher ground.",
     bibleVerse: "Genesis 2:15",
     bibleVerseText:
       "The Lord God took the man and put him in the garden of Eden to work it and keep it.",
     aiTheme:
-      `${BIBLICAL_STORY_GUARDRAILS} ONE LAND: Living Forest in a storm. ACTION: falling branches, flooded path, jammed river rocks, climb to free water, protect animals/trees. Hero CONQUERS the storm crisis as steward. No kingdom tour. Genesis 2:15.`,
-    bookTitleTemplate: "[Role] [Name] and the Storm in the Living Forest",
+      `${BIBLICAL_STORY_GUARDRAILS} ONE LAND: Living Forest on fire (age-appropriate — glowing danger, smoke, heat, NOT gore). CLEAR MISSION: SAVE animals trapped by fire and lead them to higher ground / safe ridge. ACTION: smoke path, fallen log trap, scoop/guide animals (fox, deer fawn, birds), clear a safe trail uphill, count every friend safe. Hero is a rescuer/steward. Fire can be stopped/slowed by river or rain at end if needed — focus is animal rescue. No kingdom tour. Genesis 2:15.`,
+    bookTitleTemplate: "[Role] [Name] and the Fire in the Living Forest",
     pages: [
       {
         page: 1,
-        title: "Storm in the Living Forest",
+        title: "Fire in the Living Forest",
         staticScene: "forest-guardian/title",
         text: `[Role] [Name]
-and the Storm in the Living Forest`,
+and the Fire in the Living Forest`,
         photoCaption: "The forest needs help",
         useSessionPhoto: false,
-        imagePromptHint: "cover hero in windy living forest storm light watercolor no text",
+        imagePromptHint: "cover hero facing glowing forest fire smoke animals watercolor no text",
       },
       {
         page: 2,
-        title: "Trees in Trouble",
+        title: "Smoke in the Trees",
         staticScene: "forest-guardian/call",
-        text: `The Living Forest groaned. Wind twisted the high branches. Animals ran toward the castle path.
+        text: `Orange light flickered between the trees. Smoke rolled low over the roots. Birds cried. A little fox darted toward the castle path — then stopped and looked back into the woods.
 
-"The river is blocked," a woodcutter cried. "If the water can't move, the roots will drown and the storm will break the old trees."
+"Animals are trapped near the creek bend," the King said. "The fire is blocking the way to the high hill. [Role] [Name] — can you lead them to safety?"
 
-[Role] [Name] took a deep breath. "Then I go into the storm."`,
+[Role] [Name] tied a cloth over [Name]'s face, grabbed a water gourd, and ran.
+
+"I'm going in. Nobody gets left behind."`,
         photoCaption: "The call",
         useSessionPhoto: false,
-        imagePromptHint: "stormy forest edge animals fleeing hero determined watercolor no text",
+        imagePromptHint: "forest edge smoke glow animals scared hero determined watercolor no text",
       },
       {
         page: 3,
-        title: "Into the Roar",
-        text: `Leaves flew like green birds. [Role] [Name] pushed into the Living Forest as the canopy thrashed overhead.
+        title: "Into the Smoke",
+        text: `The heat pressed against [Role] [Name]'s cheeks. Sparks floated up like fireflies. The edges of the path glowed.
 
-A branch crashed across the path. [Name] leapt it. Another cracked to the right — [Name] rolled left and kept running.
+A burning branch crashed down. [Name] leapt it. Another spark landed on the trail — [Name] stomped it out and kept running.
 
 This was not a stroll. This was a rescue at full speed.`,
-        photoCaption: "Running the storm path",
+        photoCaption: "Running the fire path",
         useSessionPhoto: false,
-        imagePromptHint: "hero running through stormy forest falling branches watercolor no text",
+        imagePromptHint: "hero running through smoky forest sparks falling branch watercolor no text",
       },
       {
         page: 4,
-        title: "The Flooded Path",
-        text: `Brown water covered the trail. [Role] [Name] waded in up to the knees, holding the lantern high.
+        title: "Trapped at the Creek",
+        text: `At the creek bend, animals were stuck — a fox under a fallen log, a baby deer frozen by the bank, birds flapping in the low brush. Fire had blocked the easy way out.
 
-Something bumped [Name]'s leg — a little fox stranded on a root island. [Name] scooped it up and set it on higher ground.
+"I've got you," [Role] [Name] said, voice steady.
 
-"I've got you. Now the river."`,
-        photoCaption: "Wading the flood",
+[Name] heaved the log just enough for the fox to scramble free, scooped the shaking fawn into both arms, and whistled the birds toward higher ground.`,
+        photoCaption: "Freeing trapped animals",
         useSessionPhoto: false,
-        imagePromptHint: "hero wading flooded forest path rescuing fox watercolor no text",
+        imagePromptHint: "hero freeing fox under log holding fawn forest fire glow watercolor no text",
       },
       {
         page: 5,
-        title: "Rocks in the River",
-        text: `At the bend, storm-tumbled boulders jammed the river into a furious swirl. Water had nowhere good to go.
+        title: "The Uphill Trail",
+        text: `Higher ground meant the rocky hill above the trees — safe, open, away from the flames.
 
-[Role] [Name] climbed onto the wet rocks, found the keystone boulder, and shoved with everything [Name] had.
+But the trail was blocked by brush and smoke.
 
-It budged an inch. Then another.
+[Role] [Name] cleared a path, poured water on hot spots, and led the animals one by one: fox first, baby deer in [Name]'s arms, birds flapping ahead.
 
-"Move!" [Name] yelled — and the rock rolled free with a thunder-splash.`,
-        photoCaption: "Freeing the river",
+"Stay with me. Almost there."`,
+        photoCaption: "Leading them up",
         useSessionPhoto: false,
-        imagePromptHint: "hero pushing boulder in raging forest river storm watercolor no text",
+        imagePromptHint: "hero leading animals up rocky trail away from forest fire watercolor no text",
       },
       {
         page: 6,
-        title: "Water Roars Free",
-        text: `The river punched through the jam and raced down its old path, singing a wild relieved song.
+        title: "Safe on the High Hill",
+        text: `They made it onto the high hill as a cool wind hit their faces.
 
-Trees straightened as the drowning pressure eased. The worst of the thrashing calmed.
+One by one [Role] [Name] counted: fox… baby deer… birds… even a sleepy owl sitting on [Name]'s shoulder.
 
-[Role] [Name] stood on the rock, soaked, laughing, victorious — guardian in action, not in title only.`,
-        photoCaption: "River freed",
+Below, the fire hissed where it met the wide creek and could go no farther.
+
+[Name] dropped to the grass, laughing with relief. Every friend was safe.`,
+        photoCaption: "Animals safe on the high hill",
         useSessionPhoto: false,
-        imagePromptHint: "hero standing on rocks as forest river bursts free watercolor no text",
+        imagePromptHint: "hero on ridge with rescued forest animals fire below creek watercolor no text",
       },
       {
         page: 7,
-        title: "Quiet After the Storm",
+        title: "Quiet After the Fire",
         staticScene: "forest-guardian/gift",
-        text: `Sunbeams found the leaves again. Birds tried out their voices. The little fox flicked its tail like a thank-you flag.
+        text: `Rain came soft and kind, tapping the ash into the soil. Green leaves still waited deeper in the woods.
 
-[Role] [Name] walked the path once more, checking nests and roots, making sure the Living Forest could breathe.`,
-        photoCaption: "Forest calms",
+The fox flicked its tail like a thank-you flag. The fawn nuzzled [Role] [Name]'s hand.
+
+[Name] walked the hill once more, checking every little animal, making sure the forest friends were safe.`,
+        photoCaption: "After the rescue",
         useSessionPhoto: false,
-        imagePromptHint: "calm after storm forest sunbeams hero with animals watercolor no text",
+        imagePromptHint: "hero with grateful animals on ridge soft rain after fire watercolor no text",
       },
       {
         page: 8,
         title: "Keeper of the Woods",
         staticScene: "forest-guardian/end",
-        text: `When [Role] [Name] returned, the people had seen the river run true again.
+        text: `When [Role] [Name] returned, the people had watched the hill fill with safe animals.
 
-"You kept the garden of the woods," the King said. "That is holy work."
+"You took care of the animals in the woods," the King said. "That was brave and good."
 
-[Name] looked back at the green cathedral of trees and felt proud all the way through.
-
-The Lord God… put him in the garden… to work it and keep it. — Genesis 2:15
+[Name] looked back at the trees and the friends [Name] had carried to higher ground — and felt proud all the way through.
 
 The End.`,
         photoCaption: "The end",
         useSessionPhoto: false,
-        imagePromptHint: "hero returning from forest after storm success watercolor no text",
+        imagePromptHint: "hero returning from forest animal rescue celebration watercolor no text",
       },
     ],
   },
   {
     id: "kindness-quest",
     option: 5,
-    label: "Lantern Run",
-    title: "The Midnight Lantern Run",
+    label: "Kingdom Race",
+    title: "The Kingdom Race",
     description:
-      "A village goes dark in a storm. Race supplies across a broken footbridge before midnight.",
-    bibleVerse: "Ephesians 4:32",
+      "Race for the kingdom ribbon — then stop to help a fallen friend finish strong.",
+    bibleVerse: "Ecclesiastes 4:9-10",
     bibleVerseText:
-      "Be kind to one another, tenderhearted, forgiving one another, as God in Christ forgave you.",
+      "Two are better than one… For if they fall, one will lift up his fellow.",
     aiTheme:
-      `${BIBLICAL_STORY_GUARDRAILS} ONE QUEST: storm-dark village + broken footbridge + midnight deadline. ACTION kindness: race with supply sled/lanterns, cross damaged bridge, restart the village light-tower, include the left-out child. Kindness is brave and physical, not boring notes-only. Ephesians 4:32.`,
-    bookTitleTemplate: "[Role] [Name] and the Midnight Lantern Run",
+      `${BIBLICAL_STORY_GUARDRAILS} ONE QUEST: Kingdom Race day. CLEAR CHALLENGE: win-the-race pressure vs help a hurt runner. ACTION: race start, obstacles on course, friend falls/gets hurt, hero slows down, helps them up, they finish together. Real win = finishing with love, not abandoning someone. No vague lantern lore. Ecclesiastes 4:9-10.`,
+    bookTitleTemplate: "[Role] [Name] and the Kingdom Race",
     pages: [
       {
         page: 1,
-        title: "The Midnight Lantern Run",
+        title: "The Kingdom Race",
         staticScene: "kindness-quest/title",
         text: `[Role] [Name]
-and the Midnight Lantern Run`,
-        photoCaption: "Lanterns ready",
+and the Kingdom Race`,
+        photoCaption: "Race day",
         useSessionPhoto: false,
-        imagePromptHint: "cover hero with glowing lantern night village watercolor no text",
+        imagePromptHint: "cover hero at race start line kingdom banners watercolor no text",
       },
       {
         page: 2,
-        title: "The Lights Go Out",
+        title: "Race Day",
         staticScene: "kindness-quest/call",
-        text: `A hard storm knocked out the village light-tower. Windows went black. The cold crept in. People were scared and stuck on opposite sides of the swollen creek.
+        text: `Banners snapped over the starting line. The whole kingdom packed the hillsides for the Kingdom Race.
 
-"If the lanterns aren't across by midnight," the elder said, "families stay separated till morning."
+The King raised his hand. "First to the finish wins the royal ribbon," the King said. "Run strong — and watch out for each other. Ready… set…"
 
-[Role] [Name] loaded a sled with blankets, bread, and lanterns.
-
-"Kindness moves," [Name] said. "I'm running."`,
-        photoCaption: "Dark village crisis",
+[Role] [Name] crouched low, heart thumping like a drum. This was going to be fun.`,
+        photoCaption: "At the starting line",
         useSessionPhoto: false,
-        imagePromptHint: "dark storm village light tower out hero with supply sled watercolor no text",
+        imagePromptHint: "hero crouched at starting line crowded kingdom race watercolor no text",
       },
       {
         page: 3,
-        title: "Sled Through the Gale",
-        text: `Wind tried to steal the sled. Rain tried to slow the boots. [Role] [Name] leaned forward and pulled harder.
+        title: "Go!",
+        text: `"GO!"
 
-Through the square. Past the bakery. Down to the creek roar.
+Feet pounded on the dirt. Dust rose behind them. [Role] [Name] ran toward the front of the pack, cape flying, eyes on the finish ribbon.
 
-Every step was a gift in motion.`,
-        photoCaption: "Pulling supplies",
+Over the hill. Around the hay bales. Across the shallow creek splash.
+
+[Name] was fast. Maybe fast enough to win.`,
+        photoCaption: "Racing hard",
         useSessionPhoto: false,
-        imagePromptHint: "hero pulling supply sled through windy rainy street watercolor no text",
+        imagePromptHint: "hero sprinting in kingdom race dust flying watercolor no text",
       },
       {
         page: 4,
-        title: "The Broken Footbridge",
-        text: `The footbridge sagged. Two boards missing. Water licked the underside like a hungry animal.
+        title: "The Hard Stretch",
+        text: `The middle of the course got hard — a steep hill, a wobbly plank bridge, and a turn so sharp runners almost fell.
 
-[Role] [Name] lashed the lanterns tight, tested the rope rail, and stepped out.
+[Role] [Name] kept going through each hard part.
 
-"People need light more than I need dry socks," [Name] muttered — and crossed.`,
-        photoCaption: "Bridge crossing",
+Crowd noise rolled like thunder. The finish ribbon flashed white in the distance.
+
+Almost there.`,
+        photoCaption: "Course obstacles",
         useSessionPhoto: false,
-        imagePromptHint: "hero crossing broken footbridge with lanterns night storm watercolor no text",
+        imagePromptHint: "hero crossing wobbly race bridge steep hill watercolor no text",
       },
       {
         page: 5,
-        title: "Almost Dropped",
-        text: `Mid-bridge, a plank tipped. The sled skidded. One lantern bounced toward the dark water—
+        title: "Someone Falls",
+        text: `Then — a cry behind [Role] [Name].
 
-[Role] [Name] dove flat and caught the handle with two fingers.
+A smaller runner had fallen hard on the turn. Knee scraped. Eyes wet. The other racers ran past without stopping.
 
-"Not tonight," [Name] told the storm.
+[Name] looked at the finish ribbon… then looked back at the kid in the dust.
 
-Back on feet. Forward again. The far bank came like a cheer.`,
-        photoCaption: "Saving the lantern",
+And [Name] knew what kind of racer to be.`,
+        photoCaption: "The fall",
         useSessionPhoto: false,
-        imagePromptHint: "hero catching falling lantern on broken bridge watercolor no text",
+        imagePromptHint: "hero looking back at fallen child runner on race path watercolor no text",
       },
       {
         page: 6,
-        title: "Lights for Every Door",
-        text: `Door to door [Role] [Name] ran — knock, lantern, blanket, bread, smile, next house.
+        title: "Stop and Help",
+        text: `[Role] [Name] stopped so fast dust puffed up like smoke.
 
-A shy child stood alone at the edge of the crowd. [Name] turned back on purpose.
+"I've got you," [Name] said, kneeling. "Can you stand?"
 
-"This one's yours. Walk with me."
+The fallen runner nodded, a little shaky. [Name] cleaned the scrape with a water splash, offered an arm, and helped them up.
 
-Kindness isn't only soft. Sometimes it is fast feet and a hand that refuses to leave anyone out.`,
-        photoCaption: "Delivering light",
+Other racers flew by. The ribbon got farther away.
+
+[Name] did not let go.`,
+        photoCaption: "Helping up",
         useSessionPhoto: false,
-        imagePromptHint: "hero giving lanterns door to door including shy child watercolor no text",
+        imagePromptHint: "hero kneeling helping fallen runner stand watercolor no text",
       },
       {
         page: 7,
-        title: "Restart the Tower",
+        title: "Two Finish Together",
         staticScene: "kindness-quest/gift",
-        text: `At the light-tower, [Role] [Name] climbed the wet stairs two at a time and set the master lantern in its glass crown.
+        text: `Side by side they ran the last stretch — slower than first place, stronger than quitting.
 
-Gold light blasted across the roofs. Windows answered one by one until the whole village glowed like a constellation on the ground.
+"You could have won alone," the friend panted.
 
-Midnight had not won.`,
-        photoCaption: "Village lit again",
+"We win differently," [Role] [Name] said.
+
+Together they crossed the finish line. The crowd cheered — not just because they were fast, but because they stopped to help.`,
+        photoCaption: "Finish line together",
         useSessionPhoto: false,
-        imagePromptHint: "hero at top of light tower lighting village night watercolor no text",
+        imagePromptHint: "hero and friend crossing finish line together cheering crowd watercolor no text",
       },
       {
         page: 8,
-        title: "Tables in the Street",
-        text: `People pulled tables into the street under the new light. Soup steamed. Laughter came back shy, then loud.
+        title: "The Better Ribbon",
+        text: `The official first-place runner got a ribbon. Fair was fair.
 
-[Role] [Name] sat in the middle, not the throne end — passing bowls, listening, tired in the best way.`,
-        photoCaption: "Shared victory meal",
+Then the King walked straight to [Role] [Name] and the friend [Name] had helped.
+
+"Today's greatest win was not coming in first," the King said. "It was not leaving someone behind."`,
+        photoCaption: "Honor after the race",
         useSessionPhoto: false,
-        imagePromptHint: "village street meal under lantern light hero among people watercolor no text",
+        imagePromptHint: "king honoring hero and helped friend after race watercolor no text",
       },
       {
         page: 9,
-        title: "Brave Kindness",
+        title: "True Winner",
         staticScene: "kindness-quest/end",
-        text: `"You didn't just say kind words," the King told [Role] [Name]. "You crossed the broken bridge. You conquered the dark with love in action."
+        text: `[Role] [Name] walked home tired, happy, and sure of the lesson:
 
-[Name] looked at the glowing tower and the open doors and felt the truth settle deep:
-
-Be kind to one another, tenderhearted… — Ephesians 4:32
+Winning is good. Helping someone who falls is better.
 
 The End.`,
         photoCaption: "The end",
         useSessionPhoto: false,
-        imagePromptHint: "hero peaceful after lantern run village glowing watercolor no text",
+        imagePromptHint: "hero peaceful after kingdom race sunset watercolor no text",
       },
     ],
   },
   {
     id: "light-treasure",
     option: 6,
-    label: "Treasure Gauntlet",
-    title: "The Treasure Gauntlet",
+    label: "Treasure Chest",
+    title: "The Treasure Chest",
     description:
-      "Follow the map through traps, tunnels, and a final leap to the hidden chest — then share it.",
+      "Follow the map, beat the path’s challenges, open the treasure chest — then share it.",
     bibleVerse: "Matthew 5:14",
     bibleVerseText: "You are the light of the world. A city set on a hill cannot be hidden.",
     aiTheme:
-      `${BIBLICAL_STORY_GUARDRAILS} ONE QUEST: treasure gauntlet path. ACTION: map clues, swinging vine gap, dark tunnel, pressure-plate puzzle, final leap to chest of real gold/gems. Hero CONQUERS obstacles and SHARES treasure. No dull kingdom tour. Matthew 5:14.`,
-    bookTitleTemplate: "[Role] [Name] and the Treasure Gauntlet",
+      `${BIBLICAL_STORY_GUARDRAILS} ONE QUEST: find the treasure chest. CLEAR CHALLENGE: map path with real obstacles (vine gap, dark tunnel, locked stone door), open the chest, carry it home, SHARE the treasure. Simple name kids understand. No 'gauntlet' jargon. Hero CONQUERS fear and greed by sharing. Matthew 5:14.`,
+    bookTitleTemplate: "[Role] [Name] and the Treasure Chest",
     pages: [
       {
         page: 1,
-        title: "The Treasure Gauntlet",
+        title: "The Treasure Chest",
         staticScene: "light-treasure/title",
         text: `[Role] [Name]
-and the Treasure Gauntlet`,
+and the Treasure Chest`,
         photoCaption: "Map in hand",
         useSessionPhoto: false,
-        imagePromptHint: "cover hero with treasure map and lantern excited watercolor no text",
+        imagePromptHint: "cover hero with treasure map and wooden chest watercolor no text",
       },
       {
         page: 2,
-        title: "X Marks Trouble",
+        title: "The Map",
         staticScene: "light-treasure/call",
-        text: `The old map did not show a gentle stroll. It showed a gauntlet: vine gap, whisper tunnel, stone teeth, and a chest under a hill door.
+        text: `An old map marked one clear prize: a treasure chest hidden beyond the hill cave.
 
-"Find it," the King said. "Then share it. Treasure hidden forever helps no one."
+"Find the chest," the King said. "Then share what is inside. Treasure locked away forever helps no one."
 
-[Role] [Name] rolled the map tight. "I will run the gauntlet."`,
+[Role] [Name] rolled up the map, eyes bright.
+
+"I will find the treasure chest."`,
         photoCaption: "Accepting the map",
         useSessionPhoto: false,
-        imagePromptHint: "hero with old treasure map castle library determined watercolor no text",
+        imagePromptHint: "hero with old treasure map determined watercolor no text",
       },
       {
         page: 3,
@@ -1025,67 +1054,67 @@ and the Treasure Gauntlet`,
 
 Caught the vine. Swung. Missed the ledge by a toe. Swung again harder and rolled onto safe grass, laughing.
 
-"One obstacle down."`,
+"One challenge down."`,
         photoCaption: "Swinging the vine gap",
         useSessionPhoto: false,
         imagePromptHint: "hero swinging on vine across canyon gap watercolor no text",
       },
       {
         page: 4,
-        title: "Whisper Tunnel",
+        title: "The Dark Tunnel",
         text: `The tunnel tried to scare [Role] [Name] with drips and echoes and shadows that looked bigger than they were.
 
-[Name] held the lantern high and walked faster. "I hear you. I am still coming."
+[Name] held the lantern high and walked faster. "Nice try. I am still coming."
 
-At the far mouth, daylight slapped [Name]'s face like a high-five.`,
+At the far end of the tunnel, warm daylight hit [Name]'s face.`,
         photoCaption: "Through the tunnel",
         useSessionPhoto: false,
         imagePromptHint: "hero in dark tunnel with lantern determined watercolor no text",
       },
       {
         page: 5,
-        title: "Stone Teeth Puzzle",
-        text: `A hallway of stone "teeth" slammed open and shut in a pattern. Wait… wait… NOW!
+        title: "The Locked Stone Door",
+        text: `A heavy stone door blocked the chest chamber. Three carved symbols. One loose stone. One rope pull.
 
-[Role] [Name] dashed between the gaps, rolled under the last tooth, and skidded into a golden chamber, map crumpled but spirit on fire.`,
-        photoCaption: "Dodging stone traps",
+[Role] [Name] matched the map marks, pushed the loose stone, pulled the rope — CLUNK.
+
+The door slid open. [Name] pumped a fist. "Yes!"`,
+        photoCaption: "Opening the door",
         useSessionPhoto: false,
-        imagePromptHint: "hero dashing through slamming stone trap hallway watercolor no text",
+        imagePromptHint: "hero opening carved stone door to treasure room watercolor no text",
       },
       {
         page: 6,
-        title: "The Final Leap",
+        title: "Open the Chest",
         staticScene: "light-treasure/find",
-        text: `Across a black pit sat the treasure chest on a stone island. The jump looked too far.
+        text: `There it was — a real wooden treasure chest with metal bands, sitting on a flat rock.
 
-[Role] [Name] breathed once, twice, then sprinted and leapt with everything in [Name]'s royal heart.
+[Role] [Name] sprinted the last steps, hands on the lid, and pushed.
 
-Boots hit stone. Hands hit wood. The chest lid flew open — gold coins, gems, light spilling like sunrise.
+Gold coins. Bright gems. Warm light spilling like sunrise.
 
-"[Name] found it!" [Name] whooped to the empty chamber — then quieter: "Now I share it."`,
+"[Name] found the treasure chest!" [Name] whooped — then quieter: "Now I share it."`,
         photoCaption: "Treasure found",
         useSessionPhoto: false,
-        imagePromptHint: "hero leaping to stone island opening treasure chest gold light watercolor no text",
+        imagePromptHint: "hero opening wooden treasure chest gold light watercolor no text",
       },
       {
         page: 7,
-        title: "Carry the Light Out",
-        text: `The gauntlet felt different on the way back — still hard, but [Role] [Name] knew every trap now. Chest strapped tight. Lantern bright.
+        title: "Carry It Home",
+        text: `The path home was still hard, but [Role] [Name] knew every step now. Chest strapped tight. Lantern bright.
 
-Obstacles that once felt impossible became a path [Name] had already conquered.`,
-        photoCaption: "Leaving with treasure",
+Obstacles that once felt impossible became a road [Name] had already conquered.`,
+        photoCaption: "Leaving with the chest",
         useSessionPhoto: false,
-        imagePromptHint: "hero carrying glowing treasure chest out of cave watercolor no text",
+        imagePromptHint: "hero carrying treasure chest out of cave watercolor no text",
       },
       {
         page: 8,
         title: "Treasure for Everyone",
         staticScene: "light-treasure/end",
-        text: `In the square [Role] [Name] opened the chest for the whole kingdom — coins for repairs, gems for the light-tower, joy for every open hand.
+        text: `In the square [Role] [Name] opened the treasure chest for the whole kingdom — coins for repairs, gems for the village light, joy for every open hand.
 
-"You ran the gauntlet," the King said. "You conquered fear. And you did not hide the light."
-
-You are the light of the world… — Matthew 5:14
+"You found the chest," the King said. "You beat the hard path. And you shared what you found."
 
 The End.`,
         photoCaption: "The end",

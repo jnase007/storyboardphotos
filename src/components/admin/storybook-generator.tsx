@@ -1,12 +1,12 @@
 "use client";
 
 const ADVENTURE_CARD_IMAGES: Record<string, string> = {
-  "dragon-slayer": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/dragon-slayer.jpg",
-  "rescue-mission": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/rescue-mission.jpg",
-  "lost-crown": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/lost-crown.jpg",
-  "forest-guardian": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/forest-guardian.jpg",
-  "kindness-quest": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/kindness-quest.jpg",
-  "light-treasure": "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/adventure-cards/light-treasure.jpg",
+  "dragon-slayer": "/adventure-cards/dragon-slayer.jpg?v=16",
+  "rescue-mission": "/adventure-cards/rescue-mission.jpg?v=16",
+  "lost-crown": "/adventure-cards/lost-crown.jpg?v=16",
+  "forest-guardian": "/adventure-cards/forest-guardian.jpg?v=16",
+  "kindness-quest": "/adventure-cards/kindness-quest.jpg?v=16",
+  "light-treasure": "/adventure-cards/light-treasure.jpg?v=16",
 };
 
 
