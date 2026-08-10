@@ -297,6 +297,51 @@ export async function POST(request: NextRequest, { params }: Params) {
     }
 
     const startedAt = new Date().toISOString();
+    const quality = parsed.data.quality;
+    const packageKind = parsed.data.package;
+    // COST LOCK (2026-08-10): Vercel after() dies mid Seedance job and restarts re-bill fal.
+    // Only draft may cook on serverless. Paid movies queue for Mac mini local worker.
+    const allowServerlessSeedance =
+      process.env.ALLOW_VERCEL_SEEDANCE === "1" ||
+      process.env.ALLOW_VERCEL_SEEDANCE === "true";
+    const needsLocalWorker = quality !== "draft" && !allowServerlessSeedance;
+
+    if (needsLocalWorker && parsed.data.mode !== "sync") {
+      const queuedLocal = buildTracker({
+        step: "queued",
+        detail:
+          "Queued for Mac mini movie worker (no Vercel Seedance — stops mid-job waste)…",
+        startedAt,
+      });
+      await writeTracker(supabase, id, queuedLocal, {
+        video_status: "in_production",
+        video_package: `${quality}:${packageKind}`,
+      });
+      await supabase
+        .from("storybooks")
+        .update({
+          video_notes:
+            encodeMovieTracker(queuedLocal) +
+            "\nLOCAL_WORKER_QUEUE|standard-seedance|do-not-run-on-vercel",
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", id);
+
+      return NextResponse.json(
+        {
+          id: book.id,
+          child_name: book.child_name,
+          video_status: "in_production",
+          tracker: queuedLocal,
+          worker: "local",
+          message:
+            "Queued on Mac mini worker 🎬 (Seedance no longer runs on Vercel — stops mid-job waste).",
+          poll: `/api/storybooks/${id}/video`,
+        },
+        { status: 202 }
+      );
+    }
+
     const queued = buildTracker({
       step: "queued",
       detail: "Order received — starting the kitchen…",
@@ -304,14 +349,14 @@ export async function POST(request: NextRequest, { params }: Params) {
     });
     await writeTracker(supabase, id, queued, {
       video_status: "in_production",
-      video_package: `${parsed.data.quality}:${parsed.data.package}`,
+      video_package: `${quality}:${packageKind}`,
     });
 
     if (parsed.data.mode === "sync") {
       await runRenderJob({
         id,
-        packageKind: parsed.data.package,
-        quality: parsed.data.quality,
+        packageKind,
+        quality,
         force: parsed.data.force,
         generateNarrationIfMissing: parsed.data.generateNarrationIfMissing,
       });
@@ -330,12 +375,12 @@ export async function POST(request: NextRequest, { params }: Params) {
       });
     }
 
-    // Async Domino mode — return now, keep cooking
+    // Draft-only async on Vercel (cheap stills). Paid Seedance blocked above.
     after(() =>
       runRenderJob({
         id,
-        packageKind: parsed.data.package,
-        quality: parsed.data.quality,
+        packageKind,
+        quality,
         force: parsed.data.force,
         generateNarrationIfMissing: parsed.data.generateNarrationIfMissing,
       })
@@ -347,8 +392,11 @@ export async function POST(request: NextRequest, { params }: Params) {
         child_name: book.child_name,
         video_status: "in_production",
         tracker: queued,
+        worker: quality === "draft" ? "vercel-draft" : "vercel",
         message:
-          "Pizza’s in the oven 🍕 Domino tracker live — refresh Movie Queue for progress.",
+          quality === "draft"
+            ? "Draft slideshow cooking on Vercel…"
+            : "Pizza’s in the oven 🍕 Domino tracker live — refresh Movie Queue for progress.",
         poll: `/api/storybooks/${id}/video`,
       },
       { status: 202 }
