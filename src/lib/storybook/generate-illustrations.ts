@@ -1,5 +1,6 @@
 import type { KingdomSet, PhotosBySet, StoryPage } from "./types";
 import { SET_UPLOAD_SLOTS } from "./types";
+import { lockedCastForPage } from "./character-bible";
 
 
 /** Pre-approved watercolor scene illustrations — used instead of generating new AI images */
@@ -413,11 +414,17 @@ export async function generateStoryIllustration(options: {
   referenceImageUrl?: string | null;
   characterPhotoUrl?: string | null;
   gender?: string | null;
+  /** Adventure path id — pulls locked cast (dragon, King, friends, etc.) */
+  questId?: string | null;
 }): Promise<FluxResult> {
   const hasPhoto = Boolean(options.characterPhotoUrl?.startsWith("data:image"));
   const wardrobe = lockedHeroWardrobe(options.gender, { fromPhoto: hasPhoto });
   const faceLock = lockedHeroFace();
-  const promptWithLocks = `${options.prompt}. ${faceLock}. ${wardrobe}`;
+  const castLock = lockedCastForPage({
+    questId: options.questId,
+    sceneText: options.prompt,
+  });
+  const promptWithLocks = `${options.prompt}. ${faceLock}. ${wardrobe}. ${castLock}`;
   // If character portrait provided as base64, use Gemini to place them in the scene
   if (hasPhoto && options.characterPhotoUrl) {
     const b64 = options.characterPhotoUrl.split(",")[1];
@@ -453,8 +460,10 @@ export async function illustrateStoryPages(options: {
   characterPhoto?: string | null;
   /** boy/girl — locks King vs Queen wardrobe for the whole book */
   gender?: string | null;
+  /** Adventure path id for IP cast locks (dragon, King, friends…) */
+  questId?: string | null;
 }): Promise<StoryPage[]> {
-  const { pages, characterPhoto, gender } = options;
+  const { pages, characterPhoto, gender, questId } = options;
   // Product rule: book + movie are 100% illustrated watercolor storybook art (no real session photos).
   // Real session photos are NEVER placed in pages. Face upload = likeness + wardrobe reference only.
   const result: StoryPage[] = [];
@@ -473,12 +482,17 @@ export async function illustrateStoryPages(options: {
 
     const uniqueness = uniqueSceneDirective(page, index, pages, usedSceneKeys, hasPhoto);
     const sceneHint = page.imagePrompt ?? page.title;
-    const prompt = `${sceneHint}. ${faceLock}. ${wardrobe}. ${uniqueness}. ${STYLE_SUFFIX}. Full-bleed 4:3 children's watercolor storybook illustration for an 8.25 inch square printed book image band. CRITICAL: edge-to-edge scene, no vine frame, no side white space. Show the complete child hero from head to toe with headroom above the crown — never cut off the head. SAME face, SAME full detailed eyes, SAME outfit as every other page. NO glowing staff, NO wand, NO scepter beam, NO spell props.`;
+    const castLock = lockedCastForPage({
+      questId,
+      sceneText: `${sceneHint} ${page.title || ""} ${page.text || ""}`,
+    });
+    const prompt = `${sceneHint}. ${faceLock}. ${wardrobe}. ${castLock}. ${uniqueness}. ${STYLE_SUFFIX}. Full-bleed 4:3 children's watercolor storybook illustration for an 8.25 inch square printed book image band. CRITICAL: edge-to-edge scene, no vine frame, no side white space. Show the complete child hero from head to toe with headroom above the crown — never cut off the head. SAME face, SAME full detailed eyes, SAME outfit as every other page. SAME locked cast (dragon/King/friends) design every page. NO glowing staff, NO wand, NO scepter beam, NO spell props.`;
 
     const art = await generateStoryIllustration({
       prompt,
       characterPhotoUrl: characterPhoto ?? null,
       gender,
+      questId,
     });
 
     const next = {

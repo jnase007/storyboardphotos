@@ -131,6 +131,7 @@ export async function POST(request: NextRequest) {
       photosBySet: photos_by_set,
       characterPhoto: character_photo ?? undefined,
       gender,
+      questId: adventure_path,
     });
 
     if (storybookId && hasRealSupabase()) {

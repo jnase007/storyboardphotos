@@ -20,6 +20,7 @@ export async function POST(request: NextRequest) {
       storybook_id,
       page_index,
       gender,
+      quest_id,
     } = body as {
       imagePrompt?: string;
       pageTitle?: string;
@@ -27,12 +28,13 @@ export async function POST(request: NextRequest) {
       storybook_id?: string;
       page_index?: number;
       gender?: string | null;
+      quest_id?: string | null;
     };
 
     let resolvedGender = gender ?? null;
-    // Prefer gender stored on the book so regenerates keep the same locked outfit
+    let resolvedQuestId = quest_id ?? null;
+    // Prefer gender + adventure path stored on the book so regenerates keep locks
     if (
-      !resolvedGender &&
       hasRealSupabase() &&
       storybook_id &&
       !String(storybook_id).startsWith("local-")
@@ -41,23 +43,28 @@ export async function POST(request: NextRequest) {
         const supabase = createServiceClient();
         const { data: row } = await supabase
           .from("storybooks")
-          .select("gender")
+          .select("gender, notes")
           .eq("id", storybook_id)
           .single();
-        if (row?.gender) resolvedGender = String(row.gender);
+        if (!resolvedGender && row?.gender) resolvedGender = String(row.gender);
+        if (!resolvedQuestId && row?.notes) {
+          const m = String(row.notes).match(/\[Adventure:\s*([^\]]+)\]/i);
+          if (m?.[1]) resolvedQuestId = m[1].trim();
+        }
       } catch {
         /* ignore */
       }
     }
 
     const scene = imagePrompt || pageTitle || "An enchanted kingdom watercolor scene";
-    const prompt = `${scene}. ONE full-bleed 4:3 landscape watercolor children's storybook illustration only — not a diptych, not two panels, not a double-page spread. Soft sepia ink outlines, pastel watercolor washes. FILL entire canvas edge-to-edge. NO vine border, NO floral frame, NO white side margins. Full figure with headroom, never crop the head, no text, no watermark. Keep the locked royal outfit identical to the rest of the book.`;
+    const prompt = `${scene}. ONE full-bleed 4:3 landscape watercolor children's storybook illustration only — not a diptych, not two panels, not a double-page spread. Soft sepia ink outlines, pastel watercolor washes. FILL entire canvas edge-to-edge. NO vine border, NO floral frame, NO white side margins. Full figure with headroom, never crop the head, no text, no watermark. Keep the locked royal outfit identical to the rest of the book. Keep locked cast (dragon/King/friends) identical to the Character Bible.`;
 
     const result = await generateStoryIllustration({
       prompt,
       referenceImageUrl: null,
       characterPhotoUrl: character_photo ?? null,
       gender: resolvedGender,
+      questId: resolvedQuestId,
     });
 
     // Persist into storybook pages when we have an id + index
