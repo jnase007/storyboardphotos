@@ -11,7 +11,7 @@ const ADVENTURES = [
     title: "Dragon Mountain",
     label: "Conquer the Peak",
     description: "Climb Dragon Mountain, douse the dragon's fire-breath with river water, and open the pass. Joshua 1:9",
-    image: "/adventure-cards/dragon-slayer.jpg?v=20",
+    image: "/adventure-cards/dragon-slayer.jpg?v=21",
     color: "#C5A26F",
   },
   {
@@ -19,7 +19,7 @@ const ADVENTURES = [
     title: "Broken Bridge Rescue",
     label: "Race the Storm",
     description: "Race the storm, cross a washed-out river bridge, and bring friends home safe. Luke 15:4",
-    image: "/adventure-cards/rescue-mission.jpg?v=20",
+    image: "/adventure-cards/rescue-mission.jpg?v=21",
     color: "#60a5fa",
   },
   {
@@ -27,7 +27,7 @@ const ADVENTURES = [
     title: "Sword of the Cliffs",
     label: "Free the Sword",
     description: "Climb the White Cliffs and pull the King's sword from the stone. Proverbs 4:23",
-    image: "/adventure-cards/lost-crown.jpg?v=20",
+    image: "/adventure-cards/lost-crown.jpg?v=21",
     color: "#f59e0b",
   },
   {
@@ -35,7 +35,7 @@ const ADVENTURES = [
     title: "Fire in the Living Forest",
     label: "Save the Animals",
     description: "Race the fire, free trapped animals, lead them to higher ground. Genesis 2:15",
-    image: "/adventure-cards/forest-guardian.jpg?v=20",
+    image: "/adventure-cards/forest-guardian.jpg?v=21",
     color: "#10b981",
   },
   {
@@ -43,7 +43,7 @@ const ADVENTURES = [
     title: "Kingdom Race",
     label: "Help a Friend",
     description: "Race hard — then stop to help a fallen friend finish. Ecclesiastes 4:9-10",
-    image: "/adventure-cards/kindness-quest.jpg?v=20",
+    image: "/adventure-cards/kindness-quest.jpg?v=21",
     color: "#ec4899",
   },
   {
@@ -51,7 +51,7 @@ const ADVENTURES = [
     title: "The Treasure Chest",
     label: "Find the Chest",
     description: "Follow the map, beat the path, open the chest and share it. Matthew 5:14",
-    image: "/adventure-cards/light-treasure.jpg?v=20",
+    image: "/adventure-cards/light-treasure.jpg?v=21",
     color: "#a78bfa",
   },
 ] as const;

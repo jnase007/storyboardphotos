@@ -7,12 +7,12 @@ import { BookingForm } from "@/components/booking-form";
 
 
 const QUESTS = [
-  { id: "dragon-slayer", num: 1, title: "Dragon Mountain", desc: "Climb Dragon Mountain, douse the dragon's fire-breath with river water, and open the pass. (Joshua 1:9)", image: "/adventure-cards/dragon-slayer.jpg?v=20" },
-  { id: "rescue-mission", num: 2, title: "Broken Bridge Rescue", desc: "Race the storm, cross a washed-out river bridge, and bring friends home safe. (Luke 15:4)", image: "/adventure-cards/rescue-mission.jpg?v=20" },
-  { id: "lost-crown", num: 3, title: "Sword of the Cliffs", desc: "Climb the White Cliffs and pull the King's sword from the stone. (Proverbs 4:23)", image: "/adventure-cards/lost-crown.jpg?v=20" },
-  { id: "forest-guardian", num: 4, title: "Fire in the Living Forest", desc: "Race the fire, free trapped animals, lead them to higher ground. (Genesis 2:15)", image: "/adventure-cards/forest-guardian.jpg?v=20" },
-  { id: "kindness-quest", num: 5, title: "Kingdom Race", desc: "Race hard — then stop to help a fallen friend finish. (Ecclesiastes 4:9-10)", image: "/adventure-cards/kindness-quest.jpg?v=20" },
-  { id: "light-treasure", num: 6, title: "The Treasure Chest", desc: "Follow the map, beat the path, open the chest and share it. (Matthew 5:14)", image: "/adventure-cards/light-treasure.jpg?v=20" },
+  { id: "dragon-slayer", num: 1, title: "Dragon Mountain", desc: "Climb Dragon Mountain, douse the dragon's fire-breath with river water, and open the pass. (Joshua 1:9)", image: "/adventure-cards/dragon-slayer.jpg?v=21" },
+  { id: "rescue-mission", num: 2, title: "Broken Bridge Rescue", desc: "Race the storm, cross a washed-out river bridge, and bring friends home safe. (Luke 15:4)", image: "/adventure-cards/rescue-mission.jpg?v=21" },
+  { id: "lost-crown", num: 3, title: "Sword of the Cliffs", desc: "Climb the White Cliffs and pull the King's sword from the stone. (Proverbs 4:23)", image: "/adventure-cards/lost-crown.jpg?v=21" },
+  { id: "forest-guardian", num: 4, title: "Fire in the Living Forest", desc: "Race the fire, free trapped animals, lead them to higher ground. (Genesis 2:15)", image: "/adventure-cards/forest-guardian.jpg?v=21" },
+  { id: "kindness-quest", num: 5, title: "Kingdom Race", desc: "Race hard — then stop to help a fallen friend finish. (Ecclesiastes 4:9-10)", image: "/adventure-cards/kindness-quest.jpg?v=21" },
+  { id: "light-treasure", num: 6, title: "The Treasure Chest", desc: "Follow the map, beat the path, open the chest and share it. (Matthew 5:14)", image: "/adventure-cards/light-treasure.jpg?v=21" },
 ];
 
 export function BookingSection() {
