@@ -184,21 +184,9 @@ async function drawCoverPageAsync(
   );
   const threeLine = Boolean(line3);
   // Title lives at the BOTTOM so long quest names never cover the child's face/crown.
+  // No brand chip on cover — Justin: remove "Storybook Photos · Kingdom Quests" from first page.
   const plaqueH = threeLine ? PAGE_H * 0.2 : PAGE_H * 0.15;
   const plaqueY = PAGE_H - plaqueH - PAGE_H * 0.045;
-  const brandY = plaqueY - PAGE_H * 0.04;
-
-  // Tiny brand chip above title (doesn't touch face)
-  doc.setFillColor(248, 244, 236);
-  doc.setGState(doc.GState({ opacity: 0.9 }));
-  doc.roundedRect(PAGE_W * 0.28, brandY, PAGE_W * 0.44, PAGE_H * 0.032, 6, 6, "F");
-  doc.setGState(doc.GState({ opacity: 1 }));
-  doc.setFont("times", "normal");
-  doc.setFontSize(9);
-  doc.setTextColor(...ROYAL_BLUE);
-  doc.text("Storybook Photos · Kingdom Quests", PAGE_W / 2, brandY + PAGE_H * 0.022, {
-    align: "center",
-  });
 
   // Soft cream title plaque at BOTTOM (face-safe)
   doc.setFillColor(248, 244, 236);
