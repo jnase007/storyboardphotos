@@ -56,10 +56,41 @@ export const STORYBOOK_IMAGE_ASPECT = "4:3" as const;
  * classic fairytale children's book, NOT bare uncolored line art.
  */
 const STYLE_SUFFIX =
-  "ONE single full-bleed 4:3 landscape watercolor children's storybook illustration only — not a diptych, not two panels, not a double-page spread, not split screen, not collage. FILL THE ENTIRE CANVAS edge-to-edge with the scene (background, sky, forest, castle continue to all four edges). NO decorative vine border, NO floral frame, NO oval matte, NO white or cream margins inside the image, NO picture-frame border. Whimsical watercolor, soft sepia ink outlines with gentle hand-drawn line variation, soft pastel watercolor washes (sage green, dusty lavender, peach, powder blue, warm gold), cream textured watercolor paper only as the painted ground not as empty side bars, cute storybook character proportions with big expressive eyes, atmospheric depth, warm golden sunlight and gentle wonder of creation, soft dust motes in sunbeams, premium faith-friendly fairytale picture-book quality (Narnia warmth not occult), NO magic wands, NO glowing staffs, NO scepters with energy beams, NO spell casting, NO witches, NO wizards, NO fairies casting spells, NO glowing runes, NO sorcery props, child may hold a simple lantern or flowers only, consistent character across pages, FULL FIGURE hero visible with headroom above crown and feet still in frame, never crop head face crown hands or feet, no photorealism, no real photographs, no 3D render, no harsh pure-black vector lines, no empty uncolored coloring-page look, no muddy gray, no text, no letters, no watermark, no logo, no signature";
+  "ONE single full-bleed 4:3 landscape watercolor children's storybook illustration only — not a diptych, not two panels, not a double-page spread, not split screen, not collage. FILL THE ENTIRE CANVAS edge-to-edge with the scene (background, sky, forest, castle continue to all four edges). NO decorative vine border, NO floral frame, NO oval matte, NO white or cream margins inside the image, NO picture-frame border. Whimsical watercolor, soft sepia ink outlines with gentle hand-drawn line variation, soft pastel watercolor washes (sage green, dusty lavender, peach, powder blue, warm gold), cream textured watercolor paper only as the painted ground not as empty side bars, cute storybook character proportions with big FULL DETAILED expressive eyes (visible whites, colored iris, dark pupil, soft lashes — NEVER simple black-dot eyes), atmospheric depth, warm golden sunlight and gentle wonder of creation, soft dust motes in sunbeams, premium faith-friendly fairytale picture-book quality (Narnia warmth not occult), NO magic wands, NO glowing staffs, NO scepters with energy beams, NO spell casting, NO witches, NO wizards, NO fairies casting spells, NO glowing runes, NO sorcery props, child may hold a simple lantern or flowers only, consistent character across pages, FULL FIGURE hero visible with headroom above crown and feet still in frame, never crop head face crown hands or feet, no photorealism, no real photographs, no 3D render, no harsh pure-black vector lines, no empty uncolored coloring-page look, no muddy gray, no text, no letters, no watermark, no logo, no signature";
 
-/** Locked royal wardrobe for the whole book — same clothes every page. */
-export function lockedHeroWardrobe(gender?: string | null): string {
+/**
+ * Face + eye lock for the whole book.
+ * Justin: full detailed eyes preferred — never switch to simple black dots.
+ */
+export function lockedHeroFace(): string {
+  return [
+    "LOCKED HERO FACE (identical on EVERY page of this book):",
+    "Same child likeness every page — same face shape, same age, same hair color/style, same skin tone.",
+    "EYES (critical): always paint FULL DETAILED storybook eyes with visible white of the eye, clear iris color, dark pupil, soft upper lid, and gentle lashes.",
+    "NEVER draw simple black dots for eyes, NEVER empty ovals, NEVER button eyes, NEVER switch eye style mid-book.",
+    "Keep eyes large, warm, and expressive in classic watercolor picture-book style — readable and consistent page to page.",
+    "Do not morph the face, do not age-shift, do not change ethnicity or hair.",
+  ].join(" ");
+}
+
+/**
+ * Locked wardrobe for the whole book.
+ * When a character photo is used, clothing must match THAT photo — not a generic costume swap.
+ * Gender defaults are fallback only when no photo clothing is available.
+ */
+export function lockedHeroWardrobe(gender?: string | null, opts?: { fromPhoto?: boolean }): string {
+  const fromPhoto = opts?.fromPhoto === true;
+  if (fromPhoto) {
+    return [
+      "LOCKED HERO WARDROBE FROM REFERENCE PHOTO (identical on EVERY page):",
+      "Copy the child's exact outfit from the reference photo — same colors, same garments, same layers, same trim, same shoes/boots, same crown or headpiece if present.",
+      "Do NOT invent a different royal costume. Do NOT swap into navy tunic, red cape, rose gown, armor, pajamas, modern clothes, or any new outfit.",
+      "If the photo shows a specific dress/tunic/cape/sash/belt, keep those exact pieces and colors on every page.",
+      "Pose and background may change; face likeness + this exact photo outfit stay fixed.",
+      "Same hair style and hair color every page.",
+    ].join(" ");
+  }
+
   const g = (gender || "").toLowerCase();
   if (g === "girl") {
     return [
@@ -71,7 +102,7 @@ export function lockedHeroWardrobe(gender?: string | null): string {
       "Pose and background may change; face likeness + this exact royal outfit stay fixed.",
     ].join(" ");
   }
-  // default King / boy
+  // default King / boy fallback when no photo
   return [
     "LOCKED HERO WARDROBE (identical on EVERY page of this book — do not redesign clothes):",
     "King outfit: royal navy-blue tunic with warm gold trim and soft red cape,",
@@ -308,12 +339,15 @@ async function generateWithCharacterPortrait(options: {
   const googleKey = process.env.GOOGLE_AI_API_KEY;
   if (!googleKey) return fallbackPlaceholder(options.prompt);
 
-  const STYLE = "ONE full-bleed 4:3 landscape whimsical watercolor children's storybook illustration only (not diptych, not two panels, not double-page, not collage), soft sepia ink outlines, soft pastel watercolor washes, cute storybook proportions, big expressive eyes, warm golden sunlight, faith-friendly fairytale picture-book quality, NO wands NO spells NO sorcery, scene fills entire canvas edge-to-edge, no photorealism, no empty uncolored coloring-page look, no text, no watermark";
-  const wardrobe = lockedHeroWardrobe(options.gender);
+  const STYLE = "ONE full-bleed 4:3 landscape whimsical watercolor children's storybook illustration only (not diptych, not two panels, not double-page, not collage), soft sepia ink outlines, soft pastel watercolor washes, cute storybook proportions, big FULL DETAILED expressive eyes with iris and pupil (never black-dot eyes), warm golden sunlight, faith-friendly fairytale picture-book quality, NO wands NO spells NO sorcery, scene fills entire canvas edge-to-edge, no photorealism, no empty uncolored coloring-page look, no text, no watermark";
+  const wardrobe = lockedHeroWardrobe(options.gender, { fromPhoto: true });
+  const faceLock = lockedHeroFace();
 
   const fullPrompt = `Create ONE premium watercolor children's storybook illustration (ink + soft color washes — NOT a blank coloring page). Single scene only. Canvas is 4:3 landscape and must be FULL BLEED.
 
 FACE LIKENESS (critical): Study the child's face in the reference photo. Paint/draw the hero as a charming royal storybook character that clearly resembles this child — same age vibe, hair, face shape, expression — stylized into soft watercolor + ink (not a photo, not realistic skin).
+
+${faceLock}
 
 ${wardrobe}
 
@@ -329,7 +363,7 @@ RULES:
 - Hero is center stage, readable silhouette, proud kind pose
 - FULL BODY in frame: entire head, crown/hair, face, hands, feet — headroom above crown, feet still visible
 - NEVER crop or cut off the head, face, crown, arms, or feet
-- Same character design AND the exact same locked royal outfit on every page of this book
+- Same character design, same face, same FULL DETAILED eyes, AND the exact same outfit from the reference photo on every page of this book
 - Soft watercolor color throughout (pastels), not empty line art
 - No real photo collage, no half-photo face, no text`;
 
@@ -380,21 +414,23 @@ export async function generateStoryIllustration(options: {
   characterPhotoUrl?: string | null;
   gender?: string | null;
 }): Promise<FluxResult> {
-  const wardrobe = lockedHeroWardrobe(options.gender);
-  const promptWithWardrobe = `${options.prompt}. ${wardrobe}`;
+  const hasPhoto = Boolean(options.characterPhotoUrl?.startsWith("data:image"));
+  const wardrobe = lockedHeroWardrobe(options.gender, { fromPhoto: hasPhoto });
+  const faceLock = lockedHeroFace();
+  const promptWithLocks = `${options.prompt}. ${faceLock}. ${wardrobe}`;
   // If character portrait provided as base64, use Gemini to place them in the scene
-  if (options.characterPhotoUrl?.startsWith("data:image")) {
+  if (hasPhoto && options.characterPhotoUrl) {
     const b64 = options.characterPhotoUrl.split(",")[1];
     if (b64) {
       return generateWithCharacterPortrait({
-        prompt: promptWithWardrobe,
+        prompt: promptWithLocks,
         characterPhotoB64: b64,
         gender: options.gender,
       });
     }
   }
   // Otherwise generate a background scene with Imagen 4.0
-  return generateWithImagen4(promptWithWardrobe);
+  return generateWithImagen4(promptWithLocks);
 }
 
 const SET_NAME_TO_ID: Record<Exclude<KingdomSet, null>, keyof PhotosBySet> = {
@@ -420,10 +456,12 @@ export async function illustrateStoryPages(options: {
 }): Promise<StoryPage[]> {
   const { pages, characterPhoto, gender } = options;
   // Product rule: book + movie are 100% illustrated watercolor storybook art (no real session photos).
-  // Real session photos are NEVER placed in pages. Face upload = likeness only.
+  // Real session photos are NEVER placed in pages. Face upload = likeness + wardrobe reference only.
   const result: StoryPage[] = [];
   const usedSceneKeys: string[] = [];
-  const wardrobe = lockedHeroWardrobe(gender);
+  const hasPhoto = Boolean(characterPhoto);
+  const wardrobe = lockedHeroWardrobe(gender, { fromPhoto: hasPhoto });
+  const faceLock = lockedHeroFace();
 
   for (let index = 0; index < pages.length; index++) {
     const page = pages[index];
@@ -433,9 +471,9 @@ export async function illustrateStoryPages(options: {
       continue;
     }
 
-    const uniqueness = uniqueSceneDirective(page, index, pages, usedSceneKeys);
+    const uniqueness = uniqueSceneDirective(page, index, pages, usedSceneKeys, hasPhoto);
     const sceneHint = page.imagePrompt ?? page.title;
-    const prompt = `${sceneHint}. ${wardrobe}. ${uniqueness}. ${STYLE_SUFFIX}. Full-bleed 4:3 children's watercolor storybook illustration for an 8.25 inch square printed book image band. CRITICAL: edge-to-edge scene, no vine frame, no side white space. Show the complete child hero from head to toe with headroom above the crown — never cut off the head. SAME outfit as every other page. NO glowing staff, NO wand, NO scepter beam, NO spell props.`;
+    const prompt = `${sceneHint}. ${faceLock}. ${wardrobe}. ${uniqueness}. ${STYLE_SUFFIX}. Full-bleed 4:3 children's watercolor storybook illustration for an 8.25 inch square printed book image band. CRITICAL: edge-to-edge scene, no vine frame, no side white space. Show the complete child hero from head to toe with headroom above the crown — never cut off the head. SAME face, SAME full detailed eyes, SAME outfit as every other page. NO glowing staff, NO wand, NO scepter beam, NO spell props.`;
 
     const art = await generateStoryIllustration({
       prompt,
@@ -468,7 +506,8 @@ function uniqueSceneDirective(
   page: StoryPage,
   index: number,
   all: StoryPage[],
-  used: string[]
+  used: string[],
+  fromPhoto = false
 ): string {
   const title = (page.title || "").toLowerCase();
   const prevTitles = all
@@ -513,7 +552,9 @@ function uniqueSceneDirective(
     used.length ? `Already used scene keys: ${used.slice(-4).join(" || ")}.` : "",
     beat,
     angle,
-    "Same child likeness and the EXACT same locked royal outfit/colors/crown every page — only NEW pose, NEW camera angle, NEW background landmark. Never a clothing change.",
+    fromPhoto
+      ? "Same child likeness, SAME full detailed eyes (never black dots), and the EXACT same outfit colors/pieces from the reference photo every page — only NEW pose, NEW camera angle, NEW background landmark. Never a clothing change or eye-style change."
+      : "Same child likeness, SAME full detailed eyes (never black dots), and the EXACT same locked royal outfit/colors/crown every page — only NEW pose, NEW camera angle, NEW background landmark. Never a clothing change or eye-style change.",
   ]
     .filter(Boolean)
     .join(" ");

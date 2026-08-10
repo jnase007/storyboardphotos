@@ -273,6 +273,8 @@ export const STORYBOOK_MOVIE_MOTION_BIBLE = [
   "NOT anime. NOT 3D CGI. NOT photoreal live-action. NOT hyper-kinetic action trailer.",
   "Preserve exact art: soft sepia ink outlines, pastel watercolor washes, cream paper texture.",
   "Face/identity LOCKED — no morphing, no warping, no age drift, no facial smear.",
+  "Eyes LOCKED: keep full detailed storybook eyes with iris + pupil — never simplify to black dots mid-shot.",
+  "Outfit LOCKED: same clothes/colors from the source illustration the whole clip — no costume changes.",
   "Camera: slow gentle push-in OR tiny parallax drift only. No whip pans. No shake-cam.",
   "Motion vocabulary (reuse every page): soft breeze on hair/cape/leaves, cloth drift, lantern glow pulse,",
   "cloud/sky drift, sparkle dust motes, character breathes/blinks subtly, small hand or head turn.",
@@ -291,7 +293,7 @@ export function buildMotionPrompt(
   const beat = (page.title || page.text || "magical kingdom scene").slice(0, 180);
   return [
     STORYBOOK_MOVIE_MOTION_BIBLE,
-    `Hero is ${role} ${childName} — keep likeness and locked royal outfit stable.`,
+    `Hero is ${role} ${childName} — keep likeness, full detailed eyes, and locked outfit from the source frame stable.`,
     `This shot beat: ${beat}.`,
     `Animate this single storybook frame into a short continuous movie moment with clear gentle motion.`,
   ].join(" ");
