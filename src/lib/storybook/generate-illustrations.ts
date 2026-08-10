@@ -79,15 +79,28 @@ export function lockedHeroFace(): string {
  * When a character photo is used, clothing must match THAT photo — not a generic costume swap.
  * Gender defaults are fallback only when no photo clothing is available.
  */
-export function lockedHeroWardrobe(gender?: string | null, opts?: { fromPhoto?: boolean }): string {
+export function lockedHeroWardrobe(
+  gender?: string | null,
+  opts?: { fromPhoto?: boolean; fromPageOne?: boolean }
+): string {
   const fromPhoto = opts?.fromPhoto === true;
-  if (fromPhoto) {
+  const fromPageOne = opts?.fromPageOne === true;
+  const hardBan =
+    "OUTFIT CONTINUITY HARD RULE: The hero wears ONE outfit for the entire book. " +
+    "If page 1 / the reference shows a DRESS or GOWN, every later page must show that SAME dress/gown — never shorts, never pants, never leggings, never a tunic swap, never a new colorway. " +
+    "If page 1 shows a TUNIC + pants/boots, keep that exact tunic+pants+boots set every page — never switch into a dress. " +
+    "Do not 'help' the adventure by changing clothes for climbing, running, or weather. Pose changes only.";
+
+  if (fromPhoto || fromPageOne) {
     return [
-      "LOCKED HERO WARDROBE FROM REFERENCE PHOTO (identical on EVERY page):",
-      "Copy the child's exact outfit from the reference photo — same colors, same garments, same layers, same trim, same shoes/boots, same crown or headpiece if present.",
-      "Do NOT invent a different royal costume. Do NOT swap into navy tunic, red cape, rose gown, armor, pajamas, modern clothes, or any new outfit.",
-      "If the photo shows a specific dress/tunic/cape/sash/belt, keep those exact pieces and colors on every page.",
-      "Pose and background may change; face likeness + this exact photo outfit stay fixed.",
+      fromPageOne
+        ? "LOCKED HERO WARDROBE FROM PAGE-1 / OUTFIT REFERENCE IMAGE (identical on EVERY page):"
+        : "LOCKED HERO WARDROBE FROM REFERENCE PHOTO (identical on EVERY page):",
+      "Copy the exact outfit on the reference — same silhouette, same garment type (dress vs tunic vs pants), same colors, same layers, same trim, same shoes/boots, same crown/headpiece if present.",
+      "Do NOT invent a different royal costume. Do NOT swap dress↔shorts↔pants mid-book.",
+      "Do NOT swap into navy tunic, red cape, rose gown, armor, pajamas, modern clothes, or any new outfit unless that is exactly what the reference shows.",
+      hardBan,
+      "Pose and background may change; face likeness + this exact outfit stay fixed.",
       "Same hair style and hair color every page.",
     ].join(" ");
   }
@@ -96,11 +109,12 @@ export function lockedHeroWardrobe(gender?: string | null, opts?: { fromPhoto?: 
   if (g === "girl") {
     return [
       "LOCKED HERO WARDROBE (identical on EVERY page of this book — do not redesign clothes):",
-      "Queen outfit: soft rose-blush and ivory princess gown with gentle gold trim,",
+      "Queen outfit: soft rose-blush and ivory princess GOWN/DRESS with gentle gold trim (a dress every page — never shorts or pants),",
       "same small gold crown every page, same rose sash, same soft ivory slippers,",
       "same hair style and hair color every page.",
-      "CRITICAL: do NOT change dress color, do NOT swap into armor, riding gear, pajamas, modern clothes, or a new gown.",
-      "Pose and background may change; face likeness + this exact royal outfit stay fixed.",
+      hardBan,
+      "CRITICAL: do NOT change dress color, do NOT swap into shorts, pants, armor, riding gear, pajamas, modern clothes, or a new gown design.",
+      "Pose and background may change; face likeness + this exact royal dress stay fixed.",
     ].join(" ");
   }
   // default King / boy fallback when no photo
@@ -109,6 +123,7 @@ export function lockedHeroWardrobe(gender?: string | null, opts?: { fromPhoto?: 
     "King outfit: royal navy-blue tunic with warm gold trim and soft red cape,",
     "same small gold crown every page, same brown belt, same soft leather boots,",
     "same hair style and hair color every page.",
+    hardBan,
     "CRITICAL: do NOT change tunic color, do NOT swap into armor, pajamas, modern clothes, or a new costume.",
     "Pose and background may change; face likeness + this exact royal outfit stay fixed.",
   ].join(" ");

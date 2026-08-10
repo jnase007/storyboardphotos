@@ -85,7 +85,7 @@ export async function buildStorybookPdf(options: {
   if (includeBack) {
     if (pageCount > 0) doc.addPage();
     pageCount++;
-    drawBackCover(doc);
+    await drawBackCoverAsync(doc);
   }
 
   return doc.output("blob");
@@ -456,7 +456,12 @@ async function drawInteriorPage(
 // ─────────────────────────────────────────────────────────────────────────────
 // Back Cover
 // ─────────────────────────────────────────────────────────────────────────────
-function drawBackCover(doc: jsPDF): void {
+/** Justin: replace gold castle/crown mark with Storybook Photos logo. */
+const BACK_COVER_LOGO_URL =
+  process.env.STORYBOOK_BACK_LOGO_URL ||
+  "https://www.storybookphotos.com/brand/storybook-photos-logo-color.png";
+
+async function drawBackCoverAsync(doc: jsPDF): Promise<void> {
   // Match interior watercolor books — cream storybook back, not corporate navy
   doc.setFillColor(...CREAM);
   doc.rect(0, 0, PAGE_W, PAGE_H, "F");
@@ -468,44 +473,70 @@ function drawBackCover(doc: jsPDF): void {
   doc.setLineWidth(0.75);
   doc.roundedRect(40, 40, PAGE_W - 80, PAGE_H - 80, 10, 10, "S");
 
-  // Small crown
-  drawCrown(doc, PAGE_W / 2, 150, 42, GOLD_DARK);
-  drawStar(doc, PAGE_W / 2 - 70, 118, 5, GOLD);
-  drawStar(doc, PAGE_W / 2 + 70, 118, 5, GOLD);
-  drawStar(doc, PAGE_W / 2, 100, 4, GOLD_DARK);
+  // Brand logo centered (no gold castle / crown mark)
+  let logoDrawn = false;
+  try {
+    const logo = await fetchImageAsDataUrl(BACK_COVER_LOGO_URL);
+    if (logo) {
+      const logoW = 220;
+      const logoH = 150;
+      const logoX = (PAGE_W - logoW) / 2;
+      const logoY = 95;
+      doc.addImage(
+        logo.dataUrl,
+        logo.format,
+        logoX,
+        logoY,
+        logoW,
+        logoH,
+        undefined,
+        "FAST"
+      );
+      logoDrawn = true;
+    }
+  } catch {
+    /* fall through to wordmark */
+  }
 
-  doc.setFont("times", "bold");
-  doc.setFontSize(26);
-  doc.setTextColor(...ROYAL_BLUE);
-  doc.text("Storybook Photos", PAGE_W / 2, 230, { align: "center" });
+  if (!logoDrawn) {
+    doc.setFont("times", "bold");
+    doc.setFontSize(28);
+    doc.setTextColor(...ROYAL_BLUE);
+    doc.text("Storybook Photos", PAGE_W / 2, 170, { align: "center" });
+  }
 
   doc.setFont("times", "italic");
   doc.setFontSize(16);
   doc.setTextColor(...GOLD_DARK);
-  doc.text("Kingdom Quests", PAGE_W / 2, 258, { align: "center" });
+  doc.text("Kingdom Quests", PAGE_W / 2, logoDrawn ? 270 : 210, {
+    align: "center",
+  });
 
   doc.setDrawColor(...GOLD);
   doc.setLineWidth(1);
-  doc.line(PAGE_W * 0.28, 278, PAGE_W * 0.72, 278);
+  const ruleY = logoDrawn ? 290 : 230;
+  doc.line(PAGE_W * 0.28, ruleY, PAGE_W * 0.72, ruleY);
 
   doc.setFont("times", "italic");
   doc.setFontSize(15);
   doc.setTextColor(...ROYAL_BLUE);
-  doc.text("Every child is the hero of their own", PAGE_W / 2, 320, {
+  const tagY = logoDrawn ? 330 : 280;
+  doc.text("Every child is the hero of their own", PAGE_W / 2, tagY, {
     align: "center",
   });
-  doc.text("kingdom adventure.", PAGE_W / 2, 342, { align: "center" });
+  doc.text("kingdom adventure.", PAGE_W / 2, tagY + 22, { align: "center" });
 
-  // Cream badge for URL
+  // URL badge
+  const badgeY = logoDrawn ? 390 : 360;
   doc.setFillColor(255, 255, 255);
-  doc.roundedRect(PAGE_W * 0.22, 380, PAGE_W * 0.56, 48, 10, 10, "F");
+  doc.roundedRect(PAGE_W * 0.22, badgeY, PAGE_W * 0.56, 48, 10, 10, "F");
   doc.setDrawColor(...GOLD);
   doc.setLineWidth(1);
-  doc.roundedRect(PAGE_W * 0.22, 380, PAGE_W * 0.56, 48, 10, 10, "S");
+  doc.roundedRect(PAGE_W * 0.22, badgeY, PAGE_W * 0.56, 48, 10, 10, "S");
   doc.setFont("times", "bold");
   doc.setFontSize(14);
   doc.setTextColor(...ROYAL_BLUE);
-  doc.text("storybookphotos.com", PAGE_W / 2, 410, { align: "center" });
+  doc.text("storybookphotos.com", PAGE_W / 2, badgeY + 30, { align: "center" });
 
   doc.setFont("times", "normal");
   doc.setFontSize(10);
@@ -513,6 +544,11 @@ function drawBackCover(doc: jsPDF): void {
   doc.text("© Storybook Photos · All rights reserved", PAGE_W / 2, PAGE_H - 56, {
     align: "center",
   });
+}
+
+function drawBackCover(doc: jsPDF): void {
+  // Sync stub — production path uses drawBackCoverAsync
+  void doc;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
