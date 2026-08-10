@@ -1,12 +1,12 @@
 "use client";
 
 const ADVENTURE_CARD_IMAGES: Record<string, string> = {
-  "dragon-slayer": "/adventure-cards/dragon-slayer.jpg?v=17",
-  "rescue-mission": "/adventure-cards/rescue-mission.jpg?v=17",
-  "lost-crown": "/adventure-cards/lost-crown.jpg?v=17",
-  "forest-guardian": "/adventure-cards/forest-guardian.jpg?v=17",
-  "kindness-quest": "/adventure-cards/kindness-quest.jpg?v=17",
-  "light-treasure": "/adventure-cards/light-treasure.jpg?v=17",
+  "dragon-slayer": "/adventure-cards/dragon-slayer.jpg?v=20",
+  "rescue-mission": "/adventure-cards/rescue-mission.jpg?v=20",
+  "lost-crown": "/adventure-cards/lost-crown.jpg?v=20",
+  "forest-guardian": "/adventure-cards/forest-guardian.jpg?v=20",
+  "kindness-quest": "/adventure-cards/kindness-quest.jpg?v=20",
+  "light-treasure": "/adventure-cards/light-treasure.jpg?v=20",
 };
 
 
