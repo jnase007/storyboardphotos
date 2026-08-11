@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Trash2, Download, Share2, Eye, BookOpen, Plus, Loader2 } from "lucide-react";
+import { Trash2, Download, Share2, Eye, BookOpen, Plus, Loader2, Shirt } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 
@@ -224,6 +224,13 @@ export function BooksLibrary() {
                     title="Preview"
                   >
                     <Eye className="w-4 h-4" />
+                  </Link>
+                  <Link
+                    href={`/admin/books/${book.id}/shirt`}
+                    className="p-2 rounded-lg hover:bg-violet-50 text-violet-600 transition-colors"
+                    title="Review white tee"
+                  >
+                    <Shirt className="w-4 h-4" />
                   </Link>
                   <button
                     onClick={() => copyShareLink(book.id)}
