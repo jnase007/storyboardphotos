@@ -908,10 +908,16 @@ export function StorybookGenerator() {
                 </label>
                 <select
                   value={gender}
-                  onChange={(e) => setGender(e.target.value as StoryGender)}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    // Boy / Girl only — no They / other
+                    if (v === "girl" || v === "boy") setGender(v);
+                  }}
                   className="w-full h-11 rounded-md border border-royal-gold/30 bg-royal-cream/40 px-3 text-royal-blue outline-none focus:border-royal-gold focus:ring-2 focus:ring-royal-gold/20"
                 >
-                  <option value="" disabled>Select boy or girl...</option>
+                  <option value="" disabled>
+                    Select boy or girl...
+                  </option>
                   <option value="girl">Girl (Queen)</option>
                   <option value="boy">Boy (King)</option>
                 </select>

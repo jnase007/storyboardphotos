@@ -127,7 +127,8 @@ export function StoryScriptsEditor() {
             Use placeholders like{" "}
             <span className="text-royal-gold/90">[Name]</span>,{" "}
             <span className="text-royal-gold/90">[Role]</span>,{" "}
-            <span className="text-royal-gold/90">[she/he/they]</span> so every
+            <span className="text-royal-gold/90">[Name]</span> and{" "}
+            <span className="text-royal-gold/90">[Role]</span> (King/Queen only) so every
             child gets a personal story.
           </p>
         </div>
