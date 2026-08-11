@@ -262,7 +262,9 @@ export const ADDITIONAL_INVESTMENTS = [
   { label: "Additional child book (4th+ child)", price: "$149 each" },
   { label: "Extra printed hardcover copy", price: "$45 each" },
   { label: "Kingdom Teaser video (15–30 sec)", price: "$149" },
-  { label: "Animated Kingdom Movie (60–90 sec)", price: "$299" },
+  { label: "Animated Kingdom Movie — Standard full-motion", price: "$199–$249" },
+  { label: "Animated Kingdom Movie — Premium (2.5 quality)", price: "$299" },
+  { label: "Kingdom tee (approved art)", price: "Quoted after art approval" },
   { label: "Rush processing (48hr turnaround)", price: "$75" },
   // Portrait prints
   { label: "8×10 portrait print", price: "$200 each" },
@@ -320,7 +322,22 @@ export const FAQ_ITEMS = [
   {
     question: "How much does a Storybook Photos session cost?",
     answer:
-      "Packages start at $299 for Kingdom Chronicles or the Royal Portrait Album. The Royal Collection, which includes both books, starts at $499. Every package includes a studio session and a premium printed hardcover book.",
+      "Packages start at $299 for Kingdom Chronicles or the Royal Portrait Album. The Royal Collection (both books) is $499. Animated Kingdom Movies are $199–$299 after you approve the book art. Every package includes a studio session and a premium printed hardcover book.",
+  },
+  {
+    question: "How long until we get the book and movie?",
+    answer:
+      "After your session we craft the storybook and send a digital share link for family preview. You review every page before we render the full-motion movie — so art always matches the story. Printed hardcovers and movies typically follow within days of approval.",
+  },
+  {
+    question: "Can we share the book with grandparents?",
+    answer:
+      "Yes. Every book includes a free digital share link you can text or email. Optional watermark-free PDF download and extra printed copies are available à la carte.",
+  },
+  {
+    question: "Do you offer shirts or merch?",
+    answer:
+      "Yes — once the book art is approved, we can produce a kingdom tee from the locked white-tee design. Ask at delivery or from your book share page.",
   },
   {
     question: "What ages are best for a session?",

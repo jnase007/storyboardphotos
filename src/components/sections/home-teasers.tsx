@@ -13,7 +13,7 @@ const teasers: Record<string, string> = {
   "/kingdom-sets": "Four enchanted worlds for your child's royal adventure.",
   "/storybooks": "Personalized storybooks where your child is the hero.",
   "/pricing":
-    "Royal Portrait $450 · Kingdom Adventure $750 · Heirloom Legacy $1,200",
+    "Books from $299 · Royal Collection $499 · Movies $199–$299",
   "/testimonials": "Families whose kids left standing taller in who they are.",
   "/faq": "Answers about sessions, storybooks, and our Costa Mesa studio.",
 };

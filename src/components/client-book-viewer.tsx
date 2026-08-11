@@ -8,6 +8,8 @@ import {
   Loader2,
   Pause,
   Play,
+  Share2,
+  Shirt,
   Volume2,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -395,6 +397,52 @@ export function ClientBookViewer({ book }: { book: Book }) {
         <p className="text-white/40 text-xs mt-1">
           A Storybook Photos Adventure
         </p>
+        <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
+          <button
+            type="button"
+            onClick={async () => {
+              const url =
+                typeof window !== "undefined"
+                  ? `${window.location.origin}/book/${book.id}`
+                  : `https://www.storybookphotos.com/book/${book.id}`;
+              try {
+                if (navigator.share) {
+                  await navigator.share({
+                    title: displayTitle,
+                    text: `Read ${book.child_name}'s kingdom story`,
+                    url,
+                  });
+                } else {
+                  await navigator.clipboard.writeText(url);
+                  toast.success("Share link copied — send to grandma!");
+                }
+              } catch {
+                try {
+                  await navigator.clipboard.writeText(url);
+                  toast.success("Share link copied");
+                } catch {
+                  toast.error("Could not copy link");
+                }
+              }
+            }}
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold border border-[#C5A26F]/50 text-[#C5A26F] hover:bg-white/5"
+          >
+            <Share2 className="w-3.5 h-3.5" />
+            Share with family
+          </button>
+          <a
+            href={`mailto:hello@storybookphotos.com?subject=${encodeURIComponent(
+              `Kingdom tee for ${book.child_name}`
+            )}&body=${encodeURIComponent(
+              `Hi Storybook Photos,\n\nI'd like a kingdom tee for this book:\nhttps://www.storybookphotos.com/book/${book.id}\n\nThanks!`
+            )}`}
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold border border-[#C5A26F]/50 text-[#C5A26F] hover:bg-white/5"
+            title="Request a kingdom tee"
+          >
+            <Shirt className="w-3.5 h-3.5" />
+            Add tee
+          </a>
+        </div>
       </div>
 
       {/* Controls */}
@@ -481,7 +529,7 @@ export function ClientBookViewer({ book }: { book: Book }) {
             className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold border border-[#C5A26F]/50 text-[#C5A26F] hover:bg-white/5"
           >
             <Film className="w-3.5 h-3.5" />
-            Animated movie · from $2,000
+            Animated movie · from $199
           </button>
         )}
       </div>
@@ -495,10 +543,10 @@ export function ClientBookViewer({ book }: { book: Book }) {
           }}
         >
           <p className="text-white/70 text-xs mb-2 leading-relaxed">
-            Heirloom animated movie ($2,000–$3,000): each page comes alive with
-            cinematic motion + bedtime narration — real downloadable MP4, not a
-            slideshow. While we produce it, use{" "}
-            <strong>Play story slideshow</strong> above.
+            Animated Kingdom Movie ($199–$299): each page comes alive with
+            full motion + bedtime narration — real downloadable MP4, not a
+            slideshow. We only render after the book art is approved. While you
+            wait, use <strong>Play story slideshow</strong> above.
           </p>
           <div className="grid gap-2 sm:grid-cols-2">
             <input

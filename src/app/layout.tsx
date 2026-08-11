@@ -27,7 +27,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? SITE.url),
   title: {
-    default: `${SITE.name} | ${SITE.subtitle} — Kingdom Photo Studio in Costa Mesa`,
+    default: `${SITE.name} — Kingdom Photo Studio in Costa Mesa`,
     template: `%s | ${SITE.name}`,
   },
   description: SITE.description,

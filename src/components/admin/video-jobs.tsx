@@ -163,19 +163,38 @@ export function VideoJobsPanel() {
   async function makeMovie(id: string, quality: Quality, force = false) {
     const labels: Record<Quality, string> = {
       draft: "Test draft (pennies)",
-      standard: "Customer coloring-book video (~$10-15)",
-      premium: "Premium (blocked)",
+      standard: "Customer Fast full-motion (~$35-class)",
+      premium: "Premium 2.5 (higher COGS)",
     };
 
+    // Gate: book art must be approved before spending Seedance $ (River lesson)
+    try {
+      const check = await fetch(`/api/admin/storybooks/${id}`, {
+        headers: { "x-admin-code": ADMIN_CODE },
+      });
+      if (check.ok) {
+        const book = await check.json();
+        const st = String(book.status || "");
+        if (st !== "approved" && quality !== "draft") {
+          const go = window.confirm(
+            `Book status is "${st || "unknown"}" — not approved yet.\n\nRule: review art ↔ text first, then Approve in Books Library, then render movie.\n\nRender anyway? (costs real $)`
+          );
+          if (!go) return;
+        }
+      }
+    } catch {
+      /* non-blocking if status check fails */
+    }
+
     if (quality === "premium") {
-      toast.error(
-        "Premium is blocked. $150 coloring-book videos use Standard (~$15). Testing uses Draft."
+      const okPrem = window.confirm(
+        "Premium 2.5 full-motion is the expensive gold tier (~$150-class).\nDefault production is Standard Fast.\n\nContinue with Premium?"
       );
-      return;
+      if (!okPrem) return;
     }
     if (quality === "standard") {
       const ok = window.confirm(
-        "Customer coloring-book video (~$8-$15, max $50).\n\nGentle 2D motion only — not hyper-real.\nUse when the book is approved.\nFor ~30 test passes, use Test draft.\n\nContinue?"
+        "Customer Fast full-motion movie (~$35 on shorter books).\n\nFull Seedance motion the whole way.\nOnly after book art is approved.\n\nContinue?"
       );
       if (!ok) return;
     }
@@ -190,7 +209,7 @@ export function VideoJobsPanel() {
           "x-admin-code": ADMIN_CODE,
         },
         body: JSON.stringify({
-          package: "teaser",
+          package: "full",
           quality,
           force,
           // Always try bedtime narration — this is the product sound

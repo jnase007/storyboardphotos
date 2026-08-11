@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Trash2, Download, Share2, Eye, BookOpen, Plus, Loader2, Shirt } from "lucide-react";
+import { Trash2, Download, Share2, Eye, BookOpen, Plus, Loader2, Shirt, CheckCircle2, Film } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 
@@ -12,8 +12,10 @@ type StorybookRecord = {
   gender: string;
   status: string;
   created_at: string;
-  pages: Array<{ imageUrl?: string }>;
+  pages: Array<{ imageUrl?: string; title?: string; text?: string }>;
   pdf_url?: string | null;
+  video_status?: string | null;
+  video_url?: string | null;
 };
 
 const ADMIN_CODE = "3121";
@@ -24,6 +26,8 @@ export function BooksLibrary() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [downloading, setDownloading] = useState<string | null>(null);
+  const [approving, setApproving] = useState<string | null>(null);
+  const [clearingVideo, setClearingVideo] = useState<string | null>(null);
 
   useEffect(() => {
     fetchBooks();
@@ -76,6 +80,69 @@ export function BooksLibrary() {
     const url = `${window.location.origin}/book/${id}`;
     navigator.clipboard.writeText(url);
     toast.success("Share link copied!");
+  }
+
+    async function approveBookArt(book: StorybookRecord) {
+    const ok = window.confirm(
+      `Approve ${book.child_name}'s book art?\n\nOnly approve after every page matches the text.\nVideo renders should wait until this is approved.`
+    );
+    if (!ok) return;
+    setApproving(book.id);
+    try {
+      const res = await fetch(`/api/admin/storybooks/${book.id}/approve`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-code": ADMIN_CODE,
+        },
+        body: JSON.stringify({
+          art_only: true,
+          pages: book.pages || [],
+          child_name: book.child_name,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Approve failed");
+      toast.success("Book art approved — safe to render movie");
+      setBooks((prev) =>
+        prev.map((b) => (b.id === book.id ? { ...b, status: "approved" } : b))
+      );
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Approve failed");
+    } finally {
+      setApproving(null);
+    }
+  }
+
+  async function clearStuckVideo(book: StorybookRecord) {
+    if (!book.video_status || book.video_status === "none" || book.video_url) return;
+    const ok = window.confirm(
+      `Clear stuck video status "${book.video_status}" for ${book.child_name}?\nBook stays. Movie queue resets.`
+    );
+    if (!ok) return;
+    setClearingVideo(book.id);
+    try {
+      const res = await fetch(`/api/storybooks/${book.id}/video`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-code": ADMIN_CODE,
+        },
+        body: JSON.stringify({
+          video_status: "none",
+          video_url: null,
+          video_notes: "Cleared stale in_production / abandoned render",
+          video_package: null,
+        }),
+      });
+      if (!res.ok) throw new Error("clear failed");
+      toast.success("Stuck video status cleared");
+      await fetchBooks();
+    } catch {
+      toast.error("Could not clear video status");
+    } finally {
+      setClearingVideo(null);
+    }
   }
 
   async function downloadPdf(book: StorybookRecord) {
@@ -204,6 +271,11 @@ export function BooksLibrary() {
                         No PDF
                       </span>
                     )}
+                    {book.video_status && book.video_status !== "none" ? (
+                      <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-violet-50 text-violet-700">
+                        video: {book.video_status}
+                      </span>
+                    ) : null}
                     <span className="text-xs text-gray-400">
                       {new Date(book.created_at).toLocaleDateString("en-US", {
                         month: "short",
@@ -217,6 +289,35 @@ export function BooksLibrary() {
 
                 {/* Actions */}
                 <div className="flex items-center gap-2 flex-shrink-0">
+                  <button
+                    onClick={() => approveBookArt(book)}
+                    disabled={approving === book.id || book.status === "approved"}
+                    className="p-2 rounded-lg hover:bg-emerald-50 text-emerald-700 transition-colors disabled:opacity-40"
+                    title={book.status === "approved" ? "Already approved" : "Approve art (required before movie)"}
+                  >
+                    {approving === book.id ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <CheckCircle2 className="w-4 h-4" />
+                    )}
+                  </button>
+                  {book.video_status &&
+                  book.video_status !== "none" &&
+                  book.video_status !== "ready" &&
+                  !book.video_url ? (
+                    <button
+                      onClick={() => clearStuckVideo(book)}
+                      disabled={clearingVideo === book.id}
+                      className="p-2 rounded-lg hover:bg-orange-50 text-orange-600 transition-colors disabled:opacity-50"
+                      title="Clear stuck video status"
+                    >
+                      {clearingVideo === book.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Film className="w-4 h-4" />
+                      )}
+                    </button>
+                  ) : null}
                   <Link
                     href={`/book/${book.id}`}
                     target="_blank"

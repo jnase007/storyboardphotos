@@ -17,16 +17,56 @@ export async function POST(request: NextRequest, { params }: Params) {
   const { id } = await params;
 
   try {
-    const body = await request.json();
+    const body = await request.json().catch(() => ({} as Record<string, unknown>));
     const pages = body.pages as StoryPage[] | undefined;
     const childName = (body.child_name as string) || "Child";
     const bookTitle =
       (body.bookTitle as string) ||
       `${childName} and the Kingdom Quest`;
+    // Art-only approval (no PDF rebuild) — gates movie spend
+    const artOnly = body.art_only === true || body.mark_approved_only === true;
+
+    if (artOnly) {
+      if (hasRealSupabase() && !id.startsWith("local-")) {
+        const supabase = createServiceClient();
+        const { data, error } = await supabase
+          .from("storybooks")
+          .update(
+            pages?.length
+              ? {
+                  status: "approved",
+                  pages,
+                  updated_at: new Date().toISOString(),
+                }
+              : {
+                  status: "approved",
+                  updated_at: new Date().toISOString(),
+                }
+          )
+          .eq("id", id)
+          .select("id, status, child_name")
+          .single();
+        if (error) {
+          return NextResponse.json({ error: error.message }, { status: 500 });
+        }
+        return NextResponse.json({
+          ok: true,
+          status: "approved",
+          book: data,
+          message: "Book art approved — safe to render movie",
+        });
+      }
+      return NextResponse.json({
+        ok: true,
+        status: "approved",
+        persisted: false,
+        message: "Approved locally (no Supabase)",
+      });
+    }
 
     if (!pages?.length) {
       return NextResponse.json(
-        { error: "pages are required" },
+        { error: "pages are required (or pass art_only:true)" },
         { status: 400 }
       );
     }
@@ -61,6 +101,16 @@ export async function POST(request: NextRequest, { params }: Params) {
           .update({
             pages,
             pdf_url: pdfUrl,
+            status: "approved",
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", id);
+      } else {
+        // Still mark approved so movie gate works even if PDF storage fails
+        await supabase
+          .from("storybooks")
+          .update({
+            pages,
             status: "approved",
             updated_at: new Date().toISOString(),
           })

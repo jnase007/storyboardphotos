@@ -110,10 +110,10 @@ export function HeroSection() {
                 <ArrowRight className="h-4 w-4 shrink-0" />
               </Link>
               <Link
-                href="/experience"
+                href="/pricing"
                 className="inline-flex h-12 w-full sm:w-auto items-center justify-center gap-2 rounded-md border border-royal-gold/50 bg-royal-blue/40 backdrop-blur-sm px-8 text-base font-semibold text-royal-cream transition-all hover:border-royal-gold hover:bg-royal-gold/15"
               >
-                Explore the Experience
+                Books from $299
               </Link>
             </div>
 
