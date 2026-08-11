@@ -14,23 +14,8 @@ export const GOLD_MOVIE_URL =
 /** Main still for Raelyn sample movie (hero princess art Justin locked). */
 export const GOLD_MOVIE_POSTER = "/brand/raelyn-movie-poster.jpg";
 
-const SAMPLE_SPREADS = [
-  {
-    src: GOLD_MOVIE_POSTER,
-    alt: "Raelyn as princess — Storybook Photos movie sample",
-    caption: "Your child on the cover",
-  },
-  {
-    src: "/sets/royal-forest.webp",
-    alt: "Royal Forest storybook scene sample",
-    caption: "Story pages from their quest",
-  },
-  {
-    src: "/sets/throne-room.jpg",
-    alt: "Throne Room portrait set sample",
-    caption: "Studio portraits that feel royal",
-  },
-] as const;
+/** Full Raelyn sample storybook PDF for homepage featured area. */
+export const GOLD_BOOK_PDF = "/brand/raelyn-kingdom-quest-sample.pdf";
 
 export function HomeSellSection() {
   return (
@@ -51,8 +36,8 @@ export function HomeSellSection() {
               Book. Movie. Memory.
             </h2>
             <p className="text-royal-cream/65 text-lg leading-relaxed">
-              Watch a real animated Kingdom Movie — then flip sample spreads from
-              the storybook your child stars in.
+              Watch a real animated Kingdom Movie — then open a full sample
+              storybook your child can star in.
             </p>
           </div>
 
@@ -87,43 +72,44 @@ export function HomeSellSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.08 }}
-              className="lg:col-span-5 space-y-4"
+              className="lg:col-span-5"
             >
-              <div className="flex items-center gap-2 text-royal-gold text-sm font-semibold uppercase tracking-wider">
-                <BookOpen className="h-4 w-4" />
-                Sample spreads
-              </div>
-              {SAMPLE_SPREADS.map((s) => (
-                <div
-                  key={s.src}
-                  className="flex gap-4 rounded-xl border border-royal-gold/20 bg-white/5 p-3 hover:border-royal-gold/40 transition-colors"
-                >
-                  <div className="relative h-20 w-28 shrink-0 overflow-hidden rounded-lg bg-royal-blue/40">
-                    <Image
-                      src={s.src}
-                      alt={s.alt}
-                      fill
-                      className="object-cover"
-                      sizes="112px"
-                    />
+              <a
+                href={GOLD_BOOK_PDF}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group block rounded-2xl overflow-hidden border border-royal-gold/30 bg-white/5 hover:border-royal-gold/55 transition-colors"
+              >
+                <div className="relative aspect-[4/3] bg-royal-blue/40">
+                  <Image
+                    src={GOLD_MOVIE_POSTER}
+                    alt="Queen Raelyn and the Dragon Mountain — sample storybook"
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                    sizes="(max-width: 1024px) 100vw, 420px"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-royal-blue/90 via-royal-blue/20 to-transparent" />
+                  <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-royal-gold px-3 py-1 text-xs font-bold text-royal-blue">
+                    <BookOpen className="h-3.5 w-3.5" />
+                    Sample book PDF
                   </div>
-                  <div className="flex flex-col justify-center min-w-0">
-                    <p className="font-serif text-royal-cream font-semibold leading-snug">
-                      {s.caption}
+                  <div className="absolute bottom-0 left-0 right-0 p-5">
+                    <p className="font-serif text-xl font-bold text-royal-cream mb-1">
+                      Queen Raelyn & the Dragon Mountain
                     </p>
-                    <p className="text-royal-cream/50 text-sm mt-1">
-                      Personalized to your child
+                    <p className="text-royal-cream/70 text-sm mb-3">
+                      Full sample storybook — open the PDF
                     </p>
+                    <span className="inline-flex items-center gap-2 text-royal-gold font-semibold text-sm">
+                      View sample PDF
+                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                    </span>
                   </div>
                 </div>
-              ))}
-              <Link
-                href="/storybooks"
-                className="inline-flex items-center gap-2 text-royal-gold font-semibold text-sm hover:underline"
-              >
-                Explore storybooks
-                <ArrowRight className="h-4 w-4" />
-              </Link>
+              </a>
+              <p className="mt-3 text-center text-royal-cream/45 text-sm">
+                Real personalized Kingdom Quest · your child is the hero
+              </p>
             </motion.div>
           </div>
         </div>
