@@ -1,77 +1,35 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { ArrowRight, MapPin, Heart } from "lucide-react";
 import { SITE } from "@/lib/constants";
 import { EnchantEmbers } from "@/components/enchant-embers";
 
-const HERO_BACKGROUNDS = [
-  {
-    src: "/brand-storefront.jpg",
-    alt: "Storybook Photos storefront — Est. Orange County",
-  },
-  {
-    src: "https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/hero-images/gemini-watercolor-hero.jpg",
-    alt: "Magical Kingdom Watercolor — Storybook Photos Kings & Queens",
-  },
-  {
-    src: "/sets/royal-forest.webp",
-    alt: "Royal Forest set — Storybook Photos Kings & Queens",
-  },
-  {
-    src: "/hero-council-hall.webp",
-    alt: "Royal Garden set — Storybook Photos Kings & Queens",
-  },
-  {
-    src: "/sets/chastle.webp",
-    alt: "Chastle set — Storybook Photos Kings & Queens",
-  },
-] as const;
-
-const ROTATE_MS = 7000;
+/** Retail walkthrough — temporary homepage inspiration backdrop */
+const HERO_VIDEO = "/brand/retail-location-hero.mp4";
+const HERO_POSTER = "/brand-storefront.jpg";
 
 export function HeroSection() {
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  useEffect(() => {
-    const id = window.setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % HERO_BACKGROUNDS.length);
-    }, ROTATE_MS);
-    return () => window.clearInterval(id);
-  }, []);
-
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
-      <AnimatePresence mode="sync">
-        {HERO_BACKGROUNDS.map((bg, index) =>
-          index === activeIndex ? (
-            <motion.div
-              key={bg.src}
-              initial={{ opacity: 0, scale: 1.04 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1.4, ease: "easeInOut" }}
-              className="absolute inset-0"
-            >
-              <Image
-                src={bg.src}
-                alt={bg.alt}
-                fill
-                priority={index === 0}
-                className="object-cover object-center"
-                sizes="100vw"
-              />
-            </motion.div>
-          ) : null
-        )}
-      </AnimatePresence>
+      <div className="absolute inset-0">
+        <video
+          className="absolute inset-0 h-full w-full object-cover object-center"
+          src={HERO_VIDEO}
+          poster={HERO_POSTER}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          aria-label="Storybook Photos Orange County retail inspiration"
+        />
+      </div>
 
-      <div className="absolute inset-0 bg-royal-blue/45 z-[1]" />
-      <div className="absolute inset-0 bg-gradient-to-r from-royal-blue/75 via-royal-blue/40 to-royal-purple/25 z-[1]" />
-      <div className="absolute inset-0 bg-gradient-to-t from-royal-cream via-transparent to-royal-blue/20 z-[1]" />
+      <div className="absolute inset-0 bg-royal-blue/50 z-[1]" />
+      <div className="absolute inset-0 bg-gradient-to-r from-royal-blue/80 via-royal-blue/45 to-royal-purple/30 z-[1]" />
+      <div className="absolute inset-0 bg-gradient-to-t from-royal-cream via-transparent to-royal-blue/25 z-[1]" />
       <div
         className="absolute inset-0 z-[1] opacity-50 mix-blend-soft-light pointer-events-none"
         style={{
@@ -98,7 +56,7 @@ export function HeroSection() {
             <p className="text-lg text-royal-cream/90 max-w-lg mb-8 leading-relaxed drop-shadow">
               Kingdom-themed photo shoots and Kingdom Chronicles that help
               kids feel brave, beloved, and full of wonder — an enchanted
-              adventure they&apos;ll never forget.
+              adventure they'll never forget.
             </p>
 
             <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 mb-8">
@@ -127,26 +85,6 @@ export function HeroSection() {
                 <span>Book · Movie · Memory they'll never outgrow</span>
               </div>
             </div>
-
-            <div className="flex gap-1 mt-8">
-              {HERO_BACKGROUNDS.map((bg, index) => (
-                <button
-                  key={bg.src}
-                  type="button"
-                  onClick={() => setActiveIndex(index)}
-                  className="inline-flex h-11 w-11 items-center justify-center"
-                  aria-label={`Show background ${index + 1}`}
-                >
-                  <span
-                    className={`rounded-full transition-all ${
-                      index === activeIndex
-                        ? "h-1.5 w-8 bg-royal-gold shadow-[0_0_12px_rgba(197,162,111,0.7)]"
-                        : "h-1.5 w-1.5 bg-royal-cream/40"
-                    }`}
-                  />
-                </button>
-              ))}
-            </div>
           </motion.div>
 
           <motion.div
@@ -166,12 +104,16 @@ export function HeroSection() {
                 We Curate Every Moment for Your Child
               </h2>
               <p className="text-royal-cream/75 leading-relaxed mb-6">
-                Before you arrive, we learn everything about your child — their personality, their favorite story, what makes them light up. When you walk through the door, we&apos;ve already built the day around them. You experience the magic. We handle everything else.
+                Before you arrive, we learn everything about your child — their
+                personality, their favorite story, what makes them light up.
+                When you walk through the door, we've already built the day
+                around them. You experience the magic. We handle everything
+                else.
               </p>
               <ul className="space-y-3 mb-8 text-sm text-royal-cream/80">
                 <li className="flex gap-2">
                   <span className="text-royal-gold">✦</span>
-                  Which quest speaks to your child&apos;s heart?
+                  Which quest speaks to your child's heart?
                 </li>
                 <li className="flex gap-2">
                   <span className="text-royal-gold">✦</span>
