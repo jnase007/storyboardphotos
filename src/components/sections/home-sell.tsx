@@ -11,10 +11,13 @@ import { SectionOrnament } from "@/components/section-ornament";
 export const GOLD_MOVIE_URL =
   "https://v3b.fal.media/files/b/0aa5eca0/nkWza6XpxygmavrUqsq0s_final-upload.mp4";
 
+/** Main still for Raelyn sample movie (hero princess art Justin locked). */
+export const GOLD_MOVIE_POSTER = "/brand/raelyn-movie-poster.jpg";
+
 const SAMPLE_SPREADS = [
   {
-    src: "/storybook-cover.webp",
-    alt: "Personalized kingdom storybook cover sample",
+    src: GOLD_MOVIE_POSTER,
+    alt: "Raelyn as princess — Storybook Photos movie sample",
     caption: "Your child on the cover",
   },
   {
@@ -71,7 +74,7 @@ export function HomeSellSection() {
                   controls
                   playsInline
                   preload="metadata"
-                  poster="/storybook-cover.webp"
+                  poster={GOLD_MOVIE_POSTER}
                 />
               </div>
               <p className="mt-3 text-center text-royal-cream/45 text-sm">
