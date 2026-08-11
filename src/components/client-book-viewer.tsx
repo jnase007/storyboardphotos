@@ -587,6 +587,12 @@ export function ClientBookViewer({ book }: { book: Book }) {
           <video
             ref={videoRef}
             src={videoUrl}
+            poster={
+              // Raelyn gold sample — locked princess still as main movie image
+              book.id === "13e32fd6-d45d-4266-811a-6993f7e051cc"
+                ? "/brand/raelyn-movie-poster.jpg"
+                : book.pages?.[0]?.imageUrl || undefined
+            }
             controls
             playsInline
             autoPlay
