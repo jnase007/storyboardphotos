@@ -1,15 +1,13 @@
 /**
  * Per-book white-tee mockup:
- * take the book's hero illustration → cut out background → place on white shirt.
- * Never reuse a shared Raelyn/default tee art.
+ * take the book's hero illustration → remove background → composite onto the
+ * approved blank white tee product photo.
+ * Never reuse a shared Raelyn/default character tee.
  */
 
+import path from "path";
+import { readFile } from "fs/promises";
 import type { StoryPage } from "./types";
-
-const WHITE_TEE_PUBLIC =
-  process.env.NEXT_PUBLIC_SITE_URL
-    ? `${process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, "")}/merch/approved-white-tee.jpg`
-    : "https://www.storybookphotos.com/merch/approved-white-tee.jpg";
 
 export type ShirtMockupResult = {
   mockupUrl: string;
@@ -30,7 +28,7 @@ export function pickHeroPageImage(pages: StoryPage[] | null | undefined): string
       const url = typeof p?.imageUrl === "string" ? p.imageUrl : "";
       if (!url.startsWith("http")) return null;
       const blob = `${p.title || ""} ${p.imagePrompt || ""} ${p.text || ""}`.toLowerCase();
-      let score = 10 - Math.min(index, 9); // earlier pages slightly preferred
+      let score = 10 - Math.min(index, 9);
       if (/title|cover|call|hero|portrait|throne/.test(blob)) score += 8;
       if (/full body|full-body|standing/.test(blob)) score += 5;
       if (/dragon|crowd|map only/.test(blob)) score -= 3;
@@ -68,7 +66,7 @@ export async function removeBackgroundUrl(imageUrl: string): Promise<string> {
 }
 
 async function uploadBytesToSupabase(
-  bytes: ArrayBuffer,
+  bytes: Buffer,
   filename: string,
   contentType: string
 ): Promise<string | null> {
@@ -86,7 +84,7 @@ async function uploadBytesToSupabase(
           "Content-Type": contentType,
           "x-upsert": "true",
         },
-        body: Buffer.from(bytes),
+        body: new Uint8Array(bytes),
       }
     );
     if (!res.ok) {
@@ -100,84 +98,83 @@ async function uploadBytesToSupabase(
   }
 }
 
-/**
- * Composite cutout character onto the approved white tee via fal image edit.
- * Falls back to returning the cutout URL if mockup generation fails.
- */
-async function compositeCutoutOnWhiteTee(options: {
-  cutoutUrl: string;
-  childName: string;
-  role: string;
-}): Promise<{ url: string; provider: string }> {
-  const key = falKey();
-  if (!key) return { url: options.cutoutUrl, provider: "cutout-only" };
+async function fetchBuffer(url: string): Promise<Buffer> {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Failed to fetch ${url} (${res.status})`);
+  return Buffer.from(await res.arrayBuffer());
+}
 
-  const prompt = [
-    "Product photo of a plain WHITE kids t-shirt on a soft cream background.",
-    "Print this exact storybook character cutout as a large front-chest DTG design, centered.",
-    `Character is ${options.role} ${options.childName} from a children's watercolor storybook.`,
-    "Keep the shirt white. Keep the character likeness, outfit, and colors from the reference cutout.",
-    "No extra logos, no text, no watermark, no other kids, no Raelyn default art.",
-    "Clean merch mockup, centered composition, high quality.",
-  ].join(" ");
-
-  // Prefer image-to-image from the cutout (character locked); model paints shirt around/under print.
-  const attempts: Array<{ model: string; body: Record<string, unknown> }> = [
-    {
-      model: "fal-ai/flux/dev/image-to-image",
-      body: {
-        prompt,
-        image_url: options.cutoutUrl,
-        strength: 0.62,
-        image_size: { width: 1024, height: 1280 },
-        num_inference_steps: 28,
-        guidance_scale: 3.5,
-        enable_safety_checker: true,
-        output_format: "jpeg",
-      },
-    },
-    {
-      // Second try: start from blank white tee product shot, steer toward character print
-      model: "fal-ai/flux/dev/image-to-image",
-      body: {
-        prompt:
-          prompt +
-          " Base garment is a blank white tee product photo; only add the chest character print.",
-        image_url: WHITE_TEE_PUBLIC,
-        strength: 0.48,
-        image_size: { width: 1024, height: 1280 },
-        num_inference_steps: 28,
-        output_format: "jpeg",
-      },
-    },
+async function loadBlankWhiteTee(): Promise<Buffer> {
+  // Prefer local approved blank tee (no character on it)
+  const candidates = [
+    path.join(process.cwd(), "public/merch/approved-white-tee.jpg"),
+    path.join(process.cwd(), "public/brand/merch-tee-white-notext-approved.jpg"),
   ];
-
-  for (const attempt of attempts) {
+  for (const file of candidates) {
     try {
-      const res = await fetch(`https://fal.run/${attempt.model}`, {
-        method: "POST",
-        headers: {
-          Authorization: `Key ${key}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(attempt.body),
-      });
-      if (!res.ok) {
-        console.warn("shirt composite fail", attempt.model, await res.text());
-        continue;
-      }
-      const data = await res.json();
-      const url =
-        data?.images?.[0]?.url ?? data?.image?.url ?? data?.image_url ?? null;
-      if (typeof url === "string" && url.startsWith("http")) {
-        return { url, provider: attempt.model };
-      }
-    } catch (err) {
-      console.warn("shirt composite error", attempt.model, err);
+      return await readFile(file);
+    } catch {
+      /* try next */
     }
   }
+  // Hosted fallback
+  return fetchBuffer("https://www.storybookphotos.com/merch/approved-white-tee.jpg");
+}
 
-  return { url: options.cutoutUrl, provider: "cutout-only" };
+/**
+ * Real product mockup: paste transparent cutout onto blank white tee photo.
+ * Uses sharp — no AI rewrite of the character.
+ */
+async function compositeCutoutOnWhiteTee(cutoutUrl: string): Promise<{
+  buffer: Buffer;
+  provider: string;
+}> {
+  // Dynamic import so local scripts without sharp still typecheck if needed
+  const sharp = (await import("sharp")).default;
+
+  const [teeBuf, cutBuf] = await Promise.all([
+    loadBlankWhiteTee(),
+    fetchBuffer(cutoutUrl),
+  ]);
+
+  const tee = sharp(teeBuf).ensureAlpha();
+  const teeMeta = await tee.metadata();
+  const tw = teeMeta.width || 1024;
+  const th = teeMeta.height || 1280;
+
+  // Trim transparent margins on cutout, then size for chest print
+  const cutTrimmed = await sharp(cutBuf).ensureAlpha().trim().png().toBuffer();
+  const cutMeta = await sharp(cutTrimmed).metadata();
+  const cw = cutMeta.width || 512;
+  const ch = cutMeta.height || 512;
+
+  let targetW = Math.round(tw * 0.42);
+  let targetH = Math.round((ch / Math.max(cw, 1)) * targetW);
+  const maxH = Math.round(th * 0.46);
+  if (targetH > maxH) {
+    const scale = maxH / targetH;
+    targetW = Math.max(80, Math.round(targetW * scale));
+    targetH = Math.max(80, Math.round(targetH * scale));
+  }
+
+  const cutResized = await sharp(cutTrimmed)
+    .resize(targetW, targetH, { fit: "inside", withoutEnlargement: false })
+    .png()
+    .toBuffer();
+  const cutFinalMeta = await sharp(cutResized).metadata();
+  const fw = cutFinalMeta.width || targetW;
+  const fh = cutFinalMeta.height || targetH;
+
+  const left = Math.max(0, Math.round((tw - fw) / 2));
+  const top = Math.max(0, Math.round(th * 0.3));
+
+  const mockup = await sharp(teeBuf)
+    .ensureAlpha()
+    .composite([{ input: cutResized, left, top }])
+    .jpeg({ quality: 92 })
+    .toBuffer();
+
+  return { buffer: mockup, provider: "sharp-cutout-on-white-tee" };
 }
 
 function upsertNoteTag(notes: string | null | undefined, tag: string, value: string): string {
@@ -207,50 +204,34 @@ export async function generateShirtMockupForBook(options: {
     throw new Error("No illustrated page available for shirt mockup");
   }
 
-  const role =
-    options.gender === "boy" ? "King" : options.gender === "girl" ? "Queen" : "Hero";
+  const cutoutRemote = await removeBackgroundUrl(sourcePageImageUrl);
+  const composed = await compositeCutoutOnWhiteTee(cutoutRemote);
 
-  const cutoutUrl = await removeBackgroundUrl(sourcePageImageUrl);
-  const composed = await compositeCutoutOnWhiteTee({
-    cutoutUrl,
-    childName: options.childName,
-    role,
-  });
+  const stamp = Date.now();
+  let mockupUrl: string | null = await uploadBytesToSupabase(
+    composed.buffer,
+    `shirts/${options.bookId}/mockup-${stamp}.jpg`,
+    "image/jpeg"
+  );
 
-  // Prefer durable supabase copies when possible
-  let mockupUrl = composed.url;
-  let durableCutout = cutoutUrl;
+  let durableCutout = cutoutRemote;
   try {
-    const mockRes = await fetch(composed.url);
-    if (mockRes.ok) {
-      const buf = await mockRes.arrayBuffer();
-      const ctype = mockRes.headers.get("content-type") || "image/jpeg";
-      const ext = ctype.includes("png") ? "png" : "jpg";
-      const uploaded = await uploadBytesToSupabase(
-        buf,
-        `shirts/${options.bookId}/mockup-${Date.now()}.${ext}`,
-        ctype
+    if (cutoutRemote !== sourcePageImageUrl) {
+      const cutBuf = await fetchBuffer(cutoutRemote);
+      const uploadedCut = await uploadBytesToSupabase(
+        cutBuf,
+        `shirts/${options.bookId}/cutout-${stamp}.png`,
+        "image/png"
       );
-      if (uploaded) mockupUrl = uploaded;
+      if (uploadedCut) durableCutout = uploadedCut;
     }
   } catch {
     /* keep fal url */
   }
-  try {
-    if (cutoutUrl !== sourcePageImageUrl) {
-      const cutRes = await fetch(cutoutUrl);
-      if (cutRes.ok) {
-        const buf = await cutRes.arrayBuffer();
-        const uploaded = await uploadBytesToSupabase(
-          buf,
-          `shirts/${options.bookId}/cutout-${Date.now()}.png`,
-          "image/png"
-        );
-        if (uploaded) durableCutout = uploaded;
-      }
-    }
-  } catch {
-    /* keep fal url */
+
+  if (!mockupUrl) {
+    // Last resort: data URL is too big for notes; throw so UI can show error
+    throw new Error("Failed to upload shirt mockup to storage");
   }
 
   let notes = options.notes || "";
