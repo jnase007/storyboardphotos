@@ -57,6 +57,22 @@ export async function POST(request: NextRequest, ctx: Ctx) {
   const { id } = await ctx.params;
   const body = await request.json().catch(() => ({}));
   const force = Boolean(body?.force);
+  const overrideMockupUrl =
+    typeof body?.mockupUrl === "string" && body.mockupUrl.startsWith("http")
+      ? body.mockupUrl.trim()
+      : null;
+  const overrideCutoutUrl =
+    typeof body?.cutoutUrl === "string" && body.cutoutUrl.startsWith("http")
+      ? body.cutoutUrl.trim()
+      : null;
+  const overrideSourceUrl =
+    typeof body?.sourceUrl === "string" && body.sourceUrl.startsWith("http")
+      ? body.sourceUrl.trim()
+      : null;
+  const overridePrintfulUrl =
+    typeof body?.printfulUrl === "string" && body.printfulUrl.startsWith("http")
+      ? body.printfulUrl.trim()
+      : null;
 
   const supabase = createServiceClient();
   const { data: book, error } = await supabase
@@ -67,6 +83,35 @@ export async function POST(request: NextRequest, ctx: Ctx) {
 
   if (error || !book) {
     return NextResponse.json({ error: "Book not found" }, { status: 404 });
+  }
+
+  // Admin can pin a prebuilt solo cutout mockup without regenerating from a full scene.
+  if (overrideMockupUrl) {
+    let notes = (book.notes as string | null) || "";
+    const upsert = (tag: string, value: string) => {
+      notes = notes.replace(new RegExp(`\\[${tag}:[^\\]]*\\]`, "g"), "").trim();
+      notes = `[${tag}: ${value}] ${notes}`.trim();
+    };
+    upsert("ShirtMockup", overrideMockupUrl);
+    if (overrideCutoutUrl) upsert("ShirtCutout", overrideCutoutUrl);
+    if (overrideSourceUrl) upsert("ShirtSource", overrideSourceUrl);
+    if (overridePrintfulUrl) upsert("ShirtPrintful", overridePrintfulUrl);
+
+    await supabase
+      .from("storybooks")
+      .update({ notes, updated_at: new Date().toISOString() })
+      .eq("id", id);
+
+    return NextResponse.json({
+      id,
+      reused: false,
+      shirt_mockup_url: overrideMockupUrl,
+      shirt_cutout_url: overrideCutoutUrl,
+      shirt_source_url: overrideSourceUrl,
+      shirt_printful_url: overridePrintfulUrl,
+      provider: "admin-override",
+      message: "Pinned prebuilt shirt mockup",
+    });
   }
 
   const existing = readNoteTag(book.notes as string | null, "ShirtMockup");
