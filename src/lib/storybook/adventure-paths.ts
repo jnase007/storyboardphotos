@@ -77,7 +77,8 @@ export const BIBLICAL_STORY_GUARDRAILS =
   "Faith-friendly Kingdom of Light story. Themes from Scripture: courage, kindness, stewardship, light, rescue, integrity. " +
   "NO magic spells, NO wands, NO casting, NO witchcraft, NO sorcery, NO wizards, NO potions, NO incantations, NO fairy-godmother magic. " +
   "Wonder comes from beauty of creation, courage, prayerful heart, love, and light — never occult power. " +
-  "Talking animals or dragons only as gentle fable creatures (Narnia-adjacent), not as spirits or gods. " +
+  "Talking animals only as gentle fable creatures (Narnia-adjacent), not as spirits or gods. " +
+  "FULL DRAGON appears ONLY in the Dragon Mountain quest. Other quests may include small cute animals (fox, bunny, bird, squirrel, goats) around the hero — never a dragon cameo. " +
   "No pronouns — always use the child name. Boy=King, Girl=Queen only. " +
   "STORY MUST BE BELIEVABLE for kids: clear cause-and-effect, no random nonsense (no crowns blowing off pillows). " +
   "Every quest = HELP someone, SAVE someone, or CONQUER a real obstacle. Exciting, fun adventure read-aloud — action, humor, heart. " +

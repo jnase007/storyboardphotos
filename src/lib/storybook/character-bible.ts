@@ -125,10 +125,16 @@ export const QUEST_CAST: Record<string, string[]> = {
   "light-treasure": ["king", "treasure_chest"],
 };
 
+/** Dragon is exclusive to the Dragon Mountain quest. */
+export function isDragonQuest(questId?: string | null): boolean {
+  const q = (questId || "").toLowerCase();
+  return q === "dragon-slayer" || q.includes("dragon");
+}
+
 /**
  * Build the cast-lock prompt block for a page.
- * Uses quest id when known; always includes King if "king" mentioned;
- * always includes dragon lock if dragon appears in scene text/prompt.
+ * Uses quest id when known.
+ * PRODUCT RULE: dragon appears ONLY in dragon-slayer. Never inject dragon into other quests.
  */
 export function lockedCastForPage(options: {
   questId?: string | null;
@@ -136,22 +142,41 @@ export function lockedCastForPage(options: {
 }): string {
   const quest = (options.questId || "").toLowerCase();
   const scene = `${options.sceneText || ""}`.toLowerCase();
+  const dragonQuest = isDragonQuest(quest);
   const ids = new Set<string>(QUEST_CAST[quest] || ["king"]);
 
-  // Scene-based safety nets (in case quest id missing)
-  if (/\bdragon\b/.test(scene)) ids.add("dragon");
+  // Never let a non-dragon quest pick up the dragon cast sheet
+  if (!dragonQuest) ids.delete("dragon");
+
+  // Scene-based safety nets (quest-scoped only)
+  if (dragonQuest && /\bdragon\b/.test(scene)) ids.add("dragon");
   if (/\bking\b/.test(scene)) ids.add("king");
-  if (/\b(fox|fawn|rabbit|squirrel|animal)/.test(scene)) ids.add("forest_animals");
+  if (quest.includes("forest") && /\b(fox|fawn|rabbit|squirrel|animal)/.test(scene)) {
+    ids.add("forest_animals");
+  }
   if (/\b(friend|stranded|rescued)/.test(scene) && quest.includes("rescue")) {
     ids.add("friends_rescue");
   }
-  if (/\b(goat)/.test(scene)) ids.add("cliff_goats");
-  if (/\b(chest|treasure)/.test(scene)) ids.add("treasure_chest");
-  if (/\b(race|runner|finish)/.test(scene)) ids.add("race_friend");
+  if (quest.includes("lost-crown") && /\b(goat)/.test(scene)) ids.add("cliff_goats");
+  if (quest.includes("light-treasure") && /\b(chest|treasure)/.test(scene)) {
+    ids.add("treasure_chest");
+  }
+  if (quest.includes("kindness") && /\b(race|runner|finish)/.test(scene)) {
+    ids.add("race_friend");
+  }
+
+  // Final hard filter: dragon only on dragon quest
+  if (!dragonQuest) ids.delete("dragon");
 
   const parts: string[] = [
     "IP CHARACTER BIBLE (mandatory consistency — do not redesign locked cast):",
   ];
+
+  if (!dragonQuest) {
+    parts.push(
+      "QUEST CAST RULE: This is NOT the Dragon Mountain story. Do NOT draw any dragon, wyvern, serpent-dragon, or dragon silhouette anywhere in this image — not in the sky, not in the background, not as a statue, not as a toy."
+    );
+  }
 
   for (const id of ids) {
     const sheet = SHARED_CAST[id];
