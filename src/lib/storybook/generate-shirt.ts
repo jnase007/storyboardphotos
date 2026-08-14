@@ -105,8 +105,9 @@ async function fetchBuffer(url: string): Promise<Buffer> {
 }
 
 async function loadBlankWhiteTee(): Promise<Buffer> {
-  // Prefer local approved blank tee (no character on it)
+  // Prefer TRUE blank tee plates (no character print). Never use Raelyn reference plate.
   const candidates = [
+    path.join(process.cwd(), "public/merch/blank-white-tee.jpg"),
     path.join(process.cwd(), "public/merch/approved-white-tee.jpg"),
     path.join(process.cwd(), "public/brand/merch-tee-white-notext-approved.jpg"),
   ];
@@ -117,8 +118,12 @@ async function loadBlankWhiteTee(): Promise<Buffer> {
       /* try next */
     }
   }
-  // Hosted fallback
-  return fetchBuffer("https://www.storybookphotos.com/merch/approved-white-tee.jpg");
+  // Hosted fallback — blank plate first
+  try {
+    return await fetchBuffer("https://www.storybookphotos.com/merch/blank-white-tee.jpg");
+  } catch {
+    return fetchBuffer("https://www.storybookphotos.com/merch/approved-white-tee.jpg");
+  }
 }
 
 /**
@@ -148,9 +153,10 @@ async function compositeCutoutOnWhiteTee(cutoutUrl: string): Promise<{
   const cw = cutMeta.width || 512;
   const ch = cutMeta.height || 512;
 
-  let targetW = Math.round(tw * 0.42);
+  // Large front-chest print so the book's character is obvious on the tee
+  let targetW = Math.round(tw * 0.54);
   let targetH = Math.round((ch / Math.max(cw, 1)) * targetW);
-  const maxH = Math.round(th * 0.46);
+  const maxH = Math.round(th * 0.52);
   if (targetH > maxH) {
     const scale = maxH / targetH;
     targetW = Math.max(80, Math.round(targetW * scale));
@@ -166,7 +172,7 @@ async function compositeCutoutOnWhiteTee(cutoutUrl: string): Promise<{
   const fh = cutFinalMeta.height || targetH;
 
   const left = Math.max(0, Math.round((tw - fw) / 2));
-  const top = Math.max(0, Math.round(th * 0.3));
+  const top = Math.max(0, Math.round(th * 0.27));
 
   const mockup = await sharp(teeBuf)
     .ensureAlpha()

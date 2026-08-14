@@ -8,8 +8,8 @@ import { toast } from "sonner";
 const ADMIN_CODE = "3121";
 
 // Blank white tee product plate only — character art must come from THIS book.
-const BLANK_WHITE_TEE = "/merch/approved-white-tee.jpg";
-const BLANK_WHITE_TEE_ALT = "/brand/merch-tee-white-notext-approved.jpg";
+const BLANK_WHITE_TEE = "/merch/blank-white-tee.jpg";
+const BLANK_WHITE_TEE_ALT = "/merch/approved-white-tee.jpg";
 
 type BookRow = {
   id: string;
@@ -57,6 +57,12 @@ export function ShirtReview({ bookId }: { bookId: string }) {
     setLoading(true);
     setError(null);
     try {
+      // Prefer dedicated shirt endpoint (always returns mockup URLs)
+      const shirtRes = await fetch(`/api/admin/storybooks/${bookId}/shirt`, {
+        headers: { "x-admin-code": ADMIN_CODE },
+      });
+      const shirtData = await shirtRes.json().catch(() => ({}));
+
       const res = await fetch("/api/admin/storybooks", {
         headers: { "x-admin-code": ADMIN_CODE },
       });
@@ -71,9 +77,19 @@ export function ShirtReview({ bookId }: { bookId: string }) {
       }
       setBook(found);
       const notes = found.notes || "";
-      setMockupUrl(readNoteTag(notes, "ShirtMockup"));
-      setCutoutUrl(readNoteTag(notes, "ShirtCutout"));
-      setSourceUrl(readNoteTag(notes, "ShirtSource") || pickHeroFromPages(found.pages));
+      setMockupUrl(
+        (shirtRes.ok && shirtData.shirt_mockup_url) ||
+          readNoteTag(notes, "ShirtMockup")
+      );
+      setCutoutUrl(
+        (shirtRes.ok && shirtData.shirt_cutout_url) ||
+          readNoteTag(notes, "ShirtCutout")
+      );
+      setSourceUrl(
+        (shirtRes.ok && shirtData.shirt_source_url) ||
+          readNoteTag(notes, "ShirtSource") ||
+          pickHeroFromPages(found.pages)
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load book");
     } finally {
@@ -222,9 +238,10 @@ export function ShirtReview({ bookId }: { bookId: string }) {
                 {displayUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    src={displayUrl}
+                    key={displayUrl}
+                    src={`${displayUrl}${displayUrl.includes("?") ? "&" : "?"}t=${Date.now()}`}
                     alt={`${child} white tee mockup from this storybook`}
-                    className="max-h-[70vh] w-auto rounded-xl shadow-md"
+                    className="max-h-[70vh] w-auto rounded-xl shadow-md bg-white"
                   />
                 ) : generating ? (
                   <div className="flex flex-col items-center justify-center gap-3 text-gray-500 py-16">
