@@ -3,6 +3,7 @@ import { createServiceClient } from "@/lib/supabase/admin";
 import { createStorybookSchema } from "@/lib/storybook/validations";
 import { generateKingdomStory } from "@/lib/storybook/generate-story";
 import { illustrateStoryPages } from "@/lib/storybook/generate-illustrations";
+import { generateShirtMockupForBook } from "@/lib/storybook/generate-shirt";
 import { hasRealSupabase } from "@/lib/storybook/supabase-helpers";
 import { assertAdminAccess } from "@/lib/storybook/admin-auth";
 import type { StoryPage } from "@/lib/storybook/types";
@@ -134,13 +135,33 @@ export async function POST(request: NextRequest) {
       questId: adventure_path,
     });
 
+    let shirtMockupUrl: string | null = null;
+    let finalNotes: string | null = notes ?? null;
+
     if (storybookId && hasRealSupabase()) {
       const supabase = createServiceClient();
       // Persist quest title in notes so cover/UI can recover it without a schema migration
       const titleTag = `[BookTitle: ${story.bookTitle}]`;
-      const notesWithTitle = notes
+      let notesWithTitle = notes
         ? `${titleTag} [Adventure: ${adventure_path}] [Package: ${outputPackage}] ${notes}`
         : `${titleTag} [Adventure: ${adventure_path}] [Package: ${outputPackage}]`;
+
+      // Per-book shirt: cut hero from THIS book's art onto white tee (never shared default kid).
+      try {
+        const shirt = await generateShirtMockupForBook({
+          bookId: storybookId,
+          childName: child_name,
+          gender,
+          pages,
+          notes: notesWithTitle,
+        });
+        notesWithTitle = shirt.notes;
+        shirtMockupUrl = shirt.mockupUrl;
+      } catch (shirtErr) {
+        console.warn("shirt mockup after book generate failed:", shirtErr);
+      }
+
+      finalNotes = notesWithTitle;
 
       await supabase
         .from("storybooks")
@@ -159,7 +180,7 @@ export async function POST(request: NextRequest) {
       child_name,
       child_age,
       gender,
-      notes: notes ?? null,
+      notes: finalNotes,
       adventure_path: story.adventurePath,
       story_mode,
       package: outputPackage,
@@ -169,6 +190,7 @@ export async function POST(request: NextRequest) {
       pages,
       status: "ready",
       storyProvider: story.provider,
+      shirt_mockup_url: shirtMockupUrl,
     });
   } catch (err) {
     console.error("Generate storybook error:", err);
