@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase
       .from("storybooks")
       .select(
-        "id, child_name, child_age, gender, status, created_at, pages, pdf_url, video_status, video_url, narration_url, video_package, video_requested_at, book_title"
+        "id, child_name, child_age, gender, status, created_at, updated_at, notes, pages, pdf_url, video_status, video_url, narration_url, video_package, video_requested_at, error_message"
       )
       .order("created_at", { ascending: false })
       .limit(50);

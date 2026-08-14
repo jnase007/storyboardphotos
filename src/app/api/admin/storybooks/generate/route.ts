@@ -16,6 +16,8 @@ export async function POST(request: NextRequest) {
   const denied = assertAdminAccess(request);
   if (denied) return denied;
 
+  let storybookId: string | null = null;
+
   try {
     const body = await request.json();
     const parsed = createStorybookSchema.safeParse(body);
@@ -59,8 +61,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-
-    let storybookId: string | null = null;
 
     const wantsMovie =
       outputPackage === "movie" || outputPackage === "both";
@@ -172,8 +172,28 @@ export async function POST(request: NextRequest) {
     });
   } catch (err) {
     console.error("Generate storybook error:", err);
+    const message =
+      err instanceof Error ? err.message : "Failed to generate storybook";
+
+    // If we already created a row, mark it error so Books Library doesn't look stuck forever.
+    if (typeof storybookId === "string" && storybookId && hasRealSupabase()) {
+      try {
+        const supabase = createServiceClient();
+        await supabase
+          .from("storybooks")
+          .update({
+            status: "error",
+            error_message: message.slice(0, 500),
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", storybookId);
+      } catch (markErr) {
+        console.error("Failed to mark storybook error:", markErr);
+      }
+    }
+
     return NextResponse.json(
-      { error: "Failed to generate storybook" },
+      { error: message.slice(0, 300) || "Failed to generate storybook" },
       { status: 500 }
     );
   }
