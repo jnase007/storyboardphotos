@@ -3,7 +3,11 @@ import { createServiceClient } from "@/lib/supabase/admin";
 import { createStorybookSchema } from "@/lib/storybook/validations";
 import { generateKingdomStory } from "@/lib/storybook/generate-story";
 import { illustrateStoryPages } from "@/lib/storybook/generate-illustrations";
-import { generateShirtMockupForBook } from "@/lib/storybook/generate-shirt";
+import {
+  generateLockedCharacterCard,
+  generateShirtMockupForBook,
+  pickHeroPageImage,
+} from "@/lib/storybook/generate-shirt";
 import { hasRealSupabase } from "@/lib/storybook/supabase-helpers";
 import { assertAdminAccess } from "@/lib/storybook/admin-auth";
 import type { StoryPage } from "@/lib/storybook/types";
@@ -146,7 +150,26 @@ export async function POST(request: NextRequest) {
         ? `${titleTag} [Adventure: ${adventure_path}] [Package: ${outputPackage}] ${notes}`
         : `${titleTag} [Adventure: ${adventure_path}] [Package: ${outputPackage}]`;
 
-      // Per-book shirt: cut hero from THIS book's art onto white tee (never shared default kid).
+      // 1) Locked solo character card from face photo + best page (ONE kid only).
+      // 2) Shirt uses that cutout on a blank white tee — never multi-kid scene art.
+      let characterCardUrl: string | null = null;
+      let characterCutoutUrl: string | null = null;
+      try {
+        const card = await generateLockedCharacterCard({
+          bookId: storybookId,
+          childName: child_name,
+          gender,
+          characterPhotoUrl: character_photo ?? null,
+          referencePageUrl: pickHeroPageImage(pages),
+          notes: notesWithTitle,
+        });
+        notesWithTitle = card.notes;
+        characterCardUrl = card.characterCardUrl;
+        characterCutoutUrl = card.cutoutUrl;
+      } catch (cardErr) {
+        console.warn("character card after book generate failed:", cardErr);
+      }
+
       try {
         const shirt = await generateShirtMockupForBook({
           bookId: storybookId,
@@ -154,6 +177,9 @@ export async function POST(request: NextRequest) {
           gender,
           pages,
           notes: notesWithTitle,
+          characterCardUrl,
+          characterCutoutUrl,
+          characterPhotoUrl: character_photo ?? null,
         });
         notesWithTitle = shirt.notes;
         shirtMockupUrl = shirt.mockupUrl;
