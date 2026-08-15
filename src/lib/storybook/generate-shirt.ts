@@ -56,14 +56,26 @@ export function pickHeroPageImage(pages: StoryPage[] | null | undefined): string
 function wardrobeLine(gender?: string | null): string {
   const g = (gender || "").toLowerCase();
   if (g === "boy" || g === "male") {
-    return "wearing one locked royal adventure tunic, short cape, soft boots — NO crown";
+    return "ONE boy only, wearing one locked royal adventure tunic, short cape, soft boots — NO crown, NO girl, NO other children";
   }
-  return "wearing one locked soft blue-lavender royal adventure dress with small cape and soft boots — NO crown, NO tiara";
+  return "ONE girl only, wearing one locked soft blue-lavender royal adventure dress with small cape and soft boots — NO crown, NO tiara, NO boy, NO other children";
+}
+
+function soloGenderLock(gender?: string | null): string {
+  const g = (gender || "").toLowerCase();
+  if (g === "boy" || g === "male") {
+    return "GENDER LOCK: boy book — render ONLY the boy hero. Zero girls, zero siblings, zero adults, zero animals, zero crowd.";
+  }
+  if (g === "girl" || g === "female") {
+    return "GENDER LOCK: girl book — render ONLY the girl hero. Zero boys, zero siblings, zero adults, zero animals, zero crowd.";
+  }
+  return "ONE child only — the book hero. No siblings, no adults, no animals, no crowd.";
 }
 
 /**
- * Build the locked solo character card once per book from face photo (+ optional page ref).
- * This is the asset shirts should use — never a multi-kid scene.
+ * Book-create step 2: locked solo character sticker (girl-only or boy-only).
+ * Pure white / cream empty background → bg-remove → cutout for shirts.
+ * Never multi-kid scenes. Never shared Raelyn/Jaylan art.
  */
 export async function generateLockedCharacterCard(options: {
   bookId: string;
@@ -78,6 +90,7 @@ export async function generateLockedCharacterCard(options: {
 
   const name = options.childName || "the child";
   const wardrobe = wardrobeLine(options.gender);
+  const genderLock = soloGenderLock(options.gender);
   const ref =
     (options.referencePageUrl && options.referencePageUrl.startsWith("http")
       ? options.referencePageUrl
@@ -90,21 +103,24 @@ export async function generateLockedCharacterCard(options: {
     throw new Error("character photo or page reference required for character card");
   }
 
+  // Gemini-style product asset: ONE hero only on pure white, ready to cut out.
   const prompt = [
-    `Solo full-body watercolor children's storybook character sticker of ONLY ${name}.`,
-    "ONE child only — no siblings, no adults, no king, no animals, no crowd.",
-    "Standing facing camera, head-to-toe, clean cream empty background for cutout.",
+    `Solo full-body watercolor children's storybook character STICKER of ONLY ${name}.`,
+    genderLock,
+    "ONLY the child — no castle, no grass, no path, no trees, no props, no throne, no scene.",
+    "Standing facing camera, head-to-toe, feet included, centered.",
+    "PURE solid white background (product sticker plate) — empty white, nothing else.",
     "Same face likeness as the reference, same hair, same age, same skin tone.",
     "Big full detailed expressive eyes (never black dots).",
     wardrobe,
     "Soft pastel watercolor, gentle sepia ink outlines, premium fairytale picture-book quality.",
-    "NO crown unless finale (no crown here), NO text, NO watermark, NO logo, NO shirt mockup.",
+    "NO crown, NO tiara, NO text, NO watermark, NO logo, NO shirt mockup, NO frame, NO border.",
   ].join(" ");
 
   let characterUrl: string | null = null;
-  let provider = "fal-flux-i2i";
+  let provider = "fal-flux-i2i-solo-white";
 
-  // Prefer image-to-image from a book page or hosted face URL
+  // Prefer image-to-image from best solo/cover page or face URL
   if (ref) {
     const res = await fetch("https://fal.run/fal-ai/flux/dev/image-to-image", {
       method: "POST",
@@ -115,9 +131,12 @@ export async function generateLockedCharacterCard(options: {
       body: JSON.stringify({
         prompt,
         image_url: ref,
-        strength: 0.48,
+        // Low-mid strength keeps likeness; high enough to drop scene junk
+        strength: 0.45,
         num_images: 1,
         image_size: "portrait_4_3",
+        num_inference_steps: 30,
+        guidance_scale: 4.0,
         enable_safety_checker: true,
         output_format: "png",
       }),
@@ -151,11 +170,12 @@ export async function generateLockedCharacterCard(options: {
     }
     const data = await res.json();
     characterUrl = data?.images?.[0]?.url ?? data?.image?.url ?? null;
-    provider = "fal-flux-t2i";
+    provider = "fal-flux-t2i-solo-white";
   }
 
   if (!characterUrl) throw new Error("character card returned no image");
 
+  // Always cut out to transparent PNG for shirt composite
   const cutoutRemote = await removeBackgroundUrl(characterUrl);
   const stamp = Date.now();
 

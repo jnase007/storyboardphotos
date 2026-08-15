@@ -150,8 +150,11 @@ export async function POST(request: NextRequest) {
         ? `${titleTag} [Adventure: ${adventure_path}] [Package: ${outputPackage}] ${notes}`
         : `${titleTag} [Adventure: ${adventure_path}] [Package: ${outputPackage}]`;
 
-      // 1) Locked solo character card from face photo + best page (ONE kid only).
-      // 2) Shirt uses that cutout on a blank white tee — never multi-kid scene art.
+      // Book create pipeline (locked product path):
+      //   1) story + page illustrations
+      //   2) SECOND asset = solo character sticker cutout (girl-only OR boy-only)
+      //      pure white bg → transparent cutout  [CharacterCard / CharacterCutout notes]
+      //   3) shirt = that cutout on blank white tee — never multi-kid scene art
       let characterCardUrl: string | null = null;
       let characterCutoutUrl: string | null = null;
       try {
@@ -166,10 +169,17 @@ export async function POST(request: NextRequest) {
         notesWithTitle = card.notes;
         characterCardUrl = card.characterCardUrl;
         characterCutoutUrl = card.cutoutUrl;
+        console.log("book-create step2 character cutout ready", {
+          bookId: storybookId,
+          provider: card.provider,
+          characterCardUrl,
+          characterCutoutUrl,
+        });
       } catch (cardErr) {
         console.warn("character card after book generate failed:", cardErr);
       }
 
+      // Shirt always prefers the locked step-2 cutout (not page scene bg-remove).
       try {
         const shirt = await generateShirtMockupForBook({
           bookId: storybookId,
