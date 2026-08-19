@@ -57,8 +57,7 @@ export async function POST(request: NextRequest) {
     }
 
     const scene = imagePrompt || pageTitle || "An enchanted kingdom watercolor scene";
-    const pageHint = { title: pageTitle || "", text: "", imagePrompt: imagePrompt || "" };
-    const prompt = `${scene}. ONE full-bleed 4:3 landscape watercolor children's storybook illustration only — not a diptych, not two panels, not a double-page spread. Soft sepia ink outlines, pastel watercolor washes. FILL entire canvas edge-to-edge. NO vine border, NO floral frame, NO white side margins. Full figure with headroom, never crop the head, no text, no watermark. Keep the locked QUEST COSTUME identical to the rest of the book (face photo = likeness only, ignore photo clothes). Crown on child ONLY if this is a crowning/finale page. Keep locked cast identical to the Character Bible for this quest only — full dragon ONLY on Dragon Mountain; other quests may use small cute animals, never a dragon.`;
+    const prompt = `${scene}. ONE full-bleed 4:3 landscape watercolor children's storybook illustration only — not a diptych, not two panels, not a double-page spread. Soft sepia ink outlines, pastel watercolor washes. FILL entire canvas edge-to-edge. NO vine border, NO floral frame, NO white side margins. Full figure with headroom, never crop the head, no text, no watermark. Keep the SAME outfit/colors as the rest of this book (if a face photo is provided, match that photo outfit; otherwise keep the locked royal outfit). Keep full detailed eyes. Keep locked cast identical to the Character Bible for this quest.`;
 
     const result = await generateStoryIllustration({
       prompt,
@@ -66,8 +65,6 @@ export async function POST(request: NextRequest) {
       characterPhotoUrl: character_photo ?? null,
       gender: resolvedGender,
       questId: resolvedQuestId,
-      pageIndex: typeof page_index === "number" ? page_index : null,
-      page: pageHint,
     });
 
     // Persist into storybook pages when we have an id + index

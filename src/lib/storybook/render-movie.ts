@@ -266,23 +266,17 @@ export function buildPageNarrationLine(
   return body;
 }
 
+/** Phoenix-era motion (pre adventure-film / Winnie-the-Pooh cinema dial). */
 export const STORYBOOK_MOVIE_MOTION_BIBLE = [
-  "STYLE LOCK: 2D watercolor children's storybook illustration coming gently alive.",
-  "Same animation language on every quest / every page — consistent movie engine.",
-  "Feel like a soft classic storybook adventure short (Winnie-the-Pooh warmth, picture-book cinema).",
-  "NOT anime. NOT 3D CGI. NOT photoreal live-action. NOT hyper-kinetic action trailer.",
-  "Preserve exact art: soft sepia ink outlines, pastel watercolor washes, cream paper texture.",
-  "Face/identity LOCKED — no morphing, no warping, no age drift, no facial smear.",
+  "A coloring-book / watercolor storybook page gently comes to life — NOT photoreal, NOT 3D, NOT live-action.",
+  "Preserve exact illustration style: soft sepia ink outlines, pastel watercolor washes, cream paper texture, flat storybook look.",
+  "Face/identity LOCKED — no morphing, no warping, no identity drift.",
   "Eyes LOCKED: keep full detailed storybook eyes with iris + pupil — never simplify to black dots mid-shot.",
   "Outfit LOCKED: same clothes/colors from the source illustration the whole clip — no costume changes.",
-  "Camera: slow gentle push-in OR tiny parallax drift only. No whip pans. No shake-cam.",
-  "Motion vocabulary (reuse every page): soft breeze on hair/cape/leaves, cloth drift, lantern glow pulse,",
-  "cloud/sky drift, sparkle dust motes, character breathes/blinks subtly, small hand or head turn.",
-  "If the scene is action (bridge/climb/storm), show gentle storybook version of that action — readable, calm pacing.",
-  "Keep bold outlines sharp and colors stable. No realistic skin pores, no cinematic CGI lighting.",
-  "No text, letters, subtitles, watermark, logo, or UI.",
-  "Wholesome bedtime adventure energy — magical but safe.",
-  "Output must feel ANIMATED, not a frozen still photo.",
+  "Very subtle 2D motion only: tiny parallax, soft breeze on hair/cape/leaves, gentle push-in.",
+  "Keep bold readable outlines sharp. No realistic skin pores, no cinematic CGI, no hyper-real lighting.",
+  "No text, no letters, no subtitles, no watermark, no logo, no UI.",
+  "Wholesome bedtime coloring-book energy.",
 ].join(" ");
 
 export function buildMotionPrompt(
@@ -290,12 +284,17 @@ export function buildMotionPrompt(
   childName: string,
   role: "King" | "Queen"
 ): string {
-  const beat = (page.title || page.text || "magical kingdom scene").slice(0, 180);
+  const beat = (page.title || page.text || "magical kingdom scene").slice(0, 160);
   return [
-    STORYBOOK_MOVIE_MOTION_BIBLE,
-    `Hero is ${role} ${childName} — keep likeness, full detailed eyes, and locked outfit from the source frame stable.`,
-    `This shot beat: ${beat}.`,
-    `Animate this single storybook frame into a short continuous movie moment with clear gentle motion.`,
+    `A coloring-book / watercolor storybook page gently comes to life — NOT photoreal, NOT 3D, NOT live-action.`,
+    `Preserve exact illustration style: soft sepia ink outlines, pastel watercolor washes, cream paper texture, flat storybook look.`,
+    `Character likeness of ${role} ${childName} stays on-model; face stable — no morphing, no warping, no identity drift.`,
+    `Keep full detailed eyes with iris + pupil and the exact outfit from the source frame.`,
+    `Scene: ${beat}.`,
+    `Very subtle 2D motion only: tiny parallax, soft breeze on hair/cape/leaves, gentle push-in.`,
+    `Keep bold readable outlines sharp. No realistic skin pores, no cinematic CGI, no hyper-real lighting.`,
+    `No text, no letters, no subtitles, no watermark, no logo, no UI.`,
+    `Wholesome bedtime coloring-book energy.`,
   ].join(" ");
 }
 
@@ -484,7 +483,7 @@ async function animatePage(options: {
     notes.push(`clip ${index + 1} seedance fail: ${msg.slice(0, 120)}`);
     try {
       url = await trySeedance("Seedance Fast retry", {
-        prompt: `Gentle storybook motion. Slow push-in. Soft breeze on hair and cape. Sparkles. Hero ${role} ${childName}. Watercolor page comes alive. No text.`,
+        prompt: `Coloring-book watercolor page gently comes alive. Tiny parallax, soft breeze on hair/cape/leaves, gentle push-in. Hero ${role} ${childName} face and outfit locked. No CGI, no text.`,
         image_url: imageUrl,
         duration: "5",
       });

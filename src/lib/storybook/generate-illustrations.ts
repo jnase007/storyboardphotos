@@ -74,105 +74,58 @@ export function lockedHeroFace(): string {
   ].join(" ");
 }
 
-/** True when this page is the victory / crowning finale (crown allowed only here). */
-export function isCrowningPage(
-  page?: Pick<StoryPage, "title" | "text" | "imagePrompt"> | null,
-  pageIndex?: number | null,
-  totalPages?: number | null
-): boolean {
-  const title = (page?.title || "").toLowerCase();
-  const blob = `${page?.title || ""} ${page?.text || ""} ${page?.imagePrompt || ""}`.toLowerCase();
-  if (
-    /\b(crown(ing|ed)?|coronation|receives? the crown|king (gives|places|sets) .*(crown)|victory return|the end)\b/.test(
-      blob
-    )
-  ) {
-    // Title/call pages mentioning crown quest object still do NOT count as crowning the child
-    if (/\b(title page|the call|call to)\b/.test(title)) return false;
-    if (/\b(lost crown|missing crown|find the crown|search.*crown)\b/.test(blob) && !/\b(crowned|receives?|placed|given|gives)\b/.test(blob)) {
-      return false;
-    }
-    return true;
-  }
-  if (
-    typeof pageIndex === "number" &&
-    typeof totalPages === "number" &&
-    totalPages > 2 &&
-    pageIndex >= totalPages - 2
-  ) {
-    return /\b(return|rejoice|home|victory|end|celebration|throne|honor)\b/.test(blob + " " + title);
-  }
-  return false;
-}
-
 /**
- * Locked QUEST COSTUME for the whole book.
- * Product rule (Justin 2026-08-14):
- * - Put the child into ONE story costume (dress/gown or tunic set) for the whole adventure.
- * - Do NOT copy modern street clothes from the face photo.
- * - NO crown on the child until the final crowning / victory pages.
- * Face photo = likeness only (face, hair, skin), never wardrobe source.
+ * Locked wardrobe for the whole book.
+ * When a character photo is used, clothing must match THAT photo — not a generic costume swap.
+ * Gender defaults are fallback only when no photo clothing is available.
  */
 export function lockedHeroWardrobe(
   gender?: string | null,
-  opts?: {
-    fromPhoto?: boolean;
-    fromPageOne?: boolean;
-    crowningPage?: boolean;
-    pageIndex?: number | null;
-    totalPages?: number | null;
-    page?: Pick<StoryPage, "title" | "text" | "imagePrompt"> | null;
-  }
+  opts?: { fromPhoto?: boolean; fromPageOne?: boolean }
 ): string {
-  const crowning =
-    opts?.crowningPage === true ||
-    isCrowningPage(opts?.page ?? null, opts?.pageIndex ?? null, opts?.totalPages ?? null);
-
+  const fromPhoto = opts?.fromPhoto === true;
+  const fromPageOne = opts?.fromPageOne === true;
   const hardBan =
-    "OUTFIT CONTINUITY HARD RULE: The hero wears ONE locked QUEST COSTUME for the entire book. " +
-    "Same silhouette, same colors, same layers, same shoes every page. " +
-    "NEVER swap dress↔shorts↔pants↔tunic mid-book. NEVER invent a new colorway. " +
-    "Do not change clothes for climbing, running, weather, or action. Pose changes only. " +
-    "Face reference photo is for FACE/HAIR/SKIN likeness ONLY — ignore any modern clothes in the photo.";
+    "OUTFIT CONTINUITY HARD RULE: The hero wears ONE outfit for the entire book. " +
+    "If page 1 / the reference shows a DRESS or GOWN, every later page must show that SAME dress/gown — never shorts, never pants, never leggings, never a tunic swap, never a new colorway. " +
+    "If page 1 shows a TUNIC + pants/boots, keep that exact tunic+pants+boots set every page — never switch into a dress. " +
+    "Do not 'help' the adventure by changing clothes for climbing, running, or weather. Pose changes only.";
 
-  const crownRule = crowning
-    ? [
-        "CROWNING / FINALE PAGE ONLY:",
-        "The child may NOW wear a small simple gold crown (just received from the King as the reward for completing the mission).",
-        "If the King is placing/giving the crown, show that clearly.",
-        "Still keep the SAME quest costume underneath — only the crown is new.",
-      ].join(" ")
-    : [
-        "CROWN RULE (critical — non-finale pages):",
-        "The child hero must NOT wear any crown, tiara, diadem, or royal headpiece on this page.",
-        "Bare head / natural hair only for the child.",
-        "The adult King (or Queen parent figure) may wear a crown — the CHILD does not yet.",
-        "Crown is earned at the END of the story only.",
-      ].join(" ");
+  if (fromPhoto || fromPageOne) {
+    return [
+      fromPageOne
+        ? "LOCKED HERO WARDROBE FROM PAGE-1 / OUTFIT REFERENCE IMAGE (identical on EVERY page):"
+        : "LOCKED HERO WARDROBE FROM REFERENCE PHOTO (identical on EVERY page):",
+      "Copy the exact outfit on the reference — same silhouette, same garment type (dress vs tunic vs pants), same colors, same layers, same trim, same shoes/boots, same crown/headpiece if present.",
+      "Do NOT invent a different royal costume. Do NOT swap dress↔shorts↔pants mid-book.",
+      "Do NOT swap into navy tunic, red cape, rose gown, armor, pajamas, modern clothes, or any new outfit unless that is exactly what the reference shows.",
+      hardBan,
+      "Pose and background may change; face likeness + this exact outfit stay fixed.",
+      "Same hair style and hair color every page.",
+    ].join(" ");
+  }
 
   const g = (gender || "").toLowerCase();
   if (g === "girl") {
     return [
-      "LOCKED QUEST COSTUME (identical on EVERY page of this book — do not redesign clothes):",
-      "Queen adventure dress: one soft rose-blush and ivory princess GOWN/DRESS with gentle gold trim,",
-      "same rose sash, same soft ivory slippers, same hair style and hair color every page.",
-      "A dress/gown every page — never shorts, never pants, never leggings, never tunic swap.",
+      "LOCKED HERO WARDROBE (identical on EVERY page of this book — do not redesign clothes):",
+      "Queen outfit: soft rose-blush and ivory princess GOWN/DRESS with gentle gold trim (a dress every page — never shorts or pants),",
+      "same small gold crown every page, same rose sash, same soft ivory slippers,",
+      "same hair style and hair color every page.",
       hardBan,
-      crownRule,
-      "CRITICAL: do NOT copy street clothes, jeans, t-shirts, hoodies, or photo-day outfits from the reference photo.",
-      "Pose and background may change; face likeness + this exact quest dress stay fixed.",
+      "CRITICAL: do NOT change dress color, do NOT swap into shorts, pants, armor, riding gear, pajamas, modern clothes, or a new gown design.",
+      "Pose and background may change; face likeness + this exact royal dress stay fixed.",
     ].join(" ");
   }
-  // default King / boy
+  // default King / boy fallback when no photo
   return [
-    "LOCKED QUEST COSTUME (identical on EVERY page of this book — do not redesign clothes):",
-    "King adventure outfit: one royal navy-blue tunic with warm gold trim and a soft red cape,",
-    "same brown belt, same soft leather boots, same hair style and hair color every page.",
-    "This exact tunic+cape+boots set every page — never a dress, never armor, never modern clothes.",
+    "LOCKED HERO WARDROBE (identical on EVERY page of this book — do not redesign clothes):",
+    "King outfit: royal navy-blue tunic with warm gold trim and soft red cape,",
+    "same small gold crown every page, same brown belt, same soft leather boots,",
+    "same hair style and hair color every page.",
     hardBan,
-    crownRule,
-    "CRITICAL: do NOT copy street clothes, jeans, t-shirts, hoodies, or photo-day outfits from the reference photo.",
-    "Pose and background may change; face likeness + this exact quest tunic stay fixed.",
+    "CRITICAL: do NOT change tunic color, do NOT swap into armor, pajamas, modern clothes, or a new costume.",
+    "Pose and background may change; face likeness + this exact royal outfit stay fixed.",
   ].join(" ");
 }
 
@@ -398,31 +351,17 @@ async function generateWithCharacterPortrait(options: {
   prompt: string;
   characterPhotoB64: string;
   gender?: string | null;
-  crowningPage?: boolean;
-  pageIndex?: number | null;
-  totalPages?: number | null;
-  page?: Pick<StoryPage, "title" | "text" | "imagePrompt"> | null;
 }): Promise<FluxResult> {
   const googleKey = process.env.GOOGLE_AI_API_KEY;
   if (!googleKey) return fallbackPlaceholder(options.prompt);
 
   const STYLE = "ONE full-bleed 4:3 landscape whimsical watercolor children's storybook illustration only (not diptych, not two panels, not double-page, not collage), soft sepia ink outlines, soft pastel watercolor washes, cute storybook proportions, big FULL DETAILED expressive eyes with iris and pupil (never black-dot eyes), warm golden sunlight, faith-friendly fairytale picture-book quality, NO wands NO spells NO sorcery, scene fills entire canvas edge-to-edge, no photorealism, no empty uncolored coloring-page look, no text, no watermark";
-  const wardrobe = lockedHeroWardrobe(options.gender, {
-    crowningPage: options.crowningPage,
-    pageIndex: options.pageIndex,
-    totalPages: options.totalPages,
-    page: options.page,
-  });
+  const wardrobe = lockedHeroWardrobe(options.gender, { fromPhoto: true });
   const faceLock = lockedHeroFace();
-  const crowning = isCrowningPage(
-    options.page ?? null,
-    options.pageIndex ?? null,
-    options.totalPages ?? null
-  ) || options.crowningPage === true;
 
   const fullPrompt = `Create ONE premium watercolor children's storybook illustration (ink + soft color washes — NOT a blank coloring page). Single scene only. Canvas is 4:3 landscape and must be FULL BLEED.
 
-FACE LIKENESS (critical): Study the child's FACE/HAIR/SKIN in the reference photo only. Paint/draw the hero as a charming royal storybook character that clearly resembles this child — same age vibe, hair, face shape, expression — stylized into soft watercolor + ink (not a photo, not realistic skin). IGNORE all clothing in the reference photo.
+FACE LIKENESS (critical): Study the child's face in the reference photo. Paint/draw the hero as a charming royal storybook character that clearly resembles this child — same age vibe, hair, face shape, expression — stylized into soft watercolor + ink (not a photo, not realistic skin).
 
 ${faceLock}
 
@@ -438,10 +377,9 @@ RULES:
 - FILL the entire image edge-to-edge — background continues to all four edges
 - NO decorative vine border, NO floral frame, NO oval vignette, NO white/cream side bars, NO picture mat
 - Hero is center stage, readable silhouette, proud kind pose
-- FULL BODY in frame: entire head, hair, face, hands, feet — headroom above the head, feet still visible
-- NEVER crop or cut off the head, face, arms, or feet
-- Same character design, same face, same FULL DETAILED eyes, AND the exact same locked QUEST COSTUME on every page of this book
-- ${crowning ? "FINALE: child may wear the earned small gold crown now." : "NO crown / tiara / royal headpiece on the child on this page (bare head / natural hair only)."}
+- FULL BODY in frame: entire head, crown/hair, face, hands, feet — headroom above crown, feet still visible
+- NEVER crop or cut off the head, face, crown, arms, or feet
+- Same character design, same face, same FULL DETAILED eyes, AND the exact same outfit from the reference photo on every page of this book
 - Soft watercolor color throughout (pastels), not empty line art
 - No real photo collage, no half-photo face, no text`;
 
@@ -493,18 +431,9 @@ export async function generateStoryIllustration(options: {
   gender?: string | null;
   /** Adventure path id — pulls locked cast (dragon, King, friends, etc.) */
   questId?: string | null;
-  crowningPage?: boolean;
-  pageIndex?: number | null;
-  totalPages?: number | null;
-  page?: Pick<StoryPage, "title" | "text" | "imagePrompt"> | null;
 }): Promise<FluxResult> {
   const hasPhoto = Boolean(options.characterPhotoUrl?.startsWith("data:image"));
-  const wardrobe = lockedHeroWardrobe(options.gender, {
-    crowningPage: options.crowningPage,
-    pageIndex: options.pageIndex,
-    totalPages: options.totalPages,
-    page: options.page,
-  });
+  const wardrobe = lockedHeroWardrobe(options.gender, { fromPhoto: hasPhoto });
   const faceLock = lockedHeroFace();
   const castLock = lockedCastForPage({
     questId: options.questId,
@@ -519,10 +448,6 @@ export async function generateStoryIllustration(options: {
         prompt: promptWithLocks,
         characterPhotoB64: b64,
         gender: options.gender,
-        crowningPage: options.crowningPage,
-        pageIndex: options.pageIndex,
-        totalPages: options.totalPages,
-        page: options.page,
       });
     }
   }
@@ -555,12 +480,12 @@ export async function illustrateStoryPages(options: {
 }): Promise<StoryPage[]> {
   const { pages, characterPhoto, gender, questId } = options;
   // Product rule: book + movie are 100% illustrated watercolor storybook art (no real session photos).
-  // Face upload = face/hair likeness only. Quest costume is locked separately (not photo clothes).
+  // Real session photos are NEVER placed in pages. Face upload = likeness + wardrobe reference only.
   const result: StoryPage[] = [];
   const usedSceneKeys: string[] = [];
   const hasPhoto = Boolean(characterPhoto);
+  const wardrobe = lockedHeroWardrobe(gender, { fromPhoto: hasPhoto });
   const faceLock = lockedHeroFace();
-  const totalPages = pages.length;
 
   for (let index = 0; index < pages.length; index++) {
     const page = pages[index];
@@ -570,33 +495,19 @@ export async function illustrateStoryPages(options: {
       continue;
     }
 
-    const crowning = isCrowningPage(page, index, totalPages);
-    const wardrobe = lockedHeroWardrobe(gender, {
-      crowningPage: crowning,
-      pageIndex: index,
-      totalPages,
-      page,
-    });
     const uniqueness = uniqueSceneDirective(page, index, pages, usedSceneKeys, hasPhoto);
     const sceneHint = page.imagePrompt ?? page.title;
     const castLock = lockedCastForPage({
       questId,
       sceneText: `${sceneHint} ${page.title || ""} ${page.text || ""}`,
     });
-    const crownLine = crowning
-      ? "FINALE PAGE: child may wear the earned small gold crown now (King just gave it)."
-      : "NO crown/tiara on the child — bare head / natural hair only until the final crowning.";
-    const prompt = `${sceneHint}. ${faceLock}. ${wardrobe}. ${castLock}. ${uniqueness}. ${STYLE_SUFFIX}. Full-bleed 4:3 children's watercolor storybook illustration for an 8.25 inch square printed book image band. CRITICAL: edge-to-edge scene, no vine frame, no side white space. Show the complete child hero from head to toe with headroom above the head — never cut off the head. SAME face, SAME full detailed eyes, SAME locked quest costume every page. ${crownLine} SAME locked cast design every page. NO glowing staff, NO wand, NO scepter beam, NO spell props.`;
+    const prompt = `${sceneHint}. ${faceLock}. ${wardrobe}. ${castLock}. ${uniqueness}. ${STYLE_SUFFIX}. Full-bleed 4:3 children's watercolor storybook illustration for an 8.25 inch square printed book image band. CRITICAL: edge-to-edge scene, no vine frame, no side white space. Show the complete child hero from head to toe with headroom above the crown — never cut off the head. SAME face, SAME full detailed eyes, SAME outfit as every other page. SAME locked cast (dragon/King/friends) design every page. NO glowing staff, NO wand, NO scepter beam, NO spell props.`;
 
     const art = await generateStoryIllustration({
       prompt,
       characterPhotoUrl: characterPhoto ?? null,
       gender,
       questId,
-      crowningPage: crowning,
-      pageIndex: index,
-      totalPages,
-      page,
     });
 
     const next = {
@@ -670,10 +581,9 @@ function uniqueSceneDirective(
     used.length ? `Already used scene keys: ${used.slice(-4).join(" || ")}.` : "",
     beat,
     angle,
-    "Same child likeness, SAME full detailed eyes (never black dots), and the EXACT same locked QUEST COSTUME every page — only NEW pose, NEW camera angle, NEW background landmark.",
-    "Never a clothing change or eye-style change. Do not copy street clothes from the face photo.",
-    "Small cute storybook animals (fox, bunny, bird, squirrel) are OK as background friends when they fit the quest.",
-    "Do NOT put a full dragon in non-dragon quests.",
+    fromPhoto
+      ? "Same child likeness, SAME full detailed eyes (never black dots), and the EXACT same outfit colors/pieces from the reference photo every page — only NEW pose, NEW camera angle, NEW background landmark. Never a clothing change or eye-style change."
+      : "Same child likeness, SAME full detailed eyes (never black dots), and the EXACT same locked royal outfit/colors/crown every page — only NEW pose, NEW camera angle, NEW background landmark. Never a clothing change or eye-style change.",
   ]
     .filter(Boolean)
     .join(" ");

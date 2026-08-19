@@ -282,6 +282,6 @@ export async function generateNarrationAudio(options: {
   };
 }
 
-/** Motion prompt for Seedance — soft classic storybook adventure film (shared engine) */
+/** Motion prompt for Seedance — Phoenix-era coloring-book / watercolor page-alive (shared engine) */
 export const SEEDANCE_PAGE_MOTION_PROMPT =
-  "Soft classic storybook adventure film motion (Winnie-the-Pooh warmth, picture-book cinema), whimsical watercolor children's page gently coming to life, soft sepia ink outlines stay stable, pastel watercolor washes preserved, soft 2D parallax, hair and cape drift lightly, magical sparkles twinkle, slow elegant camera push-in, warm golden fairy light, calm readable pacing, face identity locked, full detailed eyes with iris and pupil stay stable never black-dot eyes, outfit colors and garments locked from source frame, NOT anime, NOT 3D CGI, no morphing face, no photorealism, no text, no watermark";
+  "A coloring-book / watercolor storybook page gently comes to life, soft sepia ink outlines stay stable, pastel watercolor washes preserved, cream paper texture, flat storybook look, very subtle 2D motion only, tiny parallax, soft breeze on hair cape leaves, gentle push-in, face identity locked, full detailed eyes with iris and pupil stay stable never black-dot eyes, outfit colors and garments locked from source frame, NOT anime, NOT 3D CGI, NOT photoreal, no morphing face, no cinematic CGI lighting, no text, no watermark";
