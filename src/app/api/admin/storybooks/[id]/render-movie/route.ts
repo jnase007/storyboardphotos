@@ -270,12 +270,29 @@ export async function POST(request: NextRequest, { params }: Params) {
     const supabase = createServiceClient();
     const { data: book, error } = await supabase
       .from("storybooks")
-      .select("id, child_name, video_url, video_status, pages")
+      .select("id, child_name, status, video_url, video_status, pages")
       .eq("id", id)
       .single();
 
     if (error || !book) {
       return NextResponse.json({ error: "Book not found" }, { status: 404 });
+    }
+
+    // HARD GATE: paid Fast/premium movies require approved art first.
+    // Draft still allowed for cheap slideshow checks.
+    if (
+      parsed.data.quality !== "draft" &&
+      String(book.status || "").toLowerCase() !== "approved"
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Approve book art first in Books Library, then Make Fast movie. Prevents wasting ~$30 on unapproved pages.",
+          status: book.status || "unknown",
+          code: "ART_NOT_APPROVED",
+        },
+        { status: 409 }
+      );
     }
 
     if (book.video_url && !parsed.data.force) {

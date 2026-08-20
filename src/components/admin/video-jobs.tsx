@@ -163,11 +163,11 @@ export function VideoJobsPanel() {
   async function makeMovie(id: string, quality: Quality, force = false) {
     const labels: Record<Quality, string> = {
       draft: "Test draft (pennies)",
-      standard: "Customer Fast full-motion (~$35-class)",
+      standard: "Make Fast movie (~$30)",
       premium: "Premium 2.5 (higher COGS)",
     };
 
-    // Gate: book art must be approved before spending Seedance $ (River lesson)
+    // HARD GATE: book art must be approved before spending Seedance $
     try {
       const check = await fetch(`/api/admin/storybooks/${id}`, {
         headers: { "x-admin-code": ADMIN_CODE },
@@ -176,25 +176,25 @@ export function VideoJobsPanel() {
         const book = await check.json();
         const st = String(book.status || "");
         if (st !== "approved" && quality !== "draft") {
-          const go = window.confirm(
-            `Book status is "${st || "unknown"}" — not approved yet.\n\nRule: review art ↔ text first, then Approve in Books Library, then render movie.\n\nRender anyway? (costs real $)`
+          window.alert(
+            `Book status is "${st || "unknown"}" — not approved yet.\n\nApprove art in Books Library first.\nThen tap Make Fast movie (~$30).\n\nNo override — protects the ~$30 spend.`
           );
-          if (!go) return;
+          return;
         }
       }
     } catch {
-      /* non-blocking if status check fails */
+      /* if status check fails, API hard-gate still blocks */
     }
 
     if (quality === "premium") {
       const okPrem = window.confirm(
-        "Premium 2.5 full-motion is the expensive gold tier (~$150-class).\nDefault production is Standard Fast.\n\nContinue with Premium?"
+        "Premium is blocked for normal books (~$150-class).\nDefault is Fast (~$30).\n\nOnly continue if this is intentional gold tier."
       );
       if (!okPrem) return;
     }
     if (quality === "standard") {
       const ok = window.confirm(
-        "Customer Fast full-motion movie (~$35 on shorter books).\n\nFull Seedance motion the whole way.\nOnly after book art is approved.\n\nContinue?"
+        "Make Fast movie (~$25–35)?\n\n• Full Seedance motion\n• Narration + soft BGM\n• Mac mini worker auto-runs\n\nOnly after art is approved."
       );
       if (!ok) return;
     }
@@ -336,9 +336,8 @@ export function VideoJobsPanel() {
               Movies
             </h1>
             <p className="text-gray-600 mt-1 text-sm max-w-md">
-              Main button = <strong>real animated movie</strong> (soft storybook
-              motion + narration + logo bump, ~$10–15). Cheap stills draft is
-              secondary only.
+              Best setup: <strong>Approve art</strong> → <strong>Make Fast movie
+              (~$30)</strong> → Mac mini auto-worker + BGM. No Tinny needed.
             </p>
           </div>
           <button
@@ -360,25 +359,25 @@ export function VideoJobsPanel() {
               </p>
               <p className="text-sm text-red-700">
                 Server died mid-render (common on long Seedance jobs). Tap{" "}
-                <strong>Unstick</strong>, then <strong>Test draft</strong>.
+                <strong>Unstick</strong>, then <strong>Make Fast movie (~$30)</strong>.
               </p>
             </div>
           </div>
         ) : null}
 
         <div className="mb-6 rounded-xl border border-amber-100 bg-amber-50/60 px-4 py-3 text-sm text-gray-700">
-          <p className="font-semibold text-gray-900 mb-1">What you want</p>
+          <p className="font-semibold text-gray-900 mb-1">Every time</p>
           <ol className="list-decimal ml-5 space-y-1">
             <li>
-              Lock the <strong>book</strong> (art + story + same outfit).
+              <strong>Approve art</strong> in Books Library (hard gate).
             </li>
             <li>
-              Tap <strong>Make animated movie</strong> — real motion, narration,
-              logo bump (~$10–15, max $50).
+              Tap <strong>Make Fast movie (~$30)</strong> — Seedance motion +
+              narration + soft BGM.
             </li>
             <li>
-              Only use <strong>Cheap stills draft</strong> if you just need a
-              silent/slideshow check (not the real product).
+              Mac mini worker picks it up automatically. You get the ready link
+              when done.
             </li>
           </ol>
         </div>
@@ -462,7 +461,7 @@ export function VideoJobsPanel() {
                       {state.kind === "stuck" ? (
                         <div className="mt-3 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
                           This one died on the server. Unstick it, then run{" "}
-                          <strong>Make animated movie</strong> again.
+                          <strong>Make Fast movie (~$30)</strong> again.
                         </div>
                       ) : null}
 
@@ -527,8 +526,8 @@ export function VideoJobsPanel() {
                                 <Film className="w-4 h-4" />
                               )}
                               {job.video_url
-                                ? "Remake animated movie (~$15)"
-                                : "Make animated movie (~$15)"}
+                                ? "Remake Fast movie (~$30)"
+                                : "Make Fast movie (~$30)"}
                             </button>
                             <p className="text-[11px] text-gray-500 -mt-1">
                               Real motion + bedtime narration + logo bump. This is
