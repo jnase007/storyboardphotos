@@ -7,15 +7,22 @@ import { ArrowRight, Film, BookOpen, Shirt, Share2, Star } from "lucide-react";
 import { PRICING_PACKAGES, TESTIMONIALS, SITE } from "@/lib/constants";
 import { SectionOrnament } from "@/components/section-ornament";
 
-/** Raelyn 2.5 gold cut — full-motion sales sample (do not overwrite source). */
+/** Queen River gold cut — full-motion sales sample (best current homepage demo). */
 export const GOLD_MOVIE_URL =
-  "https://v3b.fal.media/files/b/0aa5eca0/nkWza6XpxygmavrUqsq0s_final-upload.mp4";
+  "https://v3b.fal.media/files/b/0aa65cca/RtptzVPfjEdtKfnybbqqv_river-final-bgm.mp4";
 
-/** Main still for Raelyn sample movie (hero princess art Justin locked). */
-export const GOLD_MOVIE_POSTER = "/brand/raelyn-movie-poster.jpg";
+/** Main still for River sample movie (Kingdom Race cover art). */
+export const GOLD_MOVIE_POSTER = "/brand/river-movie-poster.jpg";
 
-/** Full Raelyn sample storybook PDF for homepage featured area. */
-export const GOLD_BOOK_PDF = "/brand/raelyn-kingdom-quest-sample.pdf";
+/** Full River sample storybook PDF for homepage featured area. */
+export const GOLD_BOOK_PDF = "/brand/river-kingdom-quest-sample.pdf";
+
+/** Cover card image for the sample PDF block. */
+export const GOLD_BOOK_COVER = "/brand/river-sample-cover.jpg";
+
+export const GOLD_SAMPLE_TITLE = "Queen River & the Kingdom Race";
+export const GOLD_SAMPLE_ALT =
+  "Queen River and the Kingdom Race — sample storybook";
 
 export function HomeSellSection() {
   return (
@@ -82,8 +89,8 @@ export function HomeSellSection() {
               >
                 <div className="relative aspect-[4/3] bg-royal-blue/40">
                   <Image
-                    src={GOLD_MOVIE_POSTER}
-                    alt="Queen Raelyn and the Dragon Mountain — sample storybook"
+                    src={GOLD_BOOK_COVER}
+                    alt={GOLD_SAMPLE_ALT}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                     sizes="(max-width: 1024px) 100vw, 420px"
@@ -95,7 +102,7 @@ export function HomeSellSection() {
                   </div>
                   <div className="absolute bottom-0 left-0 right-0 p-5">
                     <p className="font-serif text-xl font-bold text-royal-cream mb-1">
-                      Queen Raelyn & the Dragon Mountain
+                      {GOLD_SAMPLE_TITLE}
                     </p>
                     <p className="text-royal-cream/70 text-sm mb-3">
                       Full sample storybook — open the PDF
