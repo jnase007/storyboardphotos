@@ -148,8 +148,8 @@ export const KINGDOM_SETS = [
     id: "throne-room",
     name: "Throne Room",
     description:
-      "A royal throne room fit for kings and queens — where your story begins.",
-    image: "/sets/throne-room.jpg",
+      "Our signature main set — a royal throne room fit for kings and queens, where your story begins.",
+    image: "/sets/main-throne-room.jpg",
   },
   {
     id: "royal-forest",

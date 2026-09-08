@@ -5,9 +5,9 @@ import { BreadcrumbStructuredData } from "@/components/structured-data";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Kingdom Sets — Throne Room, Forest, Garden & Castle",
+  title: "Kingdom Sets — Throne Room Main Set & More Coming",
   description:
-    "Explore four immersive kingdom sets in Costa Mesa — Throne Room, Royal Forest, Royal Garden, and Chastle — designed for magical kids portraits and storybook photos.",
+    "Explore the Storybook Photos Throne Room — our signature live set in Costa Mesa — plus more kingdom worlds coming soon: Royal Forest, Royal Garden, and Chastle.",
   path: "/kingdom-sets",
 });
 

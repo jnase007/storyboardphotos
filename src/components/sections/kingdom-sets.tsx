@@ -44,6 +44,9 @@ export function KingdomSetsSection() {
     setActiveSet(next);
   }
 
+  const mainSet = KINGDOM_SETS[0];
+  const moreSets = KINGDOM_SETS.slice(1);
+
   return (
     <section id="kingdom-sets" className="py-24 bg-enchanted-cream">
       <div className="container mx-auto px-4 lg:px-8">
@@ -51,25 +54,82 @@ export function KingdomSetsSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center max-w-2xl mx-auto mb-16"
+          className="text-center max-w-2xl mx-auto mb-12"
         >
           <SectionOrnament />
           <p className="text-royal-gold font-medium tracking-widest uppercase text-sm mb-3">
             The Kingdom Sets
           </p>
           <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-royal-blue mb-4">
-            Four Places to Remember Who They Are
+            Step Into the Throne Room
           </h1>
           <p className="text-royal-blue/60 text-lg">
-            Each set is crafted to help children feel brave, special, and full
-            of wonder. Click any set to see it larger. Tell us which worlds
-            speak to your child when you book.
+            Our signature set is live in studio now. More enchanted worlds are
+            coming — each crafted so kids feel brave, special, and full of wonder.
           </p>
         </motion.div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          {KINGDOM_SETS.map((set, index) => {
-            const Icon = setIcons[index] ?? Castle;
+        {/* Main featured set */}
+        <motion.button
+          type="button"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          onClick={() => setActiveSet(mainSet)}
+          className="group w-full text-left rounded-3xl overflow-hidden border-2 border-royal-gold/40 hover:border-royal-gold/70 transition-all hover:shadow-2xl hover:shadow-royal-gold/20 bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-royal-gold focus-visible:ring-offset-2 mb-16"
+          aria-label={`View larger photo of ${mainSet.name}`}
+        >
+          <div className="relative aspect-[16/9] sm:aspect-[21/9] bg-royal-blue overflow-hidden">
+            <Image
+              src={mainSet.image}
+              alt={mainSet.name}
+              fill
+              priority
+              className="object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+              sizes="(max-width: 1280px) 100vw, 1200px"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-royal-blue/80 via-royal-blue/20 to-transparent" />
+            <div className="absolute top-4 left-4">
+              <span className="inline-flex items-center rounded-full bg-royal-gold px-3 py-1 text-xs font-bold uppercase tracking-wider text-royal-blue shadow-md">
+                Main Set · Live Now
+              </span>
+            </div>
+            <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-8 flex items-end justify-between gap-4">
+              <div className="text-left">
+                <h2 className="font-serif text-2xl sm:text-4xl font-bold text-white mb-1 drop-shadow-md">
+                  {mainSet.name}
+                </h2>
+                <p className="text-white/85 text-sm sm:text-base max-w-xl drop-shadow">
+                  {mainSet.description}
+                </p>
+              </div>
+              <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-royal-blue shadow-sm shrink-0">
+                <Expand className="h-3.5 w-3.5 text-royal-gold" />
+                View larger
+              </span>
+            </div>
+          </div>
+        </motion.button>
+
+        {/* More sets to come */}
+        <div className="mb-4 flex items-end justify-between gap-4 flex-wrap">
+          <div>
+            <p className="text-royal-gold font-medium tracking-widest uppercase text-xs mb-1">
+              Coming Soon
+            </p>
+            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-royal-blue">
+              More Sets to Come
+            </h2>
+          </div>
+          <p className="text-royal-blue/55 text-sm max-w-md">
+            These worlds are already in the kingdom map — studio builds and
+            photos will expand here as each set opens.
+          </p>
+        </div>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          {moreSets.map((set, index) => {
+            const Icon = setIcons[index + 1] ?? Castle;
             const hasPhoto = Boolean(set.image);
 
             return (
@@ -88,7 +148,7 @@ export function KingdomSetsSection() {
                   className={`aspect-[4/3] relative overflow-hidden ${
                     hasPhoto
                       ? "bg-royal-blue"
-                      : `bg-gradient-to-br ${setGradients[index]}`
+                      : `bg-gradient-to-br ${setGradients[index + 1]}`
                   }`}
                 >
                   {hasPhoto ? (
@@ -98,9 +158,12 @@ export function KingdomSetsSection() {
                         alt={set.name}
                         fill
                         className="object-cover transition-transform duration-500 group-hover:scale-105"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-royal-blue/50 via-transparent to-transparent" />
+                      <span className="absolute top-3 left-3 inline-flex rounded-full bg-royal-blue/80 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-royal-gold border border-royal-gold/30">
+                        More to come
+                      </span>
                       <span className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-royal-blue shadow-sm opacity-90 group-hover:opacity-100 transition-opacity">
                         <Expand className="h-3 w-3 text-royal-gold" />
                         View larger
