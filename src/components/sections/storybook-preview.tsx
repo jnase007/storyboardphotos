@@ -11,7 +11,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const SET_IMAGES: Record<string, string> = {
-  "Throne Room": "/sets/throne-room.jpg",
+  "Throne Room": "/sets/main-throne-room.jpg",
   "Royal Forest": "/sets/royal-forest.webp",
   "Royal Garden": "/sets/royal-garden.webp",
   "Chastle": "/sets/chastle.webp",

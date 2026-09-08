@@ -10,7 +10,7 @@ import { SectionOrnament } from "@/components/section-ornament";
 const teasers: Record<string, string> = {
   "/experience": "Immersive sets and portraits that build lasting confidence.",
   "/how-it-works": "Five simple steps from booking to heirloom delivery.",
-  "/kingdom-sets": "Four enchanted worlds for your child's royal adventure.",
+  "/kingdom-sets": "Throne Room is live — more enchanted worlds coming soon.",
   "/storybooks": "Personalized storybooks where your child is the hero.",
   "/pricing":
     "Books from $299 · Royal Collection $499 · Movies $199–$299",
