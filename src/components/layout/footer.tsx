@@ -147,6 +147,12 @@ export function Footer() {
             >
               Admin
             </Link>
+            <Link
+              href="/kiosk"
+              className="inline-flex min-h-10 items-center text-royal-gold/80 hover:text-royal-gold transition-colors font-semibold"
+            >
+              Kiosk
+            </Link>
             <span className="text-royal-cream/40">{SITE.domain}</span>
           </div>
         </div>

@@ -19,7 +19,7 @@ import {
 
 const IDLE_RESET_MS = 120_000;
 /** H.264 + AAC — required for iPad Safari (AV1 will not play). */
-const ATTRACT_VIDEO = "/brand/homepage-hero-promo.mp4";
+const ATTRACT_VIDEO = "/brand/homepage-hero-promo.mp4?v=h264-2";
 const ATTRACT_POSTER = "/brand/homepage-hero-promo-poster.jpg";
 const PREVIEW_BEAT_MS = 2800;
 

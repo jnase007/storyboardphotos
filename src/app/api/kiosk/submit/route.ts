@@ -30,9 +30,17 @@ function escapeHtml(value: string) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
 }
-async function sendWithResend(subject: string, text: string, html: string) {
+type NotifyResult =
+  | { ok: true; provider: "resend" | "formsubmit" }
+  | { ok: false; reason: string };
+
+async function sendWithResend(
+  subject: string,
+  text: string,
+  html: string
+): Promise<NotifyResult> {
   const key = process.env.RESEND_API_KEY;
-  if (!key) return { ok: false as const, reason: "no-resend-key" };
+  if (!key) return { ok: false, reason: "no-resend-key" };
 
   const from =
     process.env.RESEND_FROM ||
@@ -56,12 +64,16 @@ async function sendWithResend(subject: string, text: string, html: string) {
   if (!res.ok) {
     const body = await res.text();
     console.error("Resend kiosk email failed:", res.status, body);
-    return { ok: false as const, reason: `resend-${res.status}` };
+    return { ok: false, reason: `resend-${res.status}` };
   }
-  return { ok: true as const, provider: "resend" as const };
+  return { ok: true, provider: "resend" };
 }
 
-async function sendWithFormSubmit(subject: string, text: string, html: string) {
+async function sendWithFormSubmit(
+  subject: string,
+  text: string,
+  html: string
+): Promise<NotifyResult> {
   // No API key required — creates an email trail to Justin's inbox.
   const res = await fetch(`https://formsubmit.co/ajax/${NOTIFY_TO}`, {
     method: "POST",
@@ -82,9 +94,9 @@ async function sendWithFormSubmit(subject: string, text: string, html: string) {
   if (!res.ok) {
     const body = await res.text();
     console.error("FormSubmit kiosk email failed:", res.status, body);
-    return { ok: false as const, reason: `formsubmit-${res.status}` };
+    return { ok: false, reason: `formsubmit-${res.status}` };
   }
-  return { ok: true as const, provider: "formsubmit" as const };
+  return { ok: true, provider: "formsubmit" };
 }
 
 export async function POST(request: NextRequest) {

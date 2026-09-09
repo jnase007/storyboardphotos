@@ -12,8 +12,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-/** Self-hosted homepage promo — no YouTube chrome. */
-const HERO_VIDEO = "/brand/homepage-hero-promo.mp4";
+/** Self-hosted homepage promo — H.264/AAC for iPad Safari (not AV1). */
+const HERO_VIDEO = "/brand/homepage-hero-promo.mp4?v=h264-2";
 const HERO_POSTER = "/brand/homepage-hero-promo-poster.jpg";
 const HERO_BACKDROP = "/brand-storefront.jpg";
 
@@ -155,6 +155,8 @@ export function HeroSection() {
                   loop
                   playsInline
                   preload="auto"
+                  disablePictureInPicture
+                  controls={false}
                   aria-label="Storybook Photos experience preview"
                 />
 
