@@ -1,15 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
   BookOpen,
+  Check,
   Film,
   RotateCcw,
   Sparkles,
-  Crown,
 } from "lucide-react";
 import {
   ADVENTURE_PATHS,
@@ -17,9 +17,11 @@ import {
   type AdventurePathId,
 } from "@/lib/storybook/adventure-paths";
 
-const IDLE_RESET_MS = 90_000;
-
+const IDLE_RESET_MS = 120_000;
+/** H.264 + AAC — required for iPad Safari (AV1 will not play). */
 const ATTRACT_VIDEO = "/brand/homepage-hero-promo.mp4";
+const ATTRACT_POSTER = "/brand/homepage-hero-promo-poster.jpg";
+const PREVIEW_BEAT_MS = 2800;
 
 const QUEST_ART: Record<AdventurePathId, string> = {
   "dragon-slayer": "/adventure-cards/dragon-slayer.jpg",
@@ -30,12 +32,60 @@ const QUEST_ART: Record<AdventurePathId, string> = {
   "light-treasure": "/adventure-cards/light-treasure.jpg",
 };
 
-type Step = "attract" | "choose" | "name" | "product" | "confirm";
+/** Cinematic preview frames per quest (until dedicated Seedance trailers ship). */
+const QUEST_PREVIEW_FRAMES: Record<AdventurePathId, string[]> = {
+  "dragon-slayer": [
+    "/adventure-cards/dragon-slayer.jpg",
+    "/adventure-cards/dragon-slayer-v22.jpg",
+    "/adventure-cards/dragon-slayer-v21.jpg",
+    "/adventure-cards/dragon-slayer-v20.jpg",
+    "/adventure-cards/dragon-slayer-v18.jpg",
+  ],
+  "rescue-mission": [
+    "/adventure-cards/rescue-mission.jpg",
+    "/adventure-cards/rescue-mission-v22.jpg",
+    "/adventure-cards/rescue-mission-v21.jpg",
+    "/adventure-cards/rescue-mission-v20.jpg",
+    "/adventure-cards/rescue-mission-v18.jpg",
+  ],
+  "lost-crown": [
+    "/adventure-cards/lost-crown.jpg",
+    "/adventure-cards/lost-crown-v22.jpg",
+    "/adventure-cards/lost-crown-v21.jpg",
+    "/adventure-cards/lost-crown-v20.jpg",
+    "/adventure-cards/lost-crown-v18.jpg",
+  ],
+  "forest-guardian": [
+    "/adventure-cards/forest-guardian.jpg",
+    "/adventure-cards/forest-guardian-v22.jpg",
+    "/adventure-cards/forest-guardian-v21.jpg",
+    "/adventure-cards/forest-guardian-v20.jpg",
+    "/adventure-cards/forest-guardian-v18.jpg",
+  ],
+  "kindness-quest": [
+    "/adventure-cards/kindness-quest.jpg",
+    "/adventure-cards/kindness-quest-v22.jpg",
+    "/adventure-cards/kindness-quest-v21.jpg",
+    "/adventure-cards/kindness-quest-v20.jpg",
+    "/adventure-cards/kindness-quest-v18.jpg",
+  ],
+  "light-treasure": [
+    "/adventure-cards/light-treasure.jpg",
+    "/adventure-cards/light-treasure-v22.jpg",
+    "/adventure-cards/light-treasure-v21.jpg",
+    "/adventure-cards/light-treasure-v20.jpg",
+    "/adventure-cards/light-treasure-v17.jpg",
+  ],
+};
+
+type Step = "attract" | "choose" | "preview" | "name" | "product" | "confirm";
 type Gender = "girl" | "boy";
 type Product = "book" | "movie" | "both";
 
 type KioskSelection = {
-  path: AdventurePath;
+  pathId: AdventurePathId;
+  pathLabel: string;
+  pathTitle: string;
   childName: string;
   gender: Gender;
   product: Product;
@@ -72,6 +122,16 @@ function productLabel(product: Product) {
   return "Storybook + Movie";
 }
 
+function storyBeats(path: AdventurePath) {
+  return path.pages
+    .filter((p) => p.page > 1)
+    .slice(0, 5)
+    .map((p) => ({
+      title: p.title,
+      text: p.text.replace(/\s+/g, " ").trim().slice(0, 160),
+    }));
+}
+
 export function KioskApp() {
   const paths = useMemo(() => ADVENTURE_PATHS, []);
   const [step, setStep] = useState<Step>("attract");
@@ -82,6 +142,11 @@ export function KioskApp() {
   const [lastTouch, setLastTouch] = useState(() => Date.now());
   const [staffOpen, setStaffOpen] = useState(false);
   const [history, setHistory] = useState<KioskSelection[]>([]);
+  const [previewFrame, setPreviewFrame] = useState(0);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [emailStatus, setEmailStatus] = useState<"sent" | "local" | null>(null);
+  const attractVideoRef = useRef<HTMLVideoElement>(null);
 
   const bump = useCallback(() => setLastTouch(Date.now()), []);
 
@@ -90,12 +155,15 @@ export function KioskApp() {
     setChildName("");
     setGender("girl");
     setProduct("both");
+    setPreviewFrame(0);
+    setSubmitting(false);
+    setSubmitError(null);
+    setEmailStatus(null);
     setStep("attract");
     setStaffOpen(false);
     bump();
   }, [bump]);
 
-  // Load local session log for staff testing
   useEffect(() => {
     try {
       const raw = localStorage.getItem("sbp-kiosk-selections");
@@ -107,7 +175,6 @@ export function KioskApp() {
     }
   }, []);
 
-  // Idle timeout
   useEffect(() => {
     const id = window.setInterval(() => {
       if (Date.now() - lastTouch > IDLE_RESET_MS && step !== "attract") {
@@ -117,7 +184,6 @@ export function KioskApp() {
     return () => window.clearInterval(id);
   }, [lastTouch, step, reset]);
 
-  // Keep screen awake when possible
   useEffect(() => {
     let lock: { release: () => void } | null = null;
     const nav = navigator as Navigator & {
@@ -140,6 +206,44 @@ export function KioskApp() {
     };
   }, []);
 
+  // Force attract loop on iPad Safari (autoplay is flaky even when muted).
+  useEffect(() => {
+    if (step !== "attract") return;
+    const video = attractVideoRef.current;
+    if (!video) return;
+    video.muted = true;
+    video.defaultMuted = true;
+    video.playsInline = true;
+    video.setAttribute("playsinline", "true");
+    video.setAttribute("webkit-playsinline", "true");
+    const tryPlay = () => {
+      const p = video.play();
+      if (p) p.catch(() => {});
+    };
+    tryPlay();
+    video.addEventListener("loadeddata", tryPlay);
+    video.addEventListener("canplay", tryPlay);
+    const onVis = () => {
+      if (document.visibilityState === "visible") tryPlay();
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      video.removeEventListener("loadeddata", tryPlay);
+      video.removeEventListener("canplay", tryPlay);
+      document.removeEventListener("visibilitychange", onVis);
+    };
+  }, [step]);
+
+  // Auto-advance cinematic preview frames
+  useEffect(() => {
+    if (step !== "preview" || !selected) return;
+    const frames = QUEST_PREVIEW_FRAMES[selected.id] || [QUEST_ART[selected.id]];
+    const id = window.setInterval(() => {
+      setPreviewFrame((n) => (n + 1) % frames.length);
+    }, PREVIEW_BEAT_MS);
+    return () => window.clearInterval(id);
+  }, [step, selected]);
+
   const saveSelection = (sel: KioskSelection) => {
     try {
       const next = [sel, ...history].slice(0, 30);
@@ -150,22 +254,65 @@ export function KioskApp() {
     }
   };
 
-  const confirmAll = () => {
-    if (!selected || !childName.trim()) return;
+  const confirmAll = async () => {
+    if (!selected || !childName.trim() || submitting) return;
     softClick(880);
+    setSubmitting(true);
+    setSubmitError(null);
+
+    const savedAt = new Date().toISOString();
     const sel: KioskSelection = {
-      path: selected,
+      pathId: selected.id,
+      pathLabel: selected.label,
+      pathTitle: selected.title,
       childName: childName.trim(),
       gender,
       product,
-      savedAt: new Date().toISOString(),
+      savedAt,
     };
     saveSelection(sel);
+
+    try {
+      const res = await fetch("/api/kiosk/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          childName: childName.trim(),
+          gender,
+          product,
+          adventureId: selected.id,
+          adventureLabel: selected.label,
+          adventureTitle: selected.title,
+          adventureDescription: selected.description,
+          bibleVerse: selected.bibleVerse,
+          submittedAt: savedAt,
+        }),
+      });
+      const json = (await res.json().catch(() => ({}))) as {
+        emailed?: boolean;
+        error?: string;
+      };
+      if (!res.ok) {
+        setEmailStatus("local");
+        setSubmitError(json.error || "Saved on iPad — email may be delayed");
+      } else {
+        setEmailStatus(json.emailed ? "sent" : "local");
+      }
+    } catch {
+      setEmailStatus("local");
+      setSubmitError("Saved on iPad — email may be delayed");
+    }
+
+    setSubmitting(false);
     setStep("confirm");
     bump();
   };
 
   const role = gender === "girl" ? "Queen" : "King";
+  const frames = selected
+    ? QUEST_PREVIEW_FRAMES[selected.id] || [QUEST_ART[selected.id]]
+    : [];
+  const beats = selected ? storyBeats(selected) : [];
 
   return (
     <div
@@ -173,13 +320,11 @@ export function KioskApp() {
       onPointerDown={bump}
       onTouchStart={bump}
     >
-      {/* Ambient */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(212,176,122,0.16),transparent_55%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(74,53,104,0.35),transparent_45%)]" />
       </div>
 
-      {/* Hidden staff corner */}
       <button
         type="button"
         aria-label="Staff menu"
@@ -228,7 +373,7 @@ export function KioskApp() {
                     {h.gender === "girl" ? "Queen" : "King"} {h.childName}
                   </p>
                   <p className="text-royal-cream/65">
-                    {h.path.label} · {productLabel(h.product)}
+                    {h.pathLabel} · {productLabel(h.product)}
                   </p>
                 </div>
               ))
@@ -238,7 +383,6 @@ export function KioskApp() {
       ) : null}
 
       <AnimatePresence mode="wait">
-        {/* ATTRACT — cinematic loop */}
         {step === "attract" ? (
           <motion.button
             key="attract"
@@ -255,13 +399,17 @@ export function KioskApp() {
             }}
           >
             <video
+              ref={attractVideoRef}
               className="absolute inset-0 h-full w-full object-cover"
               src={ATTRACT_VIDEO}
+              poster={ATTRACT_POSTER}
               autoPlay
               muted
               loop
               playsInline
               preload="auto"
+              disablePictureInPicture
+              controls={false}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0b1524] via-[#0b1524]/55 to-[#0b1524]/25" />
             <div className="relative z-10 flex h-full flex-col items-center justify-end px-6 pb-16 text-center sm:justify-center sm:pb-0">
@@ -274,7 +422,7 @@ export function KioskApp() {
                 <span className="block text-gradient-gold-shine">Adventure</span>
               </h1>
               <p className="mt-5 max-w-xl text-base sm:text-xl text-royal-cream/80 leading-relaxed">
-                Pick the quest. Enter your name. Create your book & movie.
+                Preview the story. Enter a name. Create the book & movie.
               </p>
               <div className="mt-8 inline-flex items-center justify-center rounded-full bg-royal-gold px-10 py-5 text-xl font-bold text-royal-blue shadow-xl shadow-black/40 animate-pulse">
                 Touch to Begin
@@ -283,7 +431,6 @@ export function KioskApp() {
           </motion.button>
         ) : null}
 
-        {/* CHOOSE QUEST */}
         {step === "choose" ? (
           <motion.div
             key="choose"
@@ -311,7 +458,8 @@ export function KioskApp() {
                   onClick={() => {
                     softClick(720);
                     setSelected(path);
-                    setStep("name");
+                    setPreviewFrame(0);
+                    setStep("preview");
                     bump();
                   }}
                   className="group relative overflow-hidden rounded-2xl border border-royal-gold/30 bg-royal-blue/40 text-left shadow-lg shadow-black/25 transition-transform active:scale-[0.985] hover:border-royal-gold/70"
@@ -344,7 +492,127 @@ export function KioskApp() {
           </motion.div>
         ) : null}
 
-        {/* NAME */}
+        {/* PREVIEW — story trailer + summary, approve or go back */}
+        {step === "preview" && selected ? (
+          <motion.div
+            key="preview"
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.35 }}
+            className="absolute inset-0 z-10 flex flex-col px-4 sm:px-7 py-4 sm:py-5"
+          >
+            <HeaderBar
+              title={selected.title}
+              eyebrow="Step 2 · Preview this story"
+              onBack={() => {
+                softClick();
+                setSelected(null);
+                setStep("choose");
+              }}
+              onReset={reset}
+            />
+
+            <div className="flex-1 min-h-0 grid lg:grid-cols-12 gap-4 lg:gap-6">
+              <div className="lg:col-span-7 relative overflow-hidden rounded-3xl border border-royal-gold/35 bg-black shadow-2xl min-h-[240px]">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={frames[previewFrame] || selected.id}
+                    initial={{ opacity: 0.2, scale: 1.04 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.7 }}
+                    className="absolute inset-0"
+                  >
+                    <Image
+                      src={frames[previewFrame] || QUEST_ART[selected.id]}
+                      alt={selected.title}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 1024px) 100vw, 60vw"
+                      priority
+                    />
+                  </motion.div>
+                </AnimatePresence>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20 pointer-events-none" />
+                <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-royal-gold px-3 py-1 text-xs font-bold text-royal-blue">
+                  <Film className="h-3.5 w-3.5" />
+                  Story preview
+                </div>
+                <div className="absolute bottom-3 left-3 right-3 flex gap-1.5">
+                  {frames.map((f, i) => (
+                    <div
+                      key={f}
+                      className={`h-1 flex-1 rounded-full ${
+                        i === previewFrame ? "bg-royal-gold" : "bg-white/25"
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="lg:col-span-5 flex flex-col rounded-3xl border border-royal-gold/30 bg-white/5 p-5 sm:p-6 backdrop-blur-md overflow-hidden">
+                <p className="text-royal-gold text-xs font-semibold tracking-[0.18em] uppercase mb-2">
+                  What happens
+                </p>
+                <p className="text-royal-cream/85 text-base sm:text-lg leading-relaxed mb-4">
+                  {selected.description}
+                </p>
+                <div className="flex-1 min-h-0 overflow-y-auto space-y-3 pr-1">
+                  {beats.map((b, i) => (
+                    <div
+                      key={`${b.title}-${i}`}
+                      className="rounded-xl border border-white/10 bg-black/20 px-3 py-2.5"
+                    >
+                      <p className="font-serif font-bold text-sm sm:text-base mb-0.5">
+                        {i + 1}. {b.title}
+                      </p>
+                      <p className="text-royal-cream/60 text-xs sm:text-sm leading-snug line-clamp-2">
+                        {b.text}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+                {selected.bibleVerse ? (
+                  <p className="mt-3 text-royal-cream/45 text-xs">
+                    {selected.bibleVerse}
+                    {selected.bibleVerseText
+                      ? ` — “${selected.bibleVerseText}”`
+                      : ""}
+                  </p>
+                ) : null}
+
+                <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      softClick(520);
+                      setSelected(null);
+                      setStep("choose");
+                      bump();
+                    }}
+                    className="inline-flex h-14 items-center justify-center rounded-xl border border-royal-gold/40 bg-white/5 px-4 text-base font-semibold hover:bg-white/10"
+                  >
+                    Pick a different story
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      softClick(780);
+                      setStep("name");
+                      bump();
+                    }}
+                    className="inline-flex h-14 items-center justify-center gap-2 rounded-xl bg-royal-gold px-4 text-base font-bold text-royal-blue hover:bg-[#D4B480]"
+                  >
+                    <Check className="h-5 w-5" />
+                    Yes — this is the one
+                  </button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        ) : null}
+
         {step === "name" && selected ? (
           <motion.div
             key="name"
@@ -356,10 +624,10 @@ export function KioskApp() {
           >
             <HeaderBar
               title="Who is the hero?"
-              eyebrow={`Step 2 · ${selected.label}`}
+              eyebrow={`Step 3 · ${selected.label}`}
               onBack={() => {
                 softClick();
-                setStep("choose");
+                setStep("preview");
               }}
               onReset={reset}
             />
@@ -378,7 +646,7 @@ export function KioskApp() {
                   </div>
                   <div>
                     <p className="text-royal-gold text-xs font-semibold tracking-widest uppercase">
-                      Selected quest
+                      Approved quest
                     </p>
                     <p className="font-serif text-2xl font-bold">
                       {selected.title}
@@ -407,8 +675,8 @@ export function KioskApp() {
                 <div className="grid grid-cols-2 gap-3 mb-8">
                   {(
                     [
-                      { id: "girl", label: "Queen", icon: Crown },
-                      { id: "boy", label: "King", icon: Crown },
+                      { id: "girl" as const, label: "Queen" },
+                      { id: "boy" as const, label: "King" },
                     ] as const
                   ).map((opt) => {
                     const active = gender === opt.id;
@@ -451,7 +719,6 @@ export function KioskApp() {
           </motion.div>
         ) : null}
 
-        {/* PRODUCT */}
         {step === "product" && selected ? (
           <motion.div
             key="product"
@@ -463,7 +730,7 @@ export function KioskApp() {
           >
             <HeaderBar
               title={`What should ${childName.trim() || "they"} create?`}
-              eyebrow="Step 3 · Book & movie"
+              eyebrow="Step 4 · Book & movie"
               onBack={() => {
                 softClick();
                 setStep("name");
@@ -536,16 +803,18 @@ export function KioskApp() {
             <div className="pt-4 flex justify-center">
               <button
                 type="button"
-                onClick={confirmAll}
-                className="inline-flex h-14 min-w-[240px] items-center justify-center rounded-xl bg-royal-gold px-8 text-lg font-bold text-royal-blue hover:bg-[#D4B480]"
+                disabled={submitting}
+                onClick={() => {
+                  void confirmAll();
+                }}
+                className="inline-flex h-14 min-w-[240px] items-center justify-center rounded-xl bg-royal-gold px-8 text-lg font-bold text-royal-blue hover:bg-[#D4B480] disabled:opacity-60"
               >
-                Lock In Adventure
+                {submitting ? "Sending…" : "Lock In Adventure"}
               </button>
             </div>
           </motion.div>
         ) : null}
 
-        {/* CONFIRM */}
         {step === "confirm" && selected ? (
           <motion.div
             key="confirm"
@@ -577,8 +846,16 @@ export function KioskApp() {
                 <p className="font-serif text-xl sm:text-2xl text-royal-cream/90 mb-2">
                   {selected.title}
                 </p>
-                <p className="text-royal-cream/70 text-sm sm:text-base mb-6">
+                <p className="text-royal-cream/70 text-sm sm:text-base mb-2">
                   {productLabel(product)} · Tell a team member to begin
+                </p>
+                <p className="text-royal-cream/45 text-xs sm:text-sm mb-6">
+                  {emailStatus === "sent"
+                    ? "Sent to justinnassie@gmail.com"
+                    : emailStatus === "local"
+                      ? "Saved on this iPad" +
+                        (submitError ? ` · ${submitError}` : "")
+                      : null}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <button
