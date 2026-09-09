@@ -132,14 +132,14 @@ export function HeroSection() {
               </Link>
             </div>
 
-            <div className="flex flex-col gap-2 text-royal-cream/70 text-sm">
+            <div className="inline-flex flex-col gap-2 rounded-xl bg-royal-blue/80 backdrop-blur-md px-4 py-3 text-sm text-royal-cream ring-1 ring-royal-gold/25 shadow-lg shadow-black/20">
               <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-royal-gold shrink-0" />
-                <span>Premium studio in {SITE.location}</span>
+                <span className="font-medium">Premium studio in {SITE.location}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Heart className="h-4 w-4 text-royal-gold shrink-0" />
-                <span>Book · Movie · Memory they'll never outgrow</span>
+                <span className="font-medium">Book · Movie · Memory they'll never outgrow</span>
               </div>
             </div>
           </motion.div>
@@ -199,9 +199,6 @@ export function HeroSection() {
                 </button>
               </div>
             </div>
-            <p className="mt-3 text-center text-royal-cream/55 text-sm">
-              Autoplays muted · Tap play for full video with sound
-            </p>
           </motion.div>
         </div>
       </div>
