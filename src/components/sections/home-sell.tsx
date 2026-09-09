@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { ArrowRight, Film, BookOpen, Shirt, Share2, Star } from "lucide-react";
+import { ArrowRight, Film, BookOpen, Star } from "lucide-react";
 import { TESTIMONIALS, SITE } from "@/lib/constants";
 import { SectionOrnament } from "@/components/section-ornament";
 
@@ -194,37 +194,6 @@ export function HomeSellSection() {
                 </div>
               ))}
             </div>
-          </div>
-
-          <div className="mt-14 grid sm:grid-cols-3 gap-4 max-w-4xl mx-auto">
-            {[
-              {
-                icon: Share2,
-                title: "Share with family",
-                body: "Send grandma the digital book link the day it’s ready.",
-              },
-              {
-                icon: Film,
-                title: "Add the movie",
-                body: "Full-motion film after you approve every page.",
-              },
-              {
-                icon: Shirt,
-                title: "Kingdom tee",
-                body: "Optional merch from the approved white-tee art.",
-              },
-            ].map((item) => (
-              <div
-                key={item.title}
-                className="rounded-xl border border-royal-gold/20 bg-white p-5 text-center"
-              >
-                <item.icon className="h-5 w-5 text-royal-gold mx-auto mb-2" />
-                <p className="font-serif font-bold text-royal-blue mb-1">
-                  {item.title}
-                </p>
-                <p className="text-royal-blue/55 text-sm">{item.body}</p>
-              </div>
-            ))}
           </div>
         </div>
       </section>
