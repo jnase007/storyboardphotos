@@ -1167,7 +1167,7 @@ export function KioskApp() {
                     }}
                     className="inline-flex h-12 items-center justify-center rounded-md bg-royal-gold px-6 font-bold text-royal-blue hover:bg-[#D4B480]"
                   >
-                    Done · Next family
+                    All Done
                   </button>
                 </div>
               </div>
