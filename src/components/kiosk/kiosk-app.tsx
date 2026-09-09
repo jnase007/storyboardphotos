@@ -78,7 +78,7 @@ const QUEST_PREVIEW_FRAMES: Record<AdventurePathId, string[]> = {
   ],
 };
 
-type Step = "attract" | "choose" | "preview" | "name" | "product" | "confirm";
+type Step = "attract" | "name" | "choose" | "preview" | "product" | "confirm";
 type Gender = "girl" | "boy";
 type Product = "book" | "movie" | "both";
 
@@ -91,6 +91,29 @@ type KioskSelection = {
   product: Product;
   savedAt: string;
 };
+
+type ConfettiPiece = {
+  id: number;
+  left: number;
+  delay: number;
+  duration: number;
+  rotate: number;
+  color: string;
+  size: number;
+  drift: number;
+  shape: "rect" | "circle" | "ribbon";
+};
+
+const CONFETTI_COLORS = [
+  "#D4B07A",
+  "#F5E6C8",
+  "#FFE8A3",
+  "#FFFFFF",
+  "#C9A227",
+  "#E8C87A",
+  "#8B5CF6",
+  "#60A5FA",
+];
 
 function softClick(freq = 660) {
   try {
@@ -116,20 +139,122 @@ function softClick(freq = 660) {
   }
 }
 
+function celebrateTone() {
+  try {
+    const AudioCtx =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext })
+        .webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const notes = [523.25, 659.25, 783.99, 1046.5];
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "triangle";
+      osc.frequency.value = freq;
+      gain.gain.value = 0.03;
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      const t = ctx.currentTime + i * 0.08;
+      osc.start(t);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
+      osc.stop(t + 0.3);
+    });
+    window.setTimeout(() => ctx.close(), 900);
+  } catch {
+    // optional
+  }
+}
+
 function productLabel(product: Product) {
   if (product === "book") return "Storybook";
   if (product === "movie") return "Kingdom Movie";
   return "Storybook + Movie";
 }
 
-function storyBeats(path: AdventurePath) {
+function storyBeats(path: AdventurePath, childName: string, role: string) {
   return path.pages
     .filter((p) => p.page > 1)
     .slice(0, 5)
     .map((p) => ({
-      title: p.title,
-      text: p.text.replace(/\s+/g, " ").trim().slice(0, 160),
+      title: p.title
+        .replace(/\[Name\]/g, childName)
+        .replace(/\[Role\]/g, role),
+      text: p.text
+        .replace(/\[Name\]/g, childName)
+        .replace(/\[Role\]/g, role)
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 160),
     }));
+}
+
+function makeConfetti(count = 90): ConfettiPiece[] {
+  return Array.from({ length: count }, (_, id) => ({
+    id,
+    left: Math.random() * 100,
+    delay: Math.random() * 0.45,
+    duration: 2.4 + Math.random() * 1.8,
+    rotate: Math.random() * 720 - 360,
+    color: CONFETTI_COLORS[id % CONFETTI_COLORS.length],
+    size: 6 + Math.random() * 10,
+    drift: (Math.random() - 0.5) * 140,
+    shape: (["rect", "circle", "ribbon"] as const)[id % 3],
+  }));
+}
+
+function ConfettiBurst({ active }: { active: boolean }) {
+  const pieces = useMemo(() => (active ? makeConfetti(110) : []), [active]);
+  if (!active) return null;
+
+  return (
+    <div
+      className="pointer-events-none absolute inset-0 z-[80] overflow-hidden"
+      aria-hidden="true"
+    >
+      {pieces.map((p) => (
+        <motion.span
+          key={p.id}
+          initial={{
+            opacity: 1,
+            y: -40,
+            x: 0,
+            rotate: 0,
+            scale: 1,
+          }}
+          animate={{
+            opacity: [1, 1, 0],
+            y: ["0vh", "105vh"],
+            x: p.drift,
+            rotate: p.rotate,
+            scale: [1, 0.9],
+          }}
+          transition={{
+            duration: p.duration,
+            delay: p.delay,
+            ease: "easeIn",
+          }}
+          style={{
+            left: `${p.left}%`,
+            top: "-2%",
+            width: p.shape === "ribbon" ? p.size * 0.35 : p.size,
+            height: p.shape === "circle" ? p.size : p.size * 1.4,
+            backgroundColor: p.color,
+            borderRadius:
+              p.shape === "circle"
+                ? "999px"
+                : p.shape === "ribbon"
+                  ? "2px"
+                  : "2px",
+            position: "absolute",
+            display: "block",
+            boxShadow: "0 0 6px rgba(212,176,122,0.35)",
+          }}
+        />
+      ))}
+    </div>
+  );
 }
 
 export function KioskApp() {
@@ -146,9 +271,24 @@ export function KioskApp() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [emailStatus, setEmailStatus] = useState<"sent" | "local" | null>(null);
+  const [confettiOn, setConfettiOn] = useState(false);
   const attractVideoRef = useRef<HTMLVideoElement>(null);
+  const confettiTimer = useRef<number | null>(null);
 
   const bump = useCallback(() => setLastTouch(Date.now()), []);
+
+  const fireConfetti = useCallback(() => {
+    setConfettiOn(false);
+    // Remount burst so animation restarts cleanly
+    window.requestAnimationFrame(() => {
+      setConfettiOn(true);
+      celebrateTone();
+      if (confettiTimer.current) window.clearTimeout(confettiTimer.current);
+      confettiTimer.current = window.setTimeout(() => {
+        setConfettiOn(false);
+      }, 4200);
+    });
+  }, []);
 
   const reset = useCallback(() => {
     setSelected(null);
@@ -159,6 +299,7 @@ export function KioskApp() {
     setSubmitting(false);
     setSubmitError(null);
     setEmailStatus(null);
+    setConfettiOn(false);
     setStep("attract");
     setStaffOpen(false);
     bump();
@@ -183,6 +324,12 @@ export function KioskApp() {
     }, 4_000);
     return () => window.clearInterval(id);
   }, [lastTouch, step, reset]);
+
+  useEffect(() => {
+    return () => {
+      if (confettiTimer.current) window.clearTimeout(confettiTimer.current);
+    };
+  }, []);
 
   useEffect(() => {
     let lock: { release: () => void } | null = null;
@@ -272,6 +419,11 @@ export function KioskApp() {
     };
     saveSelection(sel);
 
+    // Celebrate immediately — don't wait on email
+    fireConfetti();
+    setStep("confirm");
+    bump();
+
     try {
       const res = await fetch("/api/kiosk/submit", {
         method: "POST",
@@ -304,15 +456,18 @@ export function KioskApp() {
     }
 
     setSubmitting(false);
-    setStep("confirm");
-    bump();
   };
 
   const role = gender === "girl" ? "Queen" : "King";
+  const heroLabel = childName.trim()
+    ? `${role} ${childName.trim()}`
+    : role;
   const frames = selected
     ? QUEST_PREVIEW_FRAMES[selected.id] || [QUEST_ART[selected.id]]
     : [];
-  const beats = selected ? storyBeats(selected) : [];
+  const beats = selected
+    ? storyBeats(selected, childName.trim() || "the hero", role)
+    : [];
 
   return (
     <div
@@ -324,6 +479,8 @@ export function KioskApp() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(212,176,122,0.16),transparent_55%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(74,53,104,0.35),transparent_45%)]" />
       </div>
+
+      <ConfettiBurst active={confettiOn} />
 
       <button
         type="button"
@@ -394,7 +551,7 @@ export function KioskApp() {
             className="absolute inset-0 z-10 overflow-hidden"
             onClick={() => {
               softClick();
-              setStep("choose");
+              setStep("name");
               bump();
             }}
           >
@@ -422,13 +579,97 @@ export function KioskApp() {
                 <span className="block text-gradient-gold-shine">Adventure</span>
               </h1>
               <p className="mt-5 max-w-xl text-base sm:text-xl text-royal-cream/80 leading-relaxed">
-                Preview the story. Enter a name. Create the book & movie.
+                Meet the hero. Pick the quest. Create the book & movie.
               </p>
               <div className="mt-8 inline-flex items-center justify-center rounded-full bg-royal-gold px-10 py-5 text-xl font-bold text-royal-blue shadow-xl shadow-black/40 animate-pulse">
                 Touch to Begin
               </div>
             </div>
           </motion.button>
+        ) : null}
+
+        {/* NAME first — so quest cards / previews can personalize boy/girl packs */}
+        {step === "name" ? (
+          <motion.div
+            key="name"
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.35 }}
+            className="absolute inset-0 z-10 flex flex-col px-4 sm:px-8 py-4 sm:py-6"
+          >
+            <HeaderBar
+              title="Who is the hero?"
+              eyebrow="Step 1 · Name & crown"
+              onBack={reset}
+              onReset={reset}
+            />
+
+            <div className="flex-1 min-h-0 flex items-center justify-center">
+              <div className="w-full max-w-2xl rounded-3xl border border-royal-gold/30 bg-white/5 p-6 sm:p-8 backdrop-blur-md shadow-2xl">
+                <label className="block text-sm font-semibold text-royal-cream/70 mb-2">
+                  Child's first name
+                </label>
+                <input
+                  value={childName}
+                  onChange={(e) => {
+                    setChildName(e.target.value);
+                    bump();
+                  }}
+                  placeholder="Type their name"
+                  autoCapitalize="words"
+                  autoCorrect="off"
+                  className="w-full h-16 rounded-xl border border-royal-gold/30 bg-[#0b1524]/70 px-5 text-2xl font-serif text-royal-cream placeholder:text-royal-cream/30 outline-none focus:border-royal-gold focus:ring-2 focus:ring-royal-gold/30"
+                />
+
+                <p className="mt-6 mb-3 text-sm font-semibold text-royal-cream/70">
+                  They are a…
+                </p>
+                <div className="grid grid-cols-2 gap-3 mb-8">
+                  {(
+                    [
+                      { id: "girl" as const, label: "Queen" },
+                      { id: "boy" as const, label: "King" },
+                    ] as const
+                  ).map((opt) => {
+                    const active = gender === opt.id;
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => {
+                          softClick(600);
+                          setGender(opt.id);
+                          bump();
+                        }}
+                        className={`h-16 rounded-xl border text-lg font-bold transition-all ${
+                          active
+                            ? "border-royal-gold bg-royal-gold text-royal-blue"
+                            : "border-royal-gold/30 bg-white/5 text-royal-cream hover:bg-white/10"
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <button
+                  type="button"
+                  disabled={childName.trim().length < 2}
+                  onClick={() => {
+                    if (childName.trim().length < 2) return;
+                    softClick(760);
+                    setStep("choose");
+                    bump();
+                  }}
+                  className="inline-flex h-14 w-full items-center justify-center rounded-xl bg-royal-gold text-lg font-bold text-royal-blue disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#D4B480]"
+                >
+                  Choose {childName.trim() || "their"} adventure
+                </button>
+              </div>
+            </div>
+          </motion.div>
         ) : null}
 
         {step === "choose" ? (
@@ -441,9 +682,12 @@ export function KioskApp() {
             className="absolute inset-0 z-10 flex flex-col px-4 sm:px-7 py-4 sm:py-6"
           >
             <HeaderBar
-              title="Which adventure calls to you?"
-              eyebrow="Step 1 · Choose your quest"
-              onBack={reset}
+              title={`Which adventure calls to ${heroLabel}?`}
+              eyebrow="Step 2 · Choose your quest"
+              onBack={() => {
+                softClick();
+                setStep("name");
+              }}
               onReset={reset}
             />
 
@@ -492,7 +736,6 @@ export function KioskApp() {
           </motion.div>
         ) : null}
 
-        {/* PREVIEW — story trailer + summary, approve or go back */}
         {step === "preview" && selected ? (
           <motion.div
             key="preview"
@@ -503,8 +746,8 @@ export function KioskApp() {
             className="absolute inset-0 z-10 flex flex-col px-4 sm:px-7 py-4 sm:py-5"
           >
             <HeaderBar
-              title={selected.title}
-              eyebrow="Step 2 · Preview this story"
+              title={`${heroLabel}'s ${selected.label}`}
+              eyebrow="Step 3 · Preview this story"
               onBack={() => {
                 softClick();
                 setSelected(null);
@@ -599,7 +842,7 @@ export function KioskApp() {
                     type="button"
                     onClick={() => {
                       softClick(780);
-                      setStep("name");
+                      setStep("product");
                       bump();
                     }}
                     className="inline-flex h-14 items-center justify-center gap-2 rounded-xl bg-royal-gold px-4 text-base font-bold text-royal-blue hover:bg-[#D4B480]"
@@ -608,112 +851,6 @@ export function KioskApp() {
                     Yes — this is the one
                   </button>
                 </div>
-              </div>
-            </div>
-          </motion.div>
-        ) : null}
-
-        {step === "name" && selected ? (
-          <motion.div
-            key="name"
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.35 }}
-            className="absolute inset-0 z-10 flex flex-col px-4 sm:px-8 py-4 sm:py-6"
-          >
-            <HeaderBar
-              title="Who is the hero?"
-              eyebrow={`Step 3 · ${selected.label}`}
-              onBack={() => {
-                softClick();
-                setStep("preview");
-              }}
-              onReset={reset}
-            />
-
-            <div className="flex-1 min-h-0 flex items-center justify-center">
-              <div className="w-full max-w-2xl rounded-3xl border border-royal-gold/30 bg-white/5 p-6 sm:p-8 backdrop-blur-md shadow-2xl">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="relative h-20 w-20 overflow-hidden rounded-2xl border border-royal-gold/40 shrink-0">
-                    <Image
-                      src={QUEST_ART[selected.id]}
-                      alt=""
-                      fill
-                      className="object-cover"
-                      sizes="80px"
-                    />
-                  </div>
-                  <div>
-                    <p className="text-royal-gold text-xs font-semibold tracking-widest uppercase">
-                      Approved quest
-                    </p>
-                    <p className="font-serif text-2xl font-bold">
-                      {selected.title}
-                    </p>
-                  </div>
-                </div>
-
-                <label className="block text-sm font-semibold text-royal-cream/70 mb-2">
-                  Child's first name
-                </label>
-                <input
-                  value={childName}
-                  onChange={(e) => {
-                    setChildName(e.target.value);
-                    bump();
-                  }}
-                  placeholder="Type their name"
-                  autoCapitalize="words"
-                  autoCorrect="off"
-                  className="w-full h-16 rounded-xl border border-royal-gold/30 bg-[#0b1524]/70 px-5 text-2xl font-serif text-royal-cream placeholder:text-royal-cream/30 outline-none focus:border-royal-gold focus:ring-2 focus:ring-royal-gold/30"
-                />
-
-                <p className="mt-6 mb-3 text-sm font-semibold text-royal-cream/70">
-                  They are a…
-                </p>
-                <div className="grid grid-cols-2 gap-3 mb-8">
-                  {(
-                    [
-                      { id: "girl" as const, label: "Queen" },
-                      { id: "boy" as const, label: "King" },
-                    ] as const
-                  ).map((opt) => {
-                    const active = gender === opt.id;
-                    return (
-                      <button
-                        key={opt.id}
-                        type="button"
-                        onClick={() => {
-                          softClick(600);
-                          setGender(opt.id);
-                          bump();
-                        }}
-                        className={`h-16 rounded-xl border text-lg font-bold transition-all ${
-                          active
-                            ? "border-royal-gold bg-royal-gold text-royal-blue"
-                            : "border-royal-gold/30 bg-white/5 text-royal-cream hover:bg-white/10"
-                        }`}
-                      >
-                        {opt.label}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <button
-                  type="button"
-                  disabled={childName.trim().length < 2}
-                  onClick={() => {
-                    if (childName.trim().length < 2) return;
-                    softClick(760);
-                    setStep("product");
-                    bump();
-                  }}
-                  className="inline-flex h-14 w-full items-center justify-center rounded-xl bg-royal-gold text-lg font-bold text-royal-blue disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#D4B480]"
-                >
-                  Continue
-                </button>
               </div>
             </div>
           </motion.div>
@@ -733,7 +870,7 @@ export function KioskApp() {
               eyebrow="Step 4 · Book & movie"
               onBack={() => {
                 softClick();
-                setStep("name");
+                setStep("preview");
               }}
               onReset={reset}
             />
@@ -809,7 +946,7 @@ export function KioskApp() {
                 }}
                 className="inline-flex h-14 min-w-[240px] items-center justify-center rounded-xl bg-royal-gold px-8 text-lg font-bold text-royal-blue hover:bg-[#D4B480] disabled:opacity-60"
               >
-                {submitting ? "Sending…" : "Lock In Adventure"}
+                {submitting ? "Locking in…" : "Lock In Adventure"}
               </button>
             </div>
           </motion.div>
@@ -818,10 +955,10 @@ export function KioskApp() {
         {step === "confirm" && selected ? (
           <motion.div
             key="confirm"
-            initial={{ opacity: 0, scale: 0.98 }}
+            initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.4 }}
+            transition={{ duration: 0.45, type: "spring", stiffness: 180 }}
             className="absolute inset-0 z-10 flex flex-col items-center justify-center px-5 text-center"
           >
             <div className="relative w-full max-w-3xl overflow-hidden rounded-3xl border border-royal-gold/40 shadow-2xl">
@@ -837,9 +974,13 @@ export function KioskApp() {
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0b1524] via-[#0b1524]/55 to-transparent" />
               </div>
               <div className="absolute inset-x-0 bottom-0 p-6 sm:p-10">
-                <p className="text-royal-gold font-semibold tracking-[0.18em] uppercase text-xs sm:text-sm mb-2">
-                  Adventure locked
-                </p>
+                <motion.p
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-royal-gold font-semibold tracking-[0.18em] uppercase text-xs sm:text-sm mb-2"
+                >
+                  ✨ Adventure locked!
+                </motion.p>
                 <h2 className="font-serif text-3xl sm:text-5xl font-bold mb-2">
                   {role} {childName}
                 </h2>
@@ -855,13 +996,14 @@ export function KioskApp() {
                     : emailStatus === "local"
                       ? "Saved on this iPad" +
                         (submitError ? ` · ${submitError}` : "")
-                      : null}
+                      : "Saving…"}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <button
                     type="button"
                     onClick={() => {
                       softClick();
+                      setConfettiOn(false);
                       setStep("product");
                     }}
                     className="inline-flex h-12 items-center justify-center rounded-md border border-royal-gold/40 bg-white/5 px-6 font-semibold hover:bg-white/10"
