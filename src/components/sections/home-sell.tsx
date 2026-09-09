@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight, Film, BookOpen, Shirt, Share2, Star } from "lucide-react";
-import { PRICING_PACKAGES, TESTIMONIALS, SITE } from "@/lib/constants";
+import { TESTIMONIALS, SITE } from "@/lib/constants";
 import { SectionOrnament } from "@/components/section-ornament";
 
 /** Queen River gold cut — full-motion sales sample (best current homepage demo). */
@@ -118,93 +118,6 @@ export function HomeSellSection() {
                 Real personalized Kingdom Quest · your child is the hero
               </p>
             </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Price anchor */}
-      <section className="relative py-20 sm:py-24 bg-enchanted-cream">
-        <div className="container mx-auto px-4 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <p className="text-royal-gold font-medium tracking-widest uppercase text-sm mb-3">
-              Simple packages
-            </p>
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-royal-blue mb-4">
-              Books from $299 · Movies $199–$299
-            </h2>
-            <p className="text-royal-blue/60 text-lg">
-              Transparent Storybook Photos pricing — studio session, hardcover
-              keepsake, and optional animated movie.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-5 max-w-5xl mx-auto mb-10">
-            {PRICING_PACKAGES.map((pkg) => (
-              <div
-                key={pkg.id}
-                className={`rounded-2xl p-6 border ${
-                  pkg.popular
-                    ? "bg-royal-blue border-royal-gold text-royal-cream shadow-lg"
-                    : "bg-white border-royal-gold/25"
-                }`}
-              >
-                {pkg.popular ? (
-                  <p className="text-royal-gold text-xs font-bold uppercase tracking-wider mb-2">
-                    Most popular
-                  </p>
-                ) : null}
-                <h3
-                  className={`font-serif text-xl font-bold mb-1 ${
-                    pkg.popular ? "text-royal-cream" : "text-royal-blue"
-                  }`}
-                >
-                  {pkg.name}
-                </h3>
-                <p
-                  className={`font-serif text-3xl font-bold mb-3 ${
-                    pkg.popular ? "text-royal-gold" : "text-royal-blue"
-                  }`}
-                >
-                  ${pkg.price}
-                </p>
-                <p
-                  className={`text-sm leading-relaxed mb-4 ${
-                    pkg.popular ? "text-royal-cream/70" : "text-royal-blue/60"
-                  }`}
-                >
-                  {pkg.description}
-                </p>
-                <Link
-                  href={`/book?package=${pkg.id}`}
-                  className={`inline-flex h-11 w-full items-center justify-center gap-2 rounded-md text-sm font-semibold ${
-                    pkg.popular
-                      ? "bg-royal-gold text-royal-blue hover:bg-[#D4B480]"
-                      : "bg-royal-blue text-royal-cream hover:bg-royal-purple"
-                  }`}
-                >
-                  Book now
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </div>
-            ))}
-          </div>
-
-          <div className="max-w-3xl mx-auto rounded-2xl border border-royal-gold/30 bg-white p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <p className="font-serif text-xl font-bold text-royal-blue">
-                Animated Kingdom Movie
-              </p>
-              <p className="text-royal-blue/60 text-sm mt-1">
-                Full-motion story film · Standard $199–$249 · Premium $299
-              </p>
-            </div>
-            <Link
-              href="/pricing"
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-royal-gold/40 px-5 text-sm font-semibold text-royal-blue hover:bg-royal-cream"
-            >
-              Full pricing
-              <ArrowRight className="h-4 w-4" />
-            </Link>
           </div>
         </div>
       </section>
