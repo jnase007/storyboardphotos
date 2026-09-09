@@ -95,13 +95,16 @@ type KioskSelection = {
 type ConfettiPiece = {
   id: number;
   left: number;
+  top: number;
   delay: number;
   duration: number;
   rotate: number;
   color: string;
   size: number;
-  drift: number;
-  shape: "rect" | "circle" | "ribbon";
+  driftX: number;
+  driftY: number;
+  shape: "rect" | "circle" | "ribbon" | "star";
+  origin: "top" | "left" | "right" | "center";
 };
 
 const CONFETTI_COLORS = [
@@ -111,8 +114,14 @@ const CONFETTI_COLORS = [
   "#FFFFFF",
   "#C9A227",
   "#E8C87A",
+  "#FFD700",
+  "#FF9F1C",
+  "#FF6B9D",
   "#8B5CF6",
   "#60A5FA",
+  "#34D399",
+  "#F472B6",
+  "#A78BFA",
 ];
 
 function softClick(freq = 660) {
@@ -147,21 +156,36 @@ function celebrateTone() {
         .webkitAudioContext;
     if (!AudioCtx) return;
     const ctx = new AudioCtx();
-    const notes = [523.25, 659.25, 783.99, 1046.5];
-    notes.forEach((freq, i) => {
+    // Big fanfare + sparkle cascade
+    const fanfare = [392, 523.25, 659.25, 783.99, 1046.5, 1318.5];
+    fanfare.forEach((freq, i) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      osc.type = "triangle";
+      osc.type = i % 2 === 0 ? "triangle" : "sine";
       osc.frequency.value = freq;
-      gain.gain.value = 0.03;
+      gain.gain.value = 0.045;
       osc.connect(gain);
       gain.connect(ctx.destination);
-      const t = ctx.currentTime + i * 0.08;
+      const t = ctx.currentTime + i * 0.07;
       osc.start(t);
-      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
-      osc.stop(t + 0.3);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
+      osc.stop(t + 0.38);
     });
-    window.setTimeout(() => ctx.close(), 900);
+    // Second wave sparkles
+    [1568, 1318.5, 1760, 2093].forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.value = freq;
+      gain.gain.value = 0.025;
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      const t = ctx.currentTime + 0.5 + i * 0.06;
+      osc.start(t);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
+      osc.stop(t + 0.25);
+    });
+    window.setTimeout(() => ctx.close(), 1600);
   } catch {
     // optional
   }
@@ -190,22 +214,103 @@ function storyBeats(path: AdventurePath, childName: string, role: string) {
     }));
 }
 
-function makeConfetti(count = 90): ConfettiPiece[] {
-  return Array.from({ length: count }, (_, id) => ({
-    id,
-    left: Math.random() * 100,
-    delay: Math.random() * 0.45,
-    duration: 2.4 + Math.random() * 1.8,
-    rotate: Math.random() * 720 - 360,
-    color: CONFETTI_COLORS[id % CONFETTI_COLORS.length],
-    size: 6 + Math.random() * 10,
-    drift: (Math.random() - 0.5) * 140,
-    shape: (["rect", "circle", "ribbon"] as const)[id % 3],
-  }));
+function makeConfettiWave(
+  count: number,
+  origin: ConfettiPiece["origin"],
+  idOffset: number,
+  delayBase = 0
+): ConfettiPiece[] {
+  const shapes: ConfettiPiece["shape"][] = [
+    "rect",
+    "circle",
+    "ribbon",
+    "star",
+    "rect",
+    "circle",
+  ];
+  return Array.from({ length: count }, (_, i) => {
+    const id = idOffset + i;
+    if (origin === "top") {
+      return {
+        id,
+        left: Math.random() * 100,
+        top: -4 - Math.random() * 8,
+        delay: delayBase + Math.random() * 0.55,
+        duration: 2.8 + Math.random() * 2.4,
+        rotate: Math.random() * 1080 - 540,
+        color: CONFETTI_COLORS[id % CONFETTI_COLORS.length],
+        size: 8 + Math.random() * 16,
+        driftX: (Math.random() - 0.5) * 220,
+        driftY: 110 + Math.random() * 20,
+        shape: shapes[id % shapes.length],
+        origin,
+      };
+    }
+    if (origin === "left") {
+      return {
+        id,
+        left: -2 - Math.random() * 4,
+        top: 15 + Math.random() * 55,
+        delay: delayBase + Math.random() * 0.35,
+        duration: 2.2 + Math.random() * 1.6,
+        rotate: Math.random() * 900,
+        color: CONFETTI_COLORS[id % CONFETTI_COLORS.length],
+        size: 7 + Math.random() * 14,
+        driftX: 40 + Math.random() * 70,
+        driftY: -10 + Math.random() * 70,
+        shape: shapes[id % shapes.length],
+        origin,
+      };
+    }
+    if (origin === "right") {
+      return {
+        id,
+        left: 102 + Math.random() * 4,
+        top: 15 + Math.random() * 55,
+        delay: delayBase + Math.random() * 0.35,
+        duration: 2.2 + Math.random() * 1.6,
+        rotate: -(Math.random() * 900),
+        color: CONFETTI_COLORS[id % CONFETTI_COLORS.length],
+        size: 7 + Math.random() * 14,
+        driftX: -(40 + Math.random() * 70),
+        driftY: -10 + Math.random() * 70,
+        shape: shapes[id % shapes.length],
+        origin,
+      };
+    }
+    // center burst upward then fall
+    return {
+      id,
+      left: 42 + Math.random() * 16,
+      top: 48 + Math.random() * 12,
+      delay: delayBase + Math.random() * 0.2,
+      duration: 2.4 + Math.random() * 1.8,
+      rotate: Math.random() * 1200 - 600,
+      color: CONFETTI_COLORS[id % CONFETTI_COLORS.length],
+      size: 9 + Math.random() * 18,
+      driftX: (Math.random() - 0.5) * 160,
+      driftY: -(35 + Math.random() * 45),
+      shape: shapes[id % shapes.length],
+      origin,
+    };
+  });
+}
+
+function makeConfetti(): ConfettiPiece[] {
+  // Full party: sky rain + side cannons + center explosion + encore rain
+  return [
+    ...makeConfettiWave(120, "top", 0, 0),
+    ...makeConfettiWave(55, "left", 200, 0.05),
+    ...makeConfettiWave(55, "right", 300, 0.05),
+    ...makeConfettiWave(70, "center", 400, 0.08),
+    ...makeConfettiWave(90, "top", 500, 0.75), // second sky wave
+    ...makeConfettiWave(40, "left", 600, 0.9),
+    ...makeConfettiWave(40, "right", 700, 0.9),
+  ];
 }
 
 function ConfettiBurst({ active }: { active: boolean }) {
-  const pieces = useMemo(() => (active ? makeConfetti(110) : []), [active]);
+  const pieces = useMemo(() => (active ? makeConfetti() : []), [active]);
   if (!active) return null;
 
   return (
@@ -213,46 +318,90 @@ function ConfettiBurst({ active }: { active: boolean }) {
       className="pointer-events-none absolute inset-0 z-[80] overflow-hidden"
       aria-hidden="true"
     >
-      {pieces.map((p) => (
-        <motion.span
-          key={p.id}
-          initial={{
-            opacity: 1,
-            y: -40,
-            x: 0,
-            rotate: 0,
-            scale: 1,
-          }}
-          animate={{
-            opacity: [1, 1, 0],
-            y: ["0vh", "105vh"],
-            x: p.drift,
-            rotate: p.rotate,
-            scale: [1, 0.9],
-          }}
-          transition={{
-            duration: p.duration,
-            delay: p.delay,
-            ease: "easeIn",
-          }}
-          style={{
-            left: `${p.left}%`,
-            top: "-2%",
-            width: p.shape === "ribbon" ? p.size * 0.35 : p.size,
-            height: p.shape === "circle" ? p.size : p.size * 1.4,
-            backgroundColor: p.color,
-            borderRadius:
-              p.shape === "circle"
-                ? "999px"
-                : p.shape === "ribbon"
-                  ? "2px"
-                  : "2px",
-            position: "absolute",
-            display: "block",
-            boxShadow: "0 0 6px rgba(212,176,122,0.35)",
-          }}
-        />
-      ))}
+      {/* Bright flash + gold glow on lock-in */}
+      <motion.div
+        className="absolute inset-0"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: [0, 0.65, 0.2, 0] }}
+        transition={{ duration: 1.25, ease: "easeOut" }}
+        style={{
+          background:
+            "radial-gradient(circle at 50% 40%, rgba(255,230,150,0.95), rgba(212,176,122,0.4) 35%, transparent 70%)",
+        }}
+      />
+
+      {pieces.map((p) => {
+        const isCenter = p.origin === "center";
+        const isSide = p.origin === "left" || p.origin === "right";
+        const fallDistance =
+          typeof window !== "undefined" ? window.innerHeight * 1.2 : 900;
+
+        let yAnim: number[];
+        let xAnim: number[];
+        if (isCenter) {
+          yAnim = [0, p.driftY * 10, p.driftY * 10 + fallDistance * 0.85];
+          xAnim = [0, p.driftX * 3, p.driftX * 5];
+        } else if (p.origin === "top") {
+          yAnim = [-20, fallDistance];
+          xAnim = [0, p.driftX, p.driftX * 1.35];
+        } else {
+          // side cannons shoot inward then fall
+          yAnim = [0, p.driftY * 6 - 80, fallDistance * 0.7];
+          xAnim = [0, p.driftX * 5, p.driftX * 7];
+        }
+
+        return (
+          <motion.span
+            key={p.id}
+            initial={{
+              opacity: 0,
+              y: 0,
+              x: 0,
+              rotate: 0,
+              scale: 0.35,
+            }}
+            animate={{
+              opacity: [0, 1, 1, 0.9, 0],
+              y: yAnim,
+              x: xAnim,
+              rotate: [0, p.rotate * 0.45, p.rotate],
+              scale: [0.35, 1.2, 1, 0.8],
+            }}
+            transition={{
+              duration: p.duration,
+              delay: p.delay,
+              ease: isCenter || isSide ? "easeOut" : "easeIn",
+              times: [0, 0.1, 0.45, 0.75, 1],
+            }}
+            style={{
+              left: `${p.left}%`,
+              top: `${p.top}%`,
+              width:
+                p.shape === "ribbon"
+                  ? Math.max(3, p.size * 0.28)
+                  : p.shape === "star"
+                    ? p.size * 0.95
+                    : p.size,
+              height:
+                p.shape === "circle"
+                  ? p.size
+                  : p.shape === "star"
+                    ? p.size * 0.95
+                    : p.size * (p.shape === "ribbon" ? 2.3 : 1.5),
+              backgroundColor: p.color,
+              borderRadius: p.shape === "circle" ? "999px" : "2px",
+              position: "absolute",
+              display: "block",
+              boxShadow: `0 0 ${10 + p.size / 2}px ${p.color}aa`,
+              clipPath:
+                p.shape === "star"
+                  ? "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)"
+                  : undefined,
+              transformOrigin: "center",
+            }}
+          />
+        );
+      })}
     </div>
   );
 }
@@ -286,7 +435,7 @@ export function KioskApp() {
       if (confettiTimer.current) window.clearTimeout(confettiTimer.current);
       confettiTimer.current = window.setTimeout(() => {
         setConfettiOn(false);
-      }, 4200);
+      }, 7000);
     });
   }, []);
 
