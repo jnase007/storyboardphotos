@@ -13,7 +13,9 @@ export function SiteChrome({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   // /book/abc-123 → hide chrome; /book → keep nav
   const isBookViewer = /^\/book\/[^/]+/.test(pathname);
+  // Full-screen in-studio kiosk — no marketing chrome
+  const isKiosk = pathname === "/kiosk" || pathname.startsWith("/kiosk/");
 
-  if (isBookViewer) return null;
+  if (isBookViewer || isKiosk) return null;
   return <>{children}</>;
 }

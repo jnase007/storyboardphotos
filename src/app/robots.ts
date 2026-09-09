@@ -1,44 +1,53 @@
 import type { MetadataRoute } from "next";
 import { SITE } from "@/lib/constants";
 
+const DISALLOW = [
+  "/admin",
+  "/admin/",
+  "/api/",
+  "/business-plan",
+  "/business-plan/",
+  "/kiosk",
+  "/kiosk/",
+];
+
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/admin", "/admin/", "/api/", "/business-plan", "/business-plan/"],
+        disallow: DISALLOW,
       },
-      // AI crawlers — allow public content for AEO citations
       {
         userAgent: "GPTBot",
         allow: "/",
-        disallow: ["/admin", "/admin/", "/api/", "/business-plan", "/business-plan/"],
+        disallow: DISALLOW,
       },
       {
         userAgent: "ChatGPT-User",
         allow: "/",
-        disallow: ["/admin", "/admin/", "/api/", "/business-plan", "/business-plan/"],
+        disallow: DISALLOW,
       },
       {
         userAgent: "Google-Extended",
         allow: "/",
-        disallow: ["/admin", "/admin/", "/api/", "/business-plan", "/business-plan/"],
+        disallow: DISALLOW,
       },
       {
         userAgent: "PerplexityBot",
         allow: "/",
-        disallow: ["/admin", "/admin/", "/api/", "/business-plan", "/business-plan/"],
+        disallow: DISALLOW,
       },
       {
         userAgent: "ClaudeBot",
         allow: "/",
-        disallow: ["/admin", "/admin/", "/api/", "/business-plan", "/business-plan/"],
+        disallow: DISALLOW,
       },
       {
         userAgent: "Applebot-Extended",
         allow: "/",
-        disallow: ["/admin", "/admin/", "/api/", "/business-plan", "/business-plan/"],
+        disallow: DISALLOW,
       },
     ],
     sitemap: `${SITE.url}/sitemap.xml`,
