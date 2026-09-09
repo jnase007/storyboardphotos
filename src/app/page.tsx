@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { HeroSection } from "@/components/sections/hero";
+import { CurateMomentsSection } from "@/components/sections/curate-moments";
 import { HomeSellSection } from "@/components/sections/home-sell";
 import { BreadcrumbStructuredData } from "@/components/structured-data";
 import { SITE } from "@/lib/constants";
@@ -17,6 +18,7 @@ export default function HomePage() {
     <>
       <BreadcrumbStructuredData items={[{ name: "Home", path: "/" }]} />
       <HeroSection />
+      <CurateMomentsSection />
       <HomeSellSection />
     </>
   );
