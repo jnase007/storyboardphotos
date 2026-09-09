@@ -3,8 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, MapPin, Heart, Play, Volume2, VolumeX } from "lucide-react";
-import { SITE } from "@/lib/constants";
+import { ArrowRight, Play, Volume2, VolumeX } from "lucide-react";
 import { EnchantEmbers } from "@/components/enchant-embers";
 import {
   Dialog,
@@ -116,7 +115,7 @@ export function HeroSection() {
               adventure they'll never forget.
             </p>
 
-            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 mb-8">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4">
               <Link
                 href="/book"
                 className="inline-flex h-12 w-full sm:w-auto items-center justify-center gap-2 rounded-md bg-royal-gold px-8 text-base font-semibold text-royal-blue glow-gold transition-all hover:bg-[#D4B480] hover:scale-[1.02]"
@@ -130,17 +129,6 @@ export function HeroSection() {
               >
                 Books from $299
               </Link>
-            </div>
-
-            <div className="inline-flex flex-col gap-2 rounded-xl bg-royal-blue/80 backdrop-blur-md px-4 py-3 text-sm text-royal-cream ring-1 ring-royal-gold/25 shadow-lg shadow-black/20">
-              <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-royal-gold shrink-0" />
-                <span className="font-medium">Premium studio in {SITE.location}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Heart className="h-4 w-4 text-royal-gold shrink-0" />
-                <span className="font-medium">Book · Movie · Memory they'll never outgrow</span>
-              </div>
             </div>
           </motion.div>
 
