@@ -7,19 +7,22 @@ export const BP_ADVANTAGES = [
   "Strong emotional appeal and high perceived value",
 ] as const;
 
+/** Locked to live site pricing (`src/lib/constants.ts` PRICING_PACKAGES) — 2026-09-20 */
 export const BP_REVENUE_POINTS = [
-  "Session packages starting at $450 (2 kingdom sets included)",
-  "Mid and premium tiers at $750 and $1,200 for deeper set coverage + storybooks",
-  "High-margin upsells: fine art prints, digital files, and Kingdom Chronicles (starting at $3,000)",
-  "Digital-only storybooks for instant high-margin revenue",
+  "Public packages: Kingdom Chronicles $299 · Royal Portrait Album $299 · Royal Collection (both) $499",
+  "Session length: 45 min single-book · 60 min Royal Collection (siblings stay in the same window)",
+  "Storybook / portrait book INCLUDED in package — not a $3,000 surprise add-on",
+  "High-margin upsells: digital download $49, extra hardcover $45, teaser/movie $149–$299, fine art prints",
 ] as const;
 
 export const BP_GROWTH = [
-  "Instagram + local Christian mom groups marketing",
-  "Church partnerships",
-  "AI-powered fast digital storybooks",
-  "Phase 1 weekend birthday parties (second revenue stream before tea house)",
-  "Expand days/staff in Year 2",
+  "GTM lock (2026-09-20): pricing $299/$299/$499 · ROYAL30 · Fri/Sat office · moms 3–8 primary",
+  "Meta + OC mom groups + grandparent gift angle; deposit to hold calendar",
+  "Cause: $25/session to Olive Crest OC + Royal Five gifted foster/waiting-kid sessions (humanity proof)",
+  "Instagram/Facebook proof from real beta + partner shoots (with release only)",
+  "Church foster/Safe Families/FosterAll referrals for gift seats; paid moms stay the revenue engine",
+  "Phase 1 weekend birthday add-ons later; retail only after CAC + ticket gates",
+  "Expand days/staff in Year 2 after beta economics clear",
 ] as const;
 
 export const BP_RISKS = [
@@ -80,7 +83,7 @@ export const BP_PRINT_PARTNERS = [
 export const BP_STORYBOOK_APIS = [
   {
     api: "Image Generation",
-    purpose: "Watercolor scenes + character likeness",
+    purpose: "Coloring-book quest scenes + character likeness (portraits remain photo)",
     provider: "Google Imagen 4.0 + Gemini image (primary) · fal.ai Flux PuLID / Bria (likeness + BG remove)",
     cost: "$0.40 – $2.50",
   },
@@ -102,7 +105,8 @@ export const BP_STORYBOOK_AI_COST_TOTAL =
   "Total estimated AI cost per book: $0.50 – $3.00 (still very cheap vs $299–$849 packages)";
 
 export const BP_FULFILLMENT_PROCESS = [
-  "AI-generated personalized story (Grok/Claude or scripted adventure path) + watercolor illustrations (Imagen 4 / Gemini / fal.ai likeness)",
+  "AI-generated personalized story (Grok/Claude or scripted adventure path) + coloring-book style illustrations with child likeness (Imagen / Gemini / fal.ai) — portraits stay premium photo; quest pages stay line-art, not photoreal",
+
   "Human editing & curation",
   "Professional printing via Mpix on archival paper / hardcover photo books",
   "Digital PDF delivery option for instant high-margin revenue",
@@ -574,15 +578,15 @@ export const BP_AVG_CUSTOMER_SPEND = {
   competitorRange: "$1,000–$3,000+",
   competitorNote:
     "Enchanted Fairies-style studios often average ~$1,300 per family after a high-pressure ordering appointment (storybook often $3,000+ extra).",
-  ourTargetAvg: 650,
-  ourRange: "$450–$900 typical · path to $1,000+ with prints",
+  ourTargetAvg: 420,
+  ourRange: "$299–$499 core packages · path to $700–$1,000+ with digital, extras, prints, movie",
   ourNote:
-    "Transparent packages + sibling scale + optional prints. Win trust first; grow average without bait-and-switch.",
+    "Transparent packages + optional add-ons. Win trust first; grow average without bait-and-switch. Live ladder locked Sep 2026.",
   mix: [
-    { label: "Solo / single book", share: "≈40%", ticket: "$299–$349" },
-    { label: "Both books / stronger package", share: "≈20%", ticket: "≈$499" },
-    { label: "Sibling (2 kids)", share: "≈30%", ticket: "≈$549" },
-    { label: "Family (3 kids)", share: "≈10%", ticket: "≈$849" },
+    { label: "Kingdom Chronicles (storybook)", share: "≈35%", ticket: "$299" },
+    { label: "Royal Portrait Album", share: "≈20%", ticket: "$299" },
+    { label: "Royal Collection (both books)", share: "≈35%", ticket: "$499" },
+    { label: "Multi-child / add-on heavy", share: "≈10%", ticket: "$600–$900+" },
   ],
   withAddOns: [
     { stage: "Core package average (siblings common)", amount: "$450–$650" },
@@ -644,7 +648,7 @@ export const BP_COMPETITOR_PRICING = {
       { product: "Digital Image", price: "$500", us: "$500" },
       { product: "Kingdom Chronicles", price: "Starts at $3,000", us: "INCLUDED in packages" },
       { product: "MP4 Digital Slideshow", price: "$1,400", us: "$299 (animated video)" },
-      { product: "Session / Package", price: "Unknown — add-on model", us: "$299–$799 all-in" },
+      { product: "Session / Package", price: "Unknown — add-on model", us: "$299 / $299 / $499 all-in" },
     ],
   },
   ourAdvantages: [
@@ -662,9 +666,9 @@ export const BP_COMPETITOR_PRICING = {
 
 export const BP_COST_BREAKDOWN = {
   perSession: {
-    title: "Cost Per Session (Solo Quest)",
+    title: "Cost Per Session (Kingdom Chronicles $299)",
     items: [
-      { label: "Your time (60 min @ $175/hr)", cost: 175, note: "Opportunity cost" },
+      { label: "Your time (45–60 min @ $175/hr)", cost: 150, note: "Opportunity cost — exclude for cash margin" },
       { label: "Staff assist (if applicable)", cost: 25, note: "Part-time help" },
       { label: "Set overhead (amortized)", cost: 20, note: "Props, costumes, maintenance" },
       { label: "Mpix 8x8 hardcover book", cost: 32, note: "Printed and shipped" },
@@ -672,42 +676,45 @@ export const BP_COST_BREAKDOWN = {
       { label: "Processing & admin (15 min)", cost: 10, note: "Post-session work" },
       { label: "Marketing (per session avg)", cost: 15, note: "Ads, social, referrals" },
     ],
-    totalCost: 279,
+    totalCost: 254,
+    cashCostExOwner: 104,
+    note: "Cash COGS ~$104 before owner time. Loaded cost includes owner opportunity cost.",
   },
   packages: [
     {
-      name: "Solo Quest",
-      price: 349,
-      cost: 279,
-      margin: 70,
-      pct: 20,
-      sessions: { daily: [1, 2, 3], revenue: [349, 698, 1047] },
+      name: "Kingdom Chronicles",
+      price: 299,
+      cost: 104, // cash COGS approx
+      margin: 195,
+      pct: 65,
+      sessions: { daily: [1, 2, 3], revenue: [299, 598, 897] },
     },
     {
-      name: "Sibling Quest",
-      price: 549,
-      cost: 340, // extra time + 2nd book
-      margin: 209,
-      pct: 38,
+      name: "Royal Portrait Album",
+      price: 299,
+      cost: 100,
+      margin: 199,
+      pct: 67,
     },
     {
-      name: "Family Quest",
-      price: 849,
-      cost: 415, // 90 min + 3 books
-      margin: 434,
-      pct: 51,
+      name: "Royal Collection (both books)",
+      price: 499,
+      cost: 150, // two books + 60 min same window
+      margin: 349,
+      pct: 70,
     },
   ],
   monthly: {
-    conservative: { sessions: 15, avgTicket: 380, revenue: 5700, margin: 2280 },
-    moderate: { sessions: 25, avgTicket: 420, revenue: 10500, margin: 4200 },
-    strong: { sessions: 40, avgTicket: 480, revenue: 19200, margin: 7680 },
+    conservative: { sessions: 12, avgTicket: 360, revenue: 4320, margin: 2600 },
+    moderate: { sessions: 16, avgTicket: 400, revenue: 6400, margin: 4000 },
+    strong: { sessions: 24, avgTicket: 450, revenue: 10800, margin: 7000 },
   },
   addOnMargins: [
     { product: "Digital download (no watermark)", price: 49, cost: 0, margin: 49, note: "Pure software — zero cost" },
     { product: "Digital + extra printed copy", price: 79, cost: 32, margin: 47, note: "Combo upsell" },
     { product: "Extra printed hardcover", price: 45, cost: 32, margin: 13, note: "Mpix cost" },
-    { product: "Animated video (coming soon)", price: 299, cost: 5, margin: 294, note: "Pure margin" },
+    { product: "Kingdom Teaser video (15–30s)", price: 149, cost: 8, margin: 141, note: "High margin proof content" },
+    { product: "Animated Kingdom Movie — Premium", price: 299, cost: 15, margin: 284, note: "Full motion upsell" },
     { product: "Rush processing", price: 75, cost: 5, margin: 70, note: "Time premium" },
     { product: "8x10 portrait print", price: 200, cost: 35, margin: 165, note: "High margin wall art" },
     { product: "16x20 portrait print", price: 975, cost: 80, margin: 895, note: "Best margin add-on" },
@@ -1136,4 +1143,218 @@ export const BP_BETA_STRATEGY = {
 
 
 export const BP_EXECUTIVE_SUMMARY =
-  "Storybook Photos (Kingdom Quests) is a premium fantasy photo studio in Costa Mesa offering kingdom-themed photo sessions for children and families. Clients dress as kings, queens, and royalty and are photographed in custom-built sets. Every session includes the option of a personalized AI-assisted Kingdom Chronicles where the child is the hero of their own adventure.";
+  "Storybook Photos (Kingdom Quests) is a premium fantasy photo studio in Costa Mesa offering kingdom-themed photo sessions for children and families. Clients dress as kings, queens, and royalty and are photographed in custom-built sets. Every session includes a personalized AI-assisted Kingdom Chronicles storybook and/or portrait album where the child is the hero. We run a clear giveback: $25 from every paid session supports Orange County foster and waiting kids through a named nonprofit partner, and we gift limited kingdom sessions so more children feel brave and loved. Transparent packages — $299 / $299 / $499 — no pressure ordering room.";
+
+/**
+ * GTM + Audience strategy (locked 2026-09-20)
+ * Built with the 5-member AI team method (Research → Strategy → Copy → Build → Market)
+ * Goals: pricing on point · messaging on point · real audience connection
+ * Status: beta shoot done; photos in edit; Fri/Sat office open with Justin + Lachelle
+ */
+export const BP_GTM_STRATEGY = {
+  updated: "2026-09-20",
+  goals: [
+    "Pricing on point — one public ladder, no surprises",
+    "Messaging on point — plain English, child-as-hero, mom-first",
+    "Connect with the real audience — OC moms + gift buyers + foster giveback proof",
+  ],
+  intentLine:
+    "I help moms turn one ordinary afternoon into a keepsake story where their child is the hero — brave, loved, and unforgettable.",
+  pricing: {
+    ladder: [
+      { id: "storybook-only", name: "Kingdom Chronicles", price: 299, sessionMin: 45 },
+      { id: "portrait-only", name: "Royal Portrait Album", price: 299, sessionMin: 45 },
+      { id: "both-books", name: "The Royal Collection", price: 499, sessionMin: 60, popular: true },
+    ],
+    launchCode: {
+      code: "ROYAL30",
+      value: "$30 off first session",
+      windowDays: 30,
+      rule: "One use per family · any package · expires 30 days after opt-in",
+    },
+    deposit: "$50–$100 to hold Fri/Sat slot",
+    whyThisLadder: [
+      "$299 is an easy first yes for moms vs $1K–$3K pressure studios",
+      "$499 Royal Collection is the hero offer (both books) — push this in ads",
+      "Add-ons (digital $49, extra book $45, movie $149–$299, prints) raise ticket without bait-and-switch",
+      "Live site is source of truth — business plan matches constants.ts",
+    ],
+  },
+  messaging: {
+    primaryPromise: "Your child is the hero of their own storybook.",
+    pillars: [
+      "Belonging — every child deserves to feel chosen",
+      "Courage — crowns, quests, and a story they can re-read",
+      "Keepsake — printed book + share link, not a sales trap",
+      "Humanity — we gift sessions and donate so more kids feel they matter",
+    ],
+    doSay: [
+      "Transparent packages: $299–$499",
+      "Storybook included — not $3,000 extra",
+      "Costa Mesa studio · Fridays & Saturdays",
+      "$25 from every session helps OC foster and waiting kids",
+      "We gift kingdom days through a real nonprofit / foster network",
+    ],
+    dontSay: [
+      "Percent of proceeds / profits (too vague)",
+      "Official Make-A-Wish partner (unless approved in writing)",
+      "Tactical / military / hype marketing jargon",
+      "Trauma details about foster or sick kids in ads",
+      "Your session fee is your tax-deductible charity gift",
+    ],
+    adStackOrder: [
+      "1. Kid as hero (feeling)",
+      "2. Clear price + Royal Collection push",
+      "3. First-time code ROYAL30 (30 days)",
+      "4. Fri/Sat Costa Mesa booking",
+      "5. One giveback line + nonprofit name",
+    ],
+  },
+  /** Audience map — 5-member method: Researcher pain + Strategist segments */
+  audiences: {
+    note:
+      "The 5-member PDF was a general team method, not a finished Storybook ICP list. This is the Storybook audience system built with that method for this business.",
+    primary: [
+      {
+        id: "oc-everyday-mom",
+        name: "OC Everyday Mom",
+        who: "Mom 28–42, kids ages 3–8, Costa Mesa / Irvine / Newport / Tustin / Huntington / Fountain Valley",
+        pain: "Wants a gift that feels magical and personal — not more plastic toys or stiff portraits",
+        desire: "See her child light up and keep a book they’ll read at bedtime",
+        message: "Your kid as the hero. Real book. Clear price. No pressure.",
+        where: ["Instagram/Facebook moms", "local mom groups", "school/parent chats", "Meta local ads"],
+        offer: "Royal Collection $499 with ROYAL30 · or Chronicles $299 trial",
+        priority: 1,
+      },
+      {
+        id: "birthday-mom",
+        name: "Birthday / Milestone Mom",
+        who: "Planning 4th–8th birthday, half-birthday, first lost tooth, baptism-adjacent celebration",
+        pain: "Party will be forgotten; wants one thing that lasts",
+        desire: "A keepsake tied to this age forever",
+        message: "The birthday gift they still have at 20.",
+        where: ["Birthday planning groups", "venue partner referrals", "seasonal ads 3–4 weeks before parties"],
+        offer: "Session 2–3 weeks before party · book ready as gift reveal",
+        priority: 1,
+      },
+      {
+        id: "grandma-gift",
+        name: "Grandma / Long-Distance Gifter",
+        who: "Grandparent (often grandma) buying for grandkids; may not attend shoot",
+        pain: "Hard to find a gift that feels close when they live far away",
+        desire: "Be the hero who gave the magical book",
+        message: "Give them a story with your grandchild as the star.",
+        where: ["Facebook 50+", "church directories", "parent-shared ads", "gift guides"],
+        offer: "Pay for Royal Collection · parents book Fri/Sat · ship extra book to grandma +$45",
+        priority: 1,
+      },
+    ],
+    secondary: [
+      {
+        id: "christian-mom",
+        name: "Christian / Church Mom",
+        who: "Faith-friendly OC mom; values dignity, family, wonder without creepy AI vibes",
+        pain: "Doesn’t want hollow commercial fantasy; wants beauty with heart",
+        desire: "Child feels beloved and brave — identity, not just cosplay",
+        message: "A kingdom day that reminds them they are loved.",
+        where: ["Church mom groups", "Christian schools", "pastor referrals", "foster/adopt church ministries"],
+        offer: "Same packages · soft faith-compatible creative · not a sermon",
+        priority: 2,
+      },
+      {
+        id: "foster-adopt-mom",
+        name: "Foster / Adoptive Mom",
+        who: "Foster or adoptive parent wanting positive identity memories for the child",
+        pain: "Few beautiful photos of hard seasons; child needs belonging stories",
+        desire: "Joy without explaining trauma in every frame",
+        message: "A bright chapter in their story — brave, safe, celebrated.",
+        where: ["Foster parent groups", "FosterAll network", "Safe Families", "Olive Crest families", "church foster ministries"],
+        offer: "Paid sessions welcome · also priority for gifted Royal Five seats",
+        priority: 2,
+      },
+      {
+        id: "two-kid-house",
+        name: "Sibling Household",
+        who: "2–3 kids, wants fairness, one appointment",
+        pain: "Hates stacking multiple expensive shoots",
+        desire: "One hour, both kids feel special, books for each if needed",
+        message: "Siblings welcome in the same hour. Add a book, not another day.",
+        where: ["Same as everyday mom · creative shows two kids"],
+        offer: "Royal Collection + additional child book $149",
+        priority: 2,
+      },
+    ],
+    causeAudiences: [
+      {
+        id: "foster-waiting-kids",
+        name: "Foster & waiting kids (gifted)",
+        role: "Mission + humanity proof — not the paying ICP",
+        how: "Referred by Olive Crest / FosterAll / Safe Families OC / church foster teams",
+        contentRule: "Show only with guardian/agency written release; default private",
+      },
+      {
+        id: "nonprofit-partner",
+        name: "Nonprofit partner staff & donors",
+        role: "Credibility and referrals",
+        how: "Named partner on site; quarterly donation proof; optional joint posts",
+      },
+    ],
+    notTarget: [
+      "Pressure-sale art portrait buyers hunting $3K albums",
+      "Teens / senior portrait lane as primary",
+      "Parents who only want free phone pics",
+      "Trauma-spectacle content seekers",
+    ],
+  },
+  cause: {
+    publicCashPartner: "Olive Crest (Orange County) — recommended primary",
+    altCashPartners: ["FosterAll", "Make-A-Wish OCIE", "CHOC Foundation"],
+    giftPipeline: [
+      "FosterAll",
+      "Safe Families for Children — Orange County",
+      "Church foster/adopt ministries",
+      "Olive Crest family services (if they approve referrals)",
+    ],
+    perSessionDonation: 25,
+    giftedProgram: "Royal Five — up to 5 gifted kingdom sessions/month",
+    publicLine:
+      "$25 from every paid session helps foster and waiting kids in Orange County through Olive Crest. We also gift kingdom sessions so more children get a day of feeling brave and loved.",
+    humanityContent:
+      "Partner/gifted shoots (with permission) show the tangible humanity of the business — real kids, real joy — alongside customer empowerment shoots that sell the product.",
+  },
+  channels: {
+    thisWeek: [
+      "Finish beta edits → 5–10 proof stills",
+      "Meta ads $20–40/day to OC moms 28–45",
+      "2–3 local mom Facebook groups (rules-respecting)",
+      "Text 5 charity/foster referrers for Royal Five",
+      "Personal booking: Fri/Sat slots with deposit",
+    ],
+    alwaysOn: [
+      "Instagram/Facebook organic proof",
+      "Email/SMS follow-up same day on leads",
+      "Church and school soft partnerships",
+      "Grandparent gift angle in Q4",
+    ],
+  },
+  weekBookingTarget: {
+    leads: "20–40",
+    paidDeposits: "5–10",
+    royalFiveScheduled: "2–5",
+    maxFriSatFamilies: 9,
+    adSpendCap: "$300 unless clearly working",
+  },
+  fiveMemberJobs: [
+    { role: "Researcher", job: "Audience pains, mom group rules, nonprofit contacts, competitor watch" },
+    { role: "Strategist", job: "Keep price ladder + offer path + smallest tests; kill weak channels" },
+    { role: "Copywriter", job: "Ads, group posts, booking SMS, site blurbs in plain English" },
+    { role: "Builder", job: "Booking form, code ROYAL30, calendar holds, sample book pipeline" },
+    { role: "Marketer", job: "Run ads, count leads→books, Fri/Sat fill rate, CAC" },
+  ],
+} as const;
+
+/** Flat audience list for admin UI cards */
+export const BP_AUDIENCE_LIST = [
+  ...BP_GTM_STRATEGY.audiences.primary,
+  ...BP_GTM_STRATEGY.audiences.secondary,
+] as const;

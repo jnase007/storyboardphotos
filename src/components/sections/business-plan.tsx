@@ -41,6 +41,8 @@ import {
   BP_SESSION_TIMING as SESSION_TIMING,
   BP_AVG_CUSTOMER_SPEND as AVG_SPEND,
   BP_STARTUP_COSTS as STARTUP_COSTS,
+  BP_GTM_STRATEGY as GTM,
+  BP_AUDIENCE_LIST as AUDIENCE_LIST,
 } from "@/lib/business-plan-content";
 import { StorybookPreview } from "@/components/sections/storybook-preview";
 import { RevenueGrowthChart } from "@/components/sections/revenue-growth-chart";
@@ -67,6 +69,7 @@ function SectionHeading({
 export function BusinessPlanSection({ embedded = false }: { embedded?: boolean } = {}) {
   const [tab, setTab] = useState<
     | "overview"
+    | "strategy"
     | "operations"
     | "revenue"
     | "market"
@@ -78,6 +81,7 @@ export function BusinessPlanSection({ embedded = false }: { embedded?: boolean }
 
   const tabs = [
     { id: "overview" as const, label: "Overview", icon: Crown },
+    { id: "strategy" as const, label: "GTM & Audience", icon: Target },
     { id: "operations" as const, label: "Operations", icon: Building2 },
     { id: "revenue" as const, label: "Revenue", icon: TrendingUp },
     { id: "market" as const, label: "Market", icon: Target },
@@ -907,6 +911,236 @@ export function BusinessPlanSection({ embedded = false }: { embedded?: boolean }
 
           </div>
 
+          <div className={tab === "strategy" ? "space-y-12 sm:space-y-14" : "hidden print:block print:space-y-12"}>
+          {/* GTM & Audience — locked 2026-09-20 */}
+          <motion.section
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="rounded-2xl border border-royal-gold/25 bg-white/80 p-6 sm:p-8"
+          >
+            <SectionHeading icon={Target}>Go-To-Market Goals</SectionHeading>
+            <p className="text-xs font-semibold tracking-widest uppercase text-royal-gold mb-3">
+              Updated {GTM.updated} · 5-member method applied to Storybook
+            </p>
+            <p className="font-serif text-xl font-bold text-royal-blue mb-4 leading-snug">
+              {GTM.intentLine}
+            </p>
+            <ul className="space-y-2 mb-6">
+              {GTM.goals.map((g) => (
+                <li key={g} className="flex gap-2 text-royal-blue/80 text-sm sm:text-base">
+                  <span className="text-royal-gold shrink-0">✦</span>
+                  {g}
+                </li>
+              ))}
+            </ul>
+            <p className="text-sm text-royal-blue/65 leading-relaxed border-t border-royal-gold/20 pt-4">
+              {GTM.audiences.note}
+            </p>
+          </motion.section>
+
+          <motion.section
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="rounded-2xl border border-royal-gold/25 bg-white/80 p-6 sm:p-8"
+          >
+            <SectionHeading icon={Crown}>Pricing On Point</SectionHeading>
+            <div className="grid sm:grid-cols-3 gap-3 mb-5">
+              {GTM.pricing.ladder.map((pkg) => (
+                <div
+                  key={pkg.id}
+                  className={`rounded-xl border p-4 ${
+                    "popular" in pkg && pkg.popular
+                      ? "border-royal-gold bg-royal-gold/10"
+                      : "border-royal-gold/20 bg-royal-cream/40"
+                  }`}
+                >
+                  <p className="font-serif font-bold text-royal-blue">{pkg.name}</p>
+                  <p className="text-2xl font-bold text-royal-gold mt-1">${pkg.price}</p>
+                  <p className="text-xs text-royal-blue/60 mt-1">{pkg.sessionMin} min session</p>
+                </div>
+              ))}
+            </div>
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50/80 px-4 py-3 mb-4">
+              <p className="text-xs font-semibold uppercase tracking-widest text-emerald-700 mb-1">Launch code</p>
+              <p className="font-serif text-lg font-bold text-royal-blue">
+                {GTM.pricing.launchCode.code} — {GTM.pricing.launchCode.value}
+              </p>
+              <p className="text-sm text-royal-blue/70">{GTM.pricing.launchCode.rule}</p>
+              <p className="text-sm text-royal-blue/70 mt-1">Deposit: {GTM.pricing.deposit}</p>
+            </div>
+            <ul className="space-y-2">
+              {GTM.pricing.whyThisLadder.map((w) => (
+                <li key={w} className="flex gap-2 text-sm text-royal-blue/75">
+                  <span className="text-royal-gold">•</span>
+                  {w}
+                </li>
+              ))}
+            </ul>
+          </motion.section>
+
+          <motion.section
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="rounded-2xl border border-royal-gold/25 bg-white/80 p-6 sm:p-8"
+          >
+            <SectionHeading icon={Sparkles}>Messaging On Point</SectionHeading>
+            <p className="font-serif text-lg font-bold text-royal-blue mb-4">{GTM.messaging.primaryPromise}</p>
+            <div className="grid sm:grid-cols-2 gap-3 mb-5">
+              {GTM.messaging.pillars.map((p) => (
+                <div key={p} className="rounded-lg border border-royal-gold/20 bg-royal-cream/50 px-3 py-2.5 text-sm text-royal-blue/80">
+                  {p}
+                </div>
+              ))}
+            </div>
+            <div className="grid md:grid-cols-2 gap-4 mb-5">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-widest text-emerald-700 mb-2">Do say</p>
+                <ul className="space-y-1.5">
+                  {GTM.messaging.doSay.map((s) => (
+                    <li key={s} className="text-sm text-royal-blue/75 flex gap-2">
+                      <span className="text-emerald-600">✓</span>
+                      {s}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-widest text-red-700 mb-2">Don't say</p>
+                <ul className="space-y-1.5">
+                  {GTM.messaging.dontSay.map((s) => (
+                    <li key={s} className="text-sm text-royal-blue/75 flex gap-2">
+                      <span className="text-red-500">×</span>
+                      {s}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <p className="text-xs font-semibold uppercase tracking-widest text-royal-gold mb-2">Ad stack order</p>
+            <ol className="space-y-1">
+              {GTM.messaging.adStackOrder.map((s) => (
+                <li key={s} className="text-sm text-royal-blue/75">{s}</li>
+              ))}
+            </ol>
+          </motion.section>
+
+          <motion.section
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="rounded-2xl border border-royal-gold/25 bg-white/80 p-6 sm:p-8"
+          >
+            <SectionHeading icon={Target}>Audience List</SectionHeading>
+            <p className="text-sm text-royal-blue/65 mb-5 leading-relaxed">
+              Primary = book this week. Secondary = same offer, different creative angle. Cause audiences = humanity + referrals, not the paying ICP.
+            </p>
+            <div className="space-y-4">
+              {AUDIENCE_LIST.map((a) => (
+                <div
+                  key={a.id}
+                  className="rounded-xl border border-royal-gold/20 bg-royal-cream/30 p-4 sm:p-5"
+                >
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
+                    <h3 className="font-serif text-lg font-bold text-royal-blue">{a.name}</h3>
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-royal-gold/20 text-royal-blue">
+                      P{a.priority}
+                    </span>
+                  </div>
+                  <p className="text-sm text-royal-blue/80 mb-1"><strong>Who:</strong> {a.who}</p>
+                  <p className="text-sm text-royal-blue/80 mb-1"><strong>Pain:</strong> {a.pain}</p>
+                  <p className="text-sm text-royal-blue/80 mb-1"><strong>Desire:</strong> {a.desire}</p>
+                  <p className="text-sm text-royal-blue/80 mb-1"><strong>Message:</strong> {a.message}</p>
+                  <p className="text-sm text-royal-blue/80 mb-1"><strong>Offer:</strong> {a.offer}</p>
+                  <p className="text-sm text-royal-blue/70"><strong>Where:</strong> {a.where.join(" · ")}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-5 grid sm:grid-cols-2 gap-3">
+              {GTM.audiences.causeAudiences.map((c) => (
+                <div key={c.id} className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-4">
+                  <p className="font-serif font-bold text-royal-blue">{c.name}</p>
+                  <p className="text-xs text-emerald-800 mt-1">{c.role}</p>
+                  <p className="text-sm text-royal-blue/75 mt-2">{c.how}</p>
+                  {"contentRule" in c && c.contentRule ? (
+                    <p className="text-xs text-royal-blue/60 mt-2">{c.contentRule}</p>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 rounded-xl border border-red-200 bg-red-50/70 px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-widest text-red-700 mb-2">Not the target</p>
+              <ul className="space-y-1">
+                {GTM.audiences.notTarget.map((n) => (
+                  <li key={n} className="text-sm text-red-800/80">× {n}</li>
+                ))}
+              </ul>
+            </div>
+          </motion.section>
+
+          <motion.section
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="rounded-2xl border border-royal-gold/25 bg-white/80 p-6 sm:p-8"
+          >
+            <SectionHeading icon={ListChecks}>Cause + Humanity Proof</SectionHeading>
+            <p className="text-royal-blue/80 leading-relaxed mb-3">{GTM.cause.publicLine}</p>
+            <p className="text-sm text-royal-blue/70 mb-4">{GTM.cause.humanityContent}</p>
+            <p className="text-sm text-royal-blue/80 mb-1">
+              <strong>Cash partner:</strong> {GTM.cause.publicCashPartner} (${GTM.cause.perSessionDonation}/session)
+            </p>
+            <p className="text-sm text-royal-blue/80 mb-1">
+              <strong>Gift program:</strong> {GTM.cause.giftedProgram}
+            </p>
+            <p className="text-sm text-royal-blue/80">
+              <strong>Gift pipeline:</strong> {GTM.cause.giftPipeline.join(" · ")}
+            </p>
+          </motion.section>
+
+          <motion.section
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="rounded-2xl border border-royal-gold/25 bg-white/80 p-6 sm:p-8"
+          >
+            <SectionHeading icon={TrendingUp}>This Week Connect Plan</SectionHeading>
+            <div className="grid sm:grid-cols-2 gap-4 mb-5">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-widest text-royal-gold mb-2">Channels</p>
+                <ul className="space-y-1.5">
+                  {GTM.channels.thisWeek.map((c) => (
+                    <li key={c} className="text-sm text-royal-blue/75 flex gap-2">
+                      <span className="text-royal-gold">→</span>
+                      {c}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="rounded-xl border border-royal-gold/30 bg-royal-gold/10 p-4">
+                <p className="text-xs font-semibold uppercase tracking-widest text-royal-gold mb-2">Booking targets</p>
+                <ul className="space-y-1 text-sm text-royal-blue/80">
+                  <li>Leads: {GTM.weekBookingTarget.leads}</li>
+                  <li>Paid deposits: {GTM.weekBookingTarget.paidDeposits}</li>
+                  <li>Royal Five: {GTM.weekBookingTarget.royalFiveScheduled}</li>
+                  <li>Max Fri/Sat families: {GTM.weekBookingTarget.maxFriSatFamilies}</li>
+                  <li>Ad cap: {GTM.weekBookingTarget.adSpendCap}</li>
+                </ul>
+              </div>
+            </div>
+            <p className="text-xs font-semibold uppercase tracking-widest text-royal-gold mb-2">5-member crew jobs</p>
+            <ul className="space-y-2">
+              {GTM.fiveMemberJobs.map((j) => (
+                <li key={j.role} className="text-sm text-royal-blue/80">
+                  <strong>{j.role}:</strong> {j.job}
+                </li>
+              ))}
+            </ul>
+          </motion.section>
+          </div>
+
           <div className={tab === "growth" ? "space-y-12 sm:space-y-14" : "hidden print:block print:space-y-12"}>
           {/* Growth Strategy */}
           <motion.section
@@ -927,6 +1161,9 @@ export function BusinessPlanSection({ embedded = false }: { embedded?: boolean }
                 </li>
               ))}
             </ul>
+            <p className="mt-5 text-sm text-royal-blue/60 leading-relaxed border-t border-royal-gold/20 pt-4">
+              Full audience, pricing, messaging, and weekly connect plan live on the <strong>GTM & Audience</strong> tab.
+            </p>
           </motion.section>
 
           </div>
