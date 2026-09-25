@@ -221,6 +221,30 @@
   }
 }
 
+/* Real session portrait marquee (homepage + experience) */
+@keyframes session-portrait-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.session-portrait-track {
+  animation: session-portrait-scroll 55s linear infinite;
+}
+
+.session-portrait-track:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .session-portrait-track {
+    animation: none;
+  }
+}
+
 @keyframes ember-rise {
   0% {
     transform: translateY(0) translateX(0) scale(0.6);

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PageShell } from "@/components/layout/page-shell";
 import { ExperienceSection } from "@/components/sections/experience";
+import { SessionPortraitsSection } from "@/components/sections/session-portraits";
 import { BreadcrumbStructuredData } from "@/components/structured-data";
 import { buildMetadata } from "@/lib/seo";
 
@@ -21,6 +22,7 @@ export default function ExperiencePage() {
         ]}
       />
       <ExperienceSection />
+      <SessionPortraitsSection variant="experience" />
     </PageShell>
   );
 }
