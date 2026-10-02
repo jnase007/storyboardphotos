@@ -52,12 +52,17 @@ type FluxResult = {
 export const STORYBOOK_IMAGE_ASPECT = "4:3" as const;
 
 /**
- * Target look (locked to Justin's style ref):
- * whimsical watercolor + soft sepia/ink outlines on cream paper —
- * classic fairytale children's book, NOT bare uncolored line art.
+ * PRODUCT IP LOCK (Justin 2026-10-02) — same watercolor look for EVERY client book.
+ * Gold ref: docs/art-locks/river-kingdom-quest-watercolor-GOLD.pdf + WATERCOLOR-IP-LOCK.md
+ * Soft sepia ink outlines + pastel watercolor washes on cream paper.
+ * NEVER: 3D/CGI, plastic Disney faces, photoreal skin, bare line-art, generic cartoon Flux.
+ * Do not change without Justin explicit OK — this is the business brand.
  */
-const STYLE_SUFFIX =
-  "ONE single full-bleed 4:3 landscape watercolor children's storybook illustration only — not a diptych, not two panels, not a double-page spread, not split screen, not collage. FILL THE ENTIRE CANVAS edge-to-edge with the scene (background, sky, and scene landscape continue to all four edges). NO decorative vine border, NO floral frame, NO oval matte, NO white or cream margins inside the image, NO picture-frame border. Whimsical watercolor, soft sepia ink outlines with gentle hand-drawn line variation, soft pastel watercolor washes (sage green, dusty lavender, peach, powder blue, warm gold), cream textured watercolor paper only as the painted ground not as empty side bars, cute storybook character proportions with big FULL DETAILED expressive eyes (visible whites, colored iris, dark pupil, soft lashes — NEVER simple black-dot eyes), atmospheric depth, warm golden sunlight and gentle wonder of creation, soft dust motes in sunbeams, premium faith-friendly fairytale picture-book quality (Narnia warmth not occult), NO magic wands, NO glowing staffs, NO scepters with energy beams, NO spell casting, NO witches, NO wizards, NO fairies casting spells, NO glowing runes, NO sorcery props, child may hold a simple lantern or flowers only, consistent character across pages, FULL FIGURE hero visible with headroom above crown and feet still in frame, never crop head face crown hands or feet, no photorealism, no real photographs, no 3D render, no harsh pure-black vector lines, no empty uncolored coloring-page look, no muddy gray, no text, no letters, no watermark, no logo, no signature";
+export const STORYBOOK_WATERCOLOR_IP =
+  "ONE single full-bleed 4:3 landscape watercolor children's storybook illustration only — not a diptych, not two panels, not a double-page spread, not split screen, not collage. FILL THE ENTIRE CANVAS edge-to-edge with the scene (background, sky, and scene landscape continue to all four edges). NO decorative vine border, NO floral frame, NO oval matte, NO white or cream margins inside the image, NO picture-frame border. Hand-painted whimsical WATERCOLOR storybook art: soft sepia/brown ink outlines with gentle hand-drawn line variation, soft pastel watercolor washes (sage green, dusty lavender, peach, powder blue, warm gold, blush pink), visible watercolor paper texture and soft wash blooms, cream textured watercolor paper as painted ground not empty side bars, cute classic storybook character proportions (NOT 3D, NOT CGI, NOT plastic doll skin, NOT Disney Pixar render), big FULL DETAILED expressive eyes (visible whites, colored iris, dark pupil, soft lashes — NEVER simple black-dot eyes), atmospheric depth, warm golden sunlight and gentle wonder of creation, soft dust motes in sunbeams, premium faith-friendly fairytale picture-book quality matching our locked Storybook Photos watercolor IP, NO magic wands, NO glowing staffs, NO scepters with energy beams, NO spell casting, NO witches, NO wizards, NO fairies casting spells, NO glowing runes, NO sorcery props, child may hold a simple lantern or flowers only, consistent character across pages, FULL FIGURE hero visible with headroom above crown and feet still in frame, never crop head face crown hands or feet, no photorealism, no real photographs, no 3D render, no airbrushed CGI, no harsh pure-black vector lines, no empty uncolored coloring-page look, no muddy gray, no text, no letters, no watermark, no logo, no signature";
+
+/** @deprecated use STORYBOOK_WATERCOLOR_IP — kept as alias so all call sites stay locked */
+const STYLE_SUFFIX = STORYBOOK_WATERCOLOR_IP;
 
 /**
  * Face + eye lock for the whole book.
@@ -212,10 +217,12 @@ async function generateWithPulid(options: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        prompt: `${options.prompt}. ${STYLE_SUFFIX}. The child in the scene should look exactly like the reference photo — same face, features, and likeness.`,
+        prompt: `${options.prompt}. ${STYLE_SUFFIX}. The child in the scene should look exactly like the reference photo — same face, features, and likeness. Hand-painted watercolor + sepia ink only (Storybook Photos IP).`,
         reference_image_url: options.characterPhotoUrl,
         num_inference_steps: 30,
         guidance_scale: 4.5,
+        id_weight: 0.85,
+        true_cfg: 4,
         image_size: "landscape_4_3",
         enable_safety_checker: true,
       }),
@@ -256,7 +263,7 @@ async function generateWithFluxDev(prompt: string): Promise<FluxResult> {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        prompt: `${prompt}. ${STYLE_SUFFIX}`,
+        prompt: `${prompt}. ${STYLE_SUFFIX}. CRITICAL STYLE: flat hand-painted ink-and-watercolor children's book plate only — soft washes, visible paper texture, sepia linework. Forbidden: 3D, CGI, plastic skin, hyper-smooth Disney face, photoreal.`,
         image_size: "landscape_4_3",
         num_images: 1,
         num_inference_steps: 28,
@@ -551,7 +558,8 @@ export async function generateStoryIllustration(options: {
   const imagen = await generateWithImagen4(promptWithLocks);
   if (imagen.provider !== "placeholder") return imagen;
 
-  // 4) Fal Flux Dev — real unique art (never stamp one castle placeholder)
+  // 4) Flux Dev ONLY with full watercolor IP suffix (degraded path — still must match gold look)
+  // Never use this to invent a new brand look. Prefer fixing PuLID/card over style drift.
   const flux = await generateWithFluxDev(promptWithLocks);
   if (flux.provider !== "placeholder") return flux;
 
