@@ -244,6 +244,39 @@ async function generateWithPulid(options: {
  * Generate a watercolor storybook illustration via Google Imagen 4.0.
  * Higher quality than Flux Dev — used as the primary generator when no character photo.
  */
+
+async function generateWithFluxDev(prompt: string): Promise<FluxResult> {
+  const falKey = process.env.FAL_KEY ?? process.env.FAL_API_KEY;
+  if (!falKey) return fallbackPlaceholder(prompt);
+  try {
+    const res = await fetch("https://fal.run/fal-ai/flux/dev", {
+      method: "POST",
+      headers: {
+        Authorization: `Key ${falKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        prompt: `${prompt}. ${STYLE_SUFFIX}`,
+        image_size: "landscape_4_3",
+        num_images: 1,
+        num_inference_steps: 28,
+        enable_safety_checker: true,
+        seed: Math.floor(Math.random() * 1_000_000),
+      }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const url = data?.images?.[0]?.url ?? data?.image?.url;
+      if (typeof url === "string") return { imageUrl: url, provider: "fal" };
+    } else {
+      console.error("flux/dev error:", await res.text());
+    }
+  } catch (err) {
+    console.error("flux/dev failed:", err);
+  }
+  return fallbackPlaceholder(prompt);
+}
+
 async function generateWithImagen4(prompt: string): Promise<FluxResult> {
   const googleKey = process.env.GOOGLE_AI_API_KEY;
   if (!googleKey) return fallbackPlaceholder(prompt);
