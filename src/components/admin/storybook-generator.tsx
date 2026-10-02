@@ -221,6 +221,7 @@ export function StorybookGenerator() {
   const [saving, setSaving] = useState(false);
   const [approving, setApproving] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [zipLoading, setZipLoading] = useState(false);
   const [regeneratingPage, setRegeneratingPage] = useState(false);
   const [genStatus, setGenStatus] = useState("Preparing…");
   const [narrating, setNarrating] = useState(false);
@@ -321,20 +322,26 @@ export function StorybookGenerator() {
 
   // ── Character portrait handlers ─────────────────────────────────────────
 
-  function handleCharacterFile(file: File) {
+  async function handleCharacterFile(file: File) {
     if (!file.type.startsWith("image/")) {
       toast.error("Please upload an image file (JPG, PNG, or WebP).");
       return;
     }
-    const previewUrl = URL.createObjectURL(file);
-    setCharacterPreview(previewUrl);
-    // Convert to base64 for transmission
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const result = e.target?.result;
-      if (typeof result === "string") setCharacterPhoto(result);
-    };
-    reader.readAsDataURL(file);
+    try {
+      // Compress first so generate + Gemini always get a reliable face payload
+      const compressed = await compressImageFile(file, { maxEdge: 1024, quality: 0.72 });
+      const previewUrl = URL.createObjectURL(compressed);
+      setCharacterPreview(previewUrl);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result;
+        if (typeof result === "string") setCharacterPhoto(result);
+      };
+      reader.readAsDataURL(compressed);
+    } catch (err) {
+      console.error(err);
+      toast.error("Could not read that photo. Try a JPG or PNG.");
+    }
   }
 
   function clearCharacterPhoto() {
@@ -527,6 +534,46 @@ export function StorybookGenerator() {
       toast.error(err instanceof Error ? err.message : "Save failed");
     } finally {
       setSaving(false);
+    }
+  }
+
+  
+  async function downloadMpixJpgZip() {
+    if (!book) return;
+    setZipLoading(true);
+    try {
+      // 1) Same print PDF as Mpix PDF button
+      const res = await fetch("/api/admin/storybooks/build-pdf", {
+        method: "POST",
+        headers: { ...adminHeaders, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bookTitle: book.bookTitle,
+          childName: book.child_name,
+          pages: book.pages,
+          coverImageUrl: book.pages[0]?.imageUrl ?? undefined,
+        }),
+      });
+      if (!res.ok) throw new Error("PDF generation failed");
+      const pdfBlob = await res.blob();
+
+      // 2) Browser: PDF pages → 2400×2400 JPGs → zip (works on Vercel)
+      const { pdfBlobToMpixJpgZip, triggerBlobDownload } = await import(
+        "@/lib/storybook/mpix-jpg-zip"
+      );
+      const zipBlob = await pdfBlobToMpixJpgZip(
+        pdfBlob,
+        book.child_name.replace(/\s+/g, "-")
+      );
+      triggerBlobDownload(
+        zipBlob,
+        `${book.child_name.replace(/\s+/g, "-")}-Mpix-8x8-JPGs.zip`
+      );
+      toast.success("Mpix JPG zip downloaded — unzip and upload pages to 8×8 book");
+    } catch (err) {
+      console.error(err);
+      toast.error(err instanceof Error ? err.message : "Mpix JPG zip failed");
+    } finally {
+      setZipLoading(false);
     }
   }
 
@@ -1042,10 +1089,12 @@ export function StorybookGenerator() {
             saving={saving}
             approving={approving}
             pdfLoading={pdfLoading}
+            zipLoading={zipLoading}
             narrating={narrating}
             requestingMovie={requestingMovie}
             updatePageField={updatePageField}
             saveEdits={saveEdits}
+            downloadMpixJpgZip={downloadMpixJpgZip}
             downloadMpixPdf={downloadMpixPdf}
             approveAndDownload={approveAndDownload}
             regeneratePage={regeneratePage}
@@ -1078,10 +1127,12 @@ function BookFlipPreview({
   saving,
   approving,
   pdfLoading,
+  zipLoading,
   narrating,
   requestingMovie,
   updatePageField,
   saveEdits,
+  downloadMpixJpgZip,
   downloadMpixPdf,
   approveAndDownload,
   regeneratePage,
@@ -1098,10 +1149,12 @@ function BookFlipPreview({
   saving: boolean;
   approving: boolean;
   pdfLoading: boolean;
+  zipLoading: boolean;
   narrating: boolean;
   requestingMovie: boolean;
   updatePageField: (index: number, field: "title" | "text", value: string) => void;
   saveEdits: () => void;
+  downloadMpixJpgZip: () => void;
   downloadMpixPdf: () => void;
   approveAndDownload: () => void;
   regeneratePage: (pageIdx: number) => void;
@@ -1216,19 +1269,34 @@ function BookFlipPreview({
             </button>
           )}
           {(book.status === "ready" || book.status === "approved") && (
-            <button
-              type="button"
-              onClick={downloadMpixPdf}
-              disabled={pdfLoading}
-              className="inline-flex h-10 items-center gap-1.5 rounded-md border-2 border-royal-gold bg-royal-blue px-4 text-sm font-semibold text-royal-gold hover:bg-royal-blue/80 disabled:opacity-50 transition-colors"
-            >
-              {pdfLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Download className="h-4 w-4" />
-              )}
-              Download Mpix PDF
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={downloadMpixJpgZip}
+                disabled={zipLoading}
+                className="inline-flex h-10 items-center gap-1.5 rounded-md border-2 border-emerald-600 bg-emerald-700 px-4 text-sm font-semibold text-white hover:bg-emerald-800 disabled:opacity-50 transition-colors"
+              >
+                {zipLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Download className="h-4 w-4" />
+                )}
+                Download Mpix JPG Zip
+              </button>
+              <button
+                type="button"
+                onClick={downloadMpixPdf}
+                disabled={pdfLoading}
+                className="inline-flex h-10 items-center gap-1.5 rounded-md border-2 border-royal-gold bg-royal-blue px-4 text-sm font-semibold text-royal-gold hover:bg-royal-blue/80 disabled:opacity-50 transition-colors"
+              >
+                {pdfLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Download className="h-4 w-4" />
+                )}
+                Download Mpix PDF
+              </button>
+            </>
           )}
           <button
             type="button"

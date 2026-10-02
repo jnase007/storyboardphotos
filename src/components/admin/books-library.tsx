@@ -170,6 +170,48 @@ export function BooksLibrary() {
     }
   }
 
+  async function downloadMpixJpgZip(book: StorybookRecord) {
+    if (!book.pages?.length) {
+      toast.error("No pages on this book — open generator and save art first");
+      return;
+    }
+    setDownloading(`${book.id}-zip`);
+    try {
+      const res = await fetch("/api/admin/storybooks/build-pdf", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-code": ADMIN_CODE,
+        },
+        body: JSON.stringify({
+          bookTitle: `${book.child_name}'s Kingdom Chronicles`,
+          childName: book.child_name,
+          pages: book.pages,
+          coverImageUrl: book.pages[0]?.imageUrl,
+        }),
+      });
+      if (!res.ok) throw new Error("PDF generation failed");
+      const pdfBlob = await res.blob();
+      const { pdfBlobToMpixJpgZip, triggerBlobDownload } = await import(
+        "@/lib/storybook/mpix-jpg-zip"
+      );
+      const zipBlob = await pdfBlobToMpixJpgZip(
+        pdfBlob,
+        book.child_name.replace(/\s+/g, "-")
+      );
+      triggerBlobDownload(
+        zipBlob,
+        `${book.child_name.replace(/\s+/g, "-")}-Mpix-8x8-JPGs.zip`
+      );
+      toast.success("Mpix JPG zip ready — unzip, then upload to 8×8 book");
+    } catch (err) {
+      console.error(err);
+      toast.error(err instanceof Error ? err.message : "Mpix JPG zip failed");
+    } finally {
+      setDownloading(null);
+    }
+  }
+
   const statusColors: Record<string, string> = {
     pending: "bg-amber-100 text-amber-700",
     draft: "bg-gray-100 text-gray-600",
@@ -339,6 +381,18 @@ export function BooksLibrary() {
                     title="Copy share link"
                   >
                     <Share2 className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => downloadMpixJpgZip(book)}
+                    disabled={downloading === `${book.id}-zip` || !book.pages?.length}
+                    className="p-2 rounded-lg hover:bg-emerald-50 text-emerald-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    title={book.pages?.length ? "Download Mpix JPG Zip (8×8 pages)" : "No pages yet"}
+                  >
+                    {downloading === `${book.id}-zip` ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <span className="text-[10px] font-bold leading-none">ZIP</span>
+                    )}
                   </button>
                   <button
                     onClick={() => downloadPdf(book)}
