@@ -57,7 +57,7 @@ export const STORYBOOK_IMAGE_ASPECT = "4:3" as const;
  * classic fairytale children's book, NOT bare uncolored line art.
  */
 const STYLE_SUFFIX =
-  "ONE single full-bleed 4:3 landscape watercolor children's storybook illustration only — not a diptych, not two panels, not a double-page spread, not split screen, not collage. FILL THE ENTIRE CANVAS edge-to-edge with the scene (background, sky, forest, castle continue to all four edges). NO decorative vine border, NO floral frame, NO oval matte, NO white or cream margins inside the image, NO picture-frame border. Whimsical watercolor, soft sepia ink outlines with gentle hand-drawn line variation, soft pastel watercolor washes (sage green, dusty lavender, peach, powder blue, warm gold), cream textured watercolor paper only as the painted ground not as empty side bars, cute storybook character proportions with big FULL DETAILED expressive eyes (visible whites, colored iris, dark pupil, soft lashes — NEVER simple black-dot eyes), atmospheric depth, warm golden sunlight and gentle wonder of creation, soft dust motes in sunbeams, premium faith-friendly fairytale picture-book quality (Narnia warmth not occult), NO magic wands, NO glowing staffs, NO scepters with energy beams, NO spell casting, NO witches, NO wizards, NO fairies casting spells, NO glowing runes, NO sorcery props, child may hold a simple lantern or flowers only, consistent character across pages, FULL FIGURE hero visible with headroom above crown and feet still in frame, never crop head face crown hands or feet, no photorealism, no real photographs, no 3D render, no harsh pure-black vector lines, no empty uncolored coloring-page look, no muddy gray, no text, no letters, no watermark, no logo, no signature";
+  "ONE single full-bleed 4:3 landscape watercolor children's storybook illustration only — not a diptych, not two panels, not a double-page spread, not split screen, not collage. FILL THE ENTIRE CANVAS edge-to-edge with the scene (background, sky, and scene landscape continue to all four edges). NO decorative vine border, NO floral frame, NO oval matte, NO white or cream margins inside the image, NO picture-frame border. Whimsical watercolor, soft sepia ink outlines with gentle hand-drawn line variation, soft pastel watercolor washes (sage green, dusty lavender, peach, powder blue, warm gold), cream textured watercolor paper only as the painted ground not as empty side bars, cute storybook character proportions with big FULL DETAILED expressive eyes (visible whites, colored iris, dark pupil, soft lashes — NEVER simple black-dot eyes), atmospheric depth, warm golden sunlight and gentle wonder of creation, soft dust motes in sunbeams, premium faith-friendly fairytale picture-book quality (Narnia warmth not occult), NO magic wands, NO glowing staffs, NO scepters with energy beams, NO spell casting, NO witches, NO wizards, NO fairies casting spells, NO glowing runes, NO sorcery props, child may hold a simple lantern or flowers only, consistent character across pages, FULL FIGURE hero visible with headroom above crown and feet still in frame, never crop head face crown hands or feet, no photorealism, no real photographs, no 3D render, no harsh pure-black vector lines, no empty uncolored coloring-page look, no muddy gray, no text, no letters, no watermark, no logo, no signature";
 
 /**
  * Face + eye lock for the whole book.
@@ -213,11 +213,7 @@ async function generateWithPulid(options: {
       },
       body: JSON.stringify({
         prompt: `${options.prompt}. ${STYLE_SUFFIX}. The child in the scene should look exactly like the reference photo — same face, features, and likeness.`,
-        reference_images: [
-          {
-            image_url: options.characterPhotoUrl,
-          },
-        ],
+        reference_image_url: options.characterPhotoUrl,
         num_inference_steps: 30,
         guidance_scale: 4.5,
         image_size: "landscape_4_3",
@@ -294,10 +290,35 @@ async function generateWithImagen4(prompt: string): Promise<FluxResult> {
   return fallbackPlaceholder(prompt);
 }
 
-function fallbackPlaceholder(_prompt: string): FluxResult {
-  // Use a generic kingdom placeholder instead of showing the prompt text
+function fallbackPlaceholder(
+  _prompt: string,
+  opts?: { questId?: string | null; staticScene?: string | null; pageIndex?: number }
+): FluxResult {
+  // NEVER stamp the same dragon castle on every page (root cause of River 2026-10-02 bad book).
+  const q = (opts?.questId || "").toLowerCase().trim();
+  const staticKey = (opts?.staticScene || "").trim();
+  if (staticKey && STATIC_SCENES[staticKey]) {
+    return { imageUrl: STATIC_SCENES[staticKey], provider: "placeholder" };
+  }
+  // Quest-specific rotating static scenes when generation fails
+  const questKeys = Object.keys(STATIC_SCENES).filter(
+    (k) => k.startsWith(q + "/") || (q && k.includes(q))
+  );
+  if (questKeys.length) {
+    const i = Math.max(0, opts?.pageIndex ?? 0) % questKeys.length;
+    return { imageUrl: STATIC_SCENES[questKeys[i]], provider: "placeholder" };
+  }
+  // Forest-fire / forest-guardian defaults (not dragon castle)
+  const forestKeys = Object.keys(STATIC_SCENES).filter((k) => k.startsWith("forest-guardian/"));
+  if (forestKeys.length && (q.includes("forest") || /fire|smoke|animal/.test(_prompt.toLowerCase()))) {
+    const i = Math.max(0, opts?.pageIndex ?? 0) % forestKeys.length;
+    return { imageUrl: STATIC_SCENES[forestKeys[i]], provider: "placeholder" };
+  }
+  // Last resort: rotate ALL static scenes so pages never share one castle still
+  const all = Object.keys(STATIC_SCENES);
+  const i = Math.max(0, opts?.pageIndex ?? 0) % Math.max(1, all.length);
   return {
-    imageUrl: `https://cpnnztrqgbxledbikpqt.supabase.co/storage/v1/object/public/story-scenes/dragon-slayer/title.jpg`,
+    imageUrl: STATIC_SCENES[all[i]] || STATIC_SCENES["forest-guardian/title"] || STATIC_SCENES["kingdom-map"],
     provider: "placeholder",
   };
 }
@@ -424,6 +445,27 @@ RULES:
 }
 
 
+/** Fetch http(s) or data: image into base64 (no data: prefix). */
+async function resolvePhotoBase64(photoUrl: string | null | undefined): Promise<string | null> {
+  if (!photoUrl) return null;
+  if (photoUrl.startsWith("data:image")) {
+    const b64 = photoUrl.split(",")[1];
+    return b64 || null;
+  }
+  if (!/^https?:\/\//i.test(photoUrl)) return null;
+  try {
+    const res = await fetch(photoUrl);
+    if (!res.ok) return null;
+    const buf = Buffer.from(await res.arrayBuffer());
+    // Cap ~4MB for Gemini/PuLID
+    if (buf.length > 4_500_000) return null;
+    return buf.toString("base64");
+  } catch (err) {
+    console.warn("resolvePhotoBase64 failed:", err);
+    return null;
+  }
+}
+
 export async function generateStoryIllustration(options: {
   prompt: string;
   referenceImageUrl?: string | null;
@@ -431,28 +473,57 @@ export async function generateStoryIllustration(options: {
   gender?: string | null;
   /** Adventure path id — pulls locked cast (dragon, King, friends, etc.) */
   questId?: string | null;
+  /** Page index for unique fallback art */
+  pageIndex?: number;
+  /** Optional static scene key from adventure script */
+  staticScene?: string | null;
 }): Promise<FluxResult> {
-  const hasPhoto = Boolean(options.characterPhotoUrl?.startsWith("data:image"));
-  const wardrobe = lockedHeroWardrobe(options.gender, { fromPhoto: hasPhoto });
+  const photoUrl = options.characterPhotoUrl || null;
+  const hasAnyPhoto = Boolean(photoUrl);
+  const wardrobe = lockedHeroWardrobe(options.gender, { fromPhoto: hasAnyPhoto });
   const faceLock = lockedHeroFace();
   const castLock = lockedCastForPage({
     questId: options.questId,
     sceneText: options.prompt,
   });
   const promptWithLocks = `${options.prompt}. ${faceLock}. ${wardrobe}. ${castLock}`;
-  // If character portrait provided as base64, use Gemini to place them in the scene
-  if (hasPhoto && options.characterPhotoUrl) {
-    const b64 = options.characterPhotoUrl.split(",")[1];
-    if (b64) {
-      return generateWithCharacterPortrait({
-        prompt: promptWithLocks,
-        characterPhotoB64: b64,
-        gender: options.gender,
-      });
-    }
+  const fb = () =>
+    fallbackPlaceholder(promptWithLocks, {
+      questId: options.questId,
+      staticScene: options.staticScene,
+      pageIndex: options.pageIndex,
+    });
+
+  // 1) HTTPS face photo → flux-pulid (best likeness when URL is public)
+  if (photoUrl && /^https?:\/\//i.test(photoUrl)) {
+    const pulid = await generateWithPulid({
+      prompt: promptWithLocks,
+      characterPhotoUrl: photoUrl,
+    });
+    if (pulid.provider !== "placeholder") return pulid;
   }
-  // Otherwise generate a background scene with Imagen 4.0
-  return generateWithImagen4(promptWithLocks);
+
+  // 2) data: or downloaded photo → Gemini character scene
+  const b64 = await resolvePhotoBase64(photoUrl);
+  if (b64) {
+    const gem = await generateWithCharacterPortrait({
+      prompt: promptWithLocks,
+      characterPhotoB64: b64,
+      gender: options.gender,
+    });
+    if (gem.provider !== "placeholder") return gem;
+  }
+
+  // 3) Imagen 4 (no face lock, still better than castle stamp)
+  const imagen = await generateWithImagen4(promptWithLocks);
+  if (imagen.provider !== "placeholder") return imagen;
+
+  // 4) Fal Flux Dev — real unique art (never stamp one castle placeholder)
+  const flux = await generateWithFluxDev(promptWithLocks);
+  if (flux.provider !== "placeholder") return flux;
+
+  // 5) Quest-specific rotating static scenes only as last resort
+  return fb();
 }
 
 const SET_NAME_TO_ID: Record<Exclude<KingdomSet, null>, keyof PhotosBySet> = {
@@ -477,25 +548,47 @@ export async function illustrateStoryPages(options: {
   gender?: string | null;
   /** Adventure path id for IP cast locks (dragon, King, friends…) */
   questId?: string | null;
+  /** When true, ignore existing imageUrl and regenerate every page */
+  force?: boolean;
 }): Promise<StoryPage[]> {
-  const { pages, characterPhoto, gender, questId } = options;
+  const { pages, characterPhoto, gender, questId, force } = options;
   // Product rule: book + movie are 100% illustrated watercolor storybook art (no real session photos).
   // Real session photos are NEVER placed in pages. Face upload = likeness + wardrobe reference only.
   const result: StoryPage[] = [];
   const usedSceneKeys: string[] = [];
+  const usedImageUrls = new Set<string>();
   const hasPhoto = Boolean(characterPhoto);
   const wardrobe = lockedHeroWardrobe(gender, { fromPhoto: hasPhoto });
   const faceLock = lockedHeroFace();
+  const PLACEHOLDER_CASTLE =
+    "story-scenes/dragon-slayer/title.jpg";
 
   for (let index = 0; index < pages.length; index++) {
     const page = pages[index];
-    if (page.imageUrl && !looksLikeRealPhotoUrl(page.imageUrl)) {
+    const existing = page.imageUrl || "";
+    const isBadPlaceholder =
+      existing.includes(PLACEHOLDER_CASTLE) ||
+      (existing && usedImageUrls.has(existing));
+    if (
+      !force &&
+      existing &&
+      !looksLikeRealPhotoUrl(existing) &&
+      !isBadPlaceholder
+    ) {
       result.push(page);
       usedSceneKeys.push(sceneKey(page));
+      usedImageUrls.add(existing);
       continue;
     }
 
-    const uniqueness = uniqueSceneDirective(page, index, pages, usedSceneKeys, hasPhoto);
+    const uniqueness = uniqueSceneDirective(
+      page,
+      index,
+      pages,
+      usedSceneKeys,
+      hasPhoto,
+      questId
+    );
     const sceneHint = page.imagePrompt ?? page.title;
     const castLock = lockedCastForPage({
       questId,
@@ -503,21 +596,43 @@ export async function illustrateStoryPages(options: {
     });
     const prompt = `${sceneHint}. ${faceLock}. ${wardrobe}. ${castLock}. ${uniqueness}. ${STYLE_SUFFIX}. Full-bleed 4:3 children's watercolor storybook illustration for an 8.25 inch square printed book image band. CRITICAL: edge-to-edge scene, no vine frame, no side white space. Show the complete child hero from head to toe with headroom above the crown — never cut off the head. SAME face, SAME full detailed eyes, SAME outfit as every other page. SAME locked cast (dragon/King/friends) design every page. NO glowing staff, NO wand, NO scepter beam, NO spell props.`;
 
-    const art = await generateStoryIllustration({
+    let art = await generateStoryIllustration({
       prompt,
       characterPhotoUrl: characterPhoto ?? null,
       gender,
       questId,
+      pageIndex: index,
+      staticScene: page.staticScene ?? null,
     });
+
+    // Hard rule: never reuse the same image URL on two pages
+    if (art.imageUrl && usedImageUrls.has(art.imageUrl)) {
+      console.warn("duplicate page art detected, retry page", index + 1);
+      art = await generateStoryIllustration({
+        prompt: `${prompt}. DIFFERENT background landmark and pose than any prior page. New camera angle.`,
+        characterPhotoUrl: characterPhoto ?? null,
+        gender,
+        questId,
+        pageIndex: index + 17,
+        staticScene: page.staticScene ?? null,
+      });
+    }
+    if (art.imageUrl && usedImageUrls.has(art.imageUrl)) {
+      art = fallbackPlaceholder(prompt, {
+        questId,
+        staticScene: page.staticScene,
+        pageIndex: index + 31,
+      });
+    }
 
     const next = {
       ...page,
-      // Never keep session photo flags on output pages
       useSessionPhoto: false,
       imageUrl: art.imageUrl,
     };
     result.push(next);
     usedSceneKeys.push(sceneKey(next));
+    if (next.imageUrl) usedImageUrls.add(next.imageUrl);
   }
 
   return result;
@@ -536,28 +651,49 @@ function uniqueSceneDirective(
   index: number,
   all: StoryPage[],
   used: string[],
-  fromPhoto = false
+  fromPhoto = false,
+  questId?: string | null
 ): string {
   const title = (page.title || "").toLowerCase();
+  const blob = `${page.title || ""} ${page.text || ""} ${page.imagePrompt || ""}`.toLowerCase();
   const prevTitles = all
     .slice(0, index)
     .map((p) => p.title)
     .filter(Boolean)
     .join(", ");
+  const q = (questId || "").toLowerCase();
+  const isForestFire =
+    q.includes("forest") ||
+    /fire|smoke|flame|creek|animal|ridge|woods/.test(blob);
 
-  const angleBank = [
-    "COMPOSITION A: wide establishing landscape, hero small-to-medium in lower third, deep forest path leading away",
-    "COMPOSITION B: medium full-body hero center stage, different background architecture or garden than any prior page",
-    "COMPOSITION C: three-quarter view hero walking toward a NEW landmark (bridge, gate, throne steps, garden arch) — not a copy of prior page",
-    "COMPOSITION D: intimate garden or courtyard beat with different props (flowers, map, lantern on a post — never a wand)",
-    "COMPOSITION E: elevated overlook / castle balcony / hill crest with kingdom vista behind hero",
-    "COMPOSITION F: nighttime-soft or golden-hour return scene with warm windows and celebration energy",
-    "COMPOSITION G: quiet ending vignette at a window or tower with calm sky — unique from action pages",
-  ];
+  const angleBank = isForestFire
+    ? [
+        "COMPOSITION A: wide smoky forest path, hero small-to-medium, orange glow between trees — NO castle tower",
+        "COMPOSITION B: medium full-body hero on forest edge with scared animals — NO castle, NO throne room",
+        "COMPOSITION C: hero running through sparks and fallen branches in living forest — NO stone tower",
+        "COMPOSITION D: creek bend rescue — fox under log, fawn, birds — fire glow only in background trees",
+        "COMPOSITION E: uphill rocky trail through trees leading animals to higher ground — forest only",
+        "COMPOSITION F: high hill ridge overlooking creek and distant fire glow — open sky, NO castle",
+        "COMPOSITION G: soft rain after fire on ridge with grateful animals — calm woods, NO tower",
+        "COMPOSITION H: return through safe woods / village edge celebration — still no castle keep as main subject",
+      ]
+    : [
+        "COMPOSITION A: wide establishing landscape, hero small-to-medium in lower third, deep forest path leading away",
+        "COMPOSITION B: medium full-body hero center stage, different background architecture or garden than any prior page",
+        "COMPOSITION C: three-quarter view hero walking toward a NEW landmark (bridge, gate, garden arch) — not a copy of prior page",
+        "COMPOSITION D: intimate garden or courtyard beat with different props (flowers, map, lantern on a post — never a wand)",
+        "COMPOSITION E: elevated overlook / hill crest with kingdom vista behind hero",
+        "COMPOSITION F: nighttime-soft or golden-hour return scene with warm windows and celebration energy",
+        "COMPOSITION G: quiet ending vignette with calm sky — unique from action pages",
+      ];
   const angle = angleBank[index % angleBank.length];
 
   let beat = "unique story beat";
-  if (index === 0 || title.includes("title")) {
+  if (isForestFire) {
+    beat =
+      "FIRE IN THE LIVING FOREST page: stay in living forest / smoke / creek / ridge / animals. " +
+      "FORBIDDEN as main subject: stone castle tower, turret keep, throne room marble. Small distant kingdom silhouette OK only if tiny.";
+  } else if (index === 0 || title.includes("title")) {
     beat =
       "COVER/OPENING PORTRAIT ONLY: hero facing viewer in a simple royal portrait setting (soft throne or garden arch). Do NOT reuse the deep lantern-forest action composition from later pages.";
   } else if (title.includes("call")) {
@@ -566,13 +702,13 @@ function uniqueSceneDirective(
   } else if (title.includes("throne")) {
     beat = "THRONE ROOM interior: marble, banners, throne — clearly indoor castle architecture";
   } else if (title.includes("forest")) {
-    beat = "ROYAL FOREST path scene with lanterns and trees — only if this page is the forest chapter";
+    beat = "LIVING FOREST path scene with trees and story action — not a stone castle tower";
   } else if (title.includes("garden")) {
     beat = "ROYAL GARDEN with roses and open sky — not forest canopy";
   } else if (title.includes("courage") || title.includes("chastle") || title.includes("quest")) {
     beat = "COURAGE QUEST stone overlook / bridge landmark — not forest and not garden";
-  } else if (title.includes("return") || title.includes("rejoice") || title.includes("end")) {
-    beat = "RETURN/ENDING castle gates or quiet night window — distinct from opening portrait";
+  } else if (title.includes("return") || title.includes("rejoice") || title.includes("end") || title.includes("keeper")) {
+    beat = "RETURN/ENDING celebration or quiet safe place — distinct from opening portrait";
   }
 
   return [

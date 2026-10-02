@@ -235,7 +235,7 @@ def mark_claimed_on_site(book_id, pid):
             book_id,
             {
                 "video_status": "in_production",
-                "video_package": "standard:full",
+                "video_package": "full",
                 "video_notes": notes[:1900],
             },
         )

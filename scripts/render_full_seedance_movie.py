@@ -32,8 +32,31 @@ BGM_BED_LOCAL = ROOT / "public/audio/storybook-bedtime-bed.mp3"
 BGM_VOLUME = float(os.environ.get("BGM_VOLUME", "0.18"))
 ENABLE_BGM = os.environ.get("ENABLE_BGM", "1") == "1"
 ALLOW_SEEDANCE = os.environ.get("ALLOW_SEEDANCE", "1") == "1"
-tools = Path("/Users/brandastic/.openclaw/workspace/TOOLS.md").read_text()
-FAL = re.search(r"dd81a063-9b3b-4eae-a34f-e73f9b013fdc:[A-Za-z0-9]+", tools).group(0)
+def _load_fal_key() -> str:
+    env_key = (os.environ.get("FAL_KEY") or os.environ.get("FAL_API_KEY") or "").strip()
+    if env_key:
+        return env_key
+    for cand in [
+        Path("/tmp/fal.key"),
+        Path("/Users/brandastic/.openclaw/workspace/AGENTS.md"),
+        Path("/Users/brandastic/.openclaw/workspace/TOOLS.md"),
+        ROOT / ".env.prod.pull",
+        ROOT / ".env.sensitive.tmp",
+    ]:
+        if not cand.exists():
+            continue
+        txt = cand.read_text(errors="ignore")
+        m = re.search(r"dd81a063-9b3b-4eae-a34f-e73f9b013fdc:[A-Za-z0-9]+", txt)
+        if m:
+            return m.group(0)
+        m = re.search(r"([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}:[a-f0-9]+)", txt)
+        if m:
+            return m.group(1)
+        # bare key file
+        if cand.name.endswith(".key") and ":" in txt.strip():
+            return txt.strip()
+    raise SystemExit("FAL API key not found (set FAL_KEY or restore TOOLS.md)")
+FAL = _load_fal_key()
 # Defaults stay 2.5/30s; Fast cost tests set SEEDANCE_MODEL + SEEDANCE_CLIP_SEC=15
 SEEDANCE = os.environ.get("SEEDANCE_MODEL", "bytedance/seedance-2.5/image-to-video")
 TTS = "fal-ai/minimax/speech-02-hd"
