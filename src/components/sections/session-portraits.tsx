@@ -10,6 +10,10 @@ export const SESSION_PORTRAITS = [
     alt: "Child in a white gown looking toward a kingdom castle backdrop",
   },
   {
+    src: "/brand/pro-session-gallery/princess-set-12.jpg",
+    alt: "Girl in a cream lace gown and gold tiara smiling on the kingdom set",
+  },
+  {
     src: "/brand/pro-session-gallery/princess-set-08.jpg",
     alt: "Child in royal costume on the kingdom set during a Storybook Photos session",
   },
@@ -18,12 +22,20 @@ export const SESSION_PORTRAITS = [
     alt: "Child kneeling by a treasure chest with rabbits on the moss",
   },
   {
+    src: "/brand/pro-session-gallery/princess-set-13.jpg",
+    alt: "Girl in cream lace gown reaching into a treasure chest for a tiara",
+  },
+  {
     src: "/brand/pro-session-gallery/princess-set-09.jpg",
     alt: "Portrait from a Storybook Photos kingdom session in Costa Mesa",
   },
   {
     src: "/brand/pro-session-gallery/princess-set-03.jpg",
     alt: "Child twirling a white tulle dress under cherry blossoms",
+  },
+  {
+    src: "/brand/pro-session-gallery/princess-set-14.jpg",
+    alt: "Girl in cream lace gown and jeweled crown smiling toward the light",
   },
   {
     src: "/brand/pro-session-gallery/princess-set-10.jpg",
