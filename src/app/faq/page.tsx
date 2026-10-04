@@ -8,6 +8,7 @@ import {
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildMetadata({
+  absoluteTitle: true,
   title: "FAQ — Storybook Photos Kids Sessions & Storybooks",
   description:
     "Frequently asked questions about Storybook Photos in Costa Mesa — ages, session length, Kingdom Chronicles storybooks, packages, and studio location.",

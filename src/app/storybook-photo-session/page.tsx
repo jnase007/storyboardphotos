@@ -56,6 +56,7 @@ const content: LocalLandingContent = {
 };
 
 export const metadata: Metadata = buildMetadata({
+  absoluteTitle: true,
   title: "Storybook Photo Session | Personalized Kids Storybooks",
   description:
     "Book a storybook photo session in Costa Mesa. Kingdom sets, royal costumes, and personalized hardcover storybooks that cast your child as the hero. Packages from $299.",

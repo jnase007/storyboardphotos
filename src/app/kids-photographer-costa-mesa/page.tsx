@@ -57,6 +57,7 @@ const content: LocalLandingContent = {
 };
 
 export const metadata: Metadata = buildMetadata({
+  absoluteTitle: true,
   title: "Kids Photographer Costa Mesa | Kingdom Photo Studio",
   description:
     "Kids photographer in Costa Mesa offering kingdom-themed portrait sessions and personalized storybooks. Immersive sets, ages 2–12, packages from $299 at Storybook Photos.",

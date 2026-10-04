@@ -60,6 +60,7 @@ export const metadata: Metadata = buildMetadata({
   description:
     "Children photography in Orange County with kingdom-themed studio sessions and personalized storybooks. Based in Costa Mesa. Packages from $299 at Storybook Photos.",
   path: "/children-photography-orange-county",
+  absoluteTitle: true,
   keywords: [
     "children photography Orange County",
     "kids photographer Orange County",
