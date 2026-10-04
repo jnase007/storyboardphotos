@@ -16,7 +16,7 @@ function JsonLdScript({ id, data }: { id: string; data: JsonLd | JsonLd[] }) {
 const localBusiness: JsonLd = {
   "@context": "https://schema.org",
   "@type": ["LocalBusiness", "ProfessionalService"],
-  "@id": `${SITE.url}/#business`,
+"@id": `${SITE.url}/#business`,
   name: `${SITE.name} — ${SITE.subtitle}`,
   alternateName: ["Storybook Photos", "Kings & Queens Photo Studio"],
   description: SITE.description,
@@ -24,8 +24,8 @@ const localBusiness: JsonLd = {
   email: SITE.email,
   telephone: SITE.phone,
   image: [
-    absoluteUrl("/og-image.jpg"),
-    absoluteUrl("/hero-kingdom.jpg"),
+    absoluteUrl("/og-storefront-2026.jpg"),
+    absoluteUrl("/brand-storefront.jpg"),
     absoluteUrl("/storybook-cover.webp"),
   ],
   logo: absoluteUrl("/favicon.svg"),

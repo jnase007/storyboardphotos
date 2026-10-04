@@ -76,9 +76,8 @@ export function HeroSection() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={HERO_BACKDROP}
-          alt=""
+          alt="Storybook Photos storefront in Costa Mesa, Orange County"
           className="absolute inset-0 h-full w-full object-cover object-center opacity-35"
-          aria-hidden="true"
         />
       </div>
 
@@ -110,9 +109,8 @@ export function HeroSection() {
             </h1>
 
             <p className="text-lg text-royal-cream/90 max-w-lg mb-8 leading-relaxed drop-shadow">
-              Kingdom-themed photo shoots and Kingdom Chronicles that help
-              kids feel brave, beloved, and full of wonder — an enchanted
-              adventure they'll never forget.
+              Kingdom photo sessions and personalized storybooks — an
+              enchanted adventure your family will keep forever.
             </p>
 
             <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4">
